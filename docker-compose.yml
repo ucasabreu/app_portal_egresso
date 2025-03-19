@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  postgres-db: 
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=egressosdb
+      - POSTGRES_USER=egresso_owner
+      - POSTGRES_PASSWORD=r4MxdsKSH8eV
+  
+  spring-app:
+    image: backend-egressos:latest
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/egressosdb
+    depends_on:
+      - postgres-db
+  
+  spa-app:
+    buid:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "9090:9090"
+    depends_on:
+      - spring-app
