@@ -1,0 +1,68 @@
+.card-container {
+    display: flex; /* Alinha imagem e descrição horizontalmente */
+    gap: 20px; /* Espaçamento entre imagem e descrição */
+    width: 100%;
+    background-color: var(--white);
+    box-shadow: 2px rgba(0, 0, 0, 0.1);
+    margin-bottom: 12px;
+    height: 400px; /* Altura fixa para o card */
+    padding: 50px; /* Adiciona um pouco de espaço ao redor */
+    justify-content: space-between; /* Espaça os itens ao longo do container */
+}
+
+.img-container {
+    width: 300px; /* Tamanho fixo para a imagem */
+    height: 300px; /* Tamanho fixo para a altura da imagem */
+    object-fit: cover; /* Garante que a imagem se ajuste corretamente sem distorção */
+    border-radius: 8px; /* Opcional, para arredondar os cantos da imagem */
+    align-self: center; /* Alinha a imagem ao centro verticalmente */
+    
+}
+
+.description {
+    display: flex;
+    flex-direction: column; /* Organiza o título e o texto verticalmente */
+    margin-top: 0;
+    align-self: center; /* Alinha a descrição ao início (topo) */
+    margin-left: 10px;
+}
+
+.title-card {
+    font-size: 40px;
+    margin-bottom: 10px; /* Espaçamento entre o título e o texto */
+}
+
+.text {
+    font-size: 20px;
+    margin-bottom: 20px; /* Espaçamento entre o texto e os ícones */
+    
+}
+
+.itens {
+    display: flex;
+    gap: 10px; /* Espaçamento entre os itens */
+}
+
+.bottom{
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--blue);
+    border: 0;
+    gap: 10px;
+    color: var(--white);
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 30px;
+    line-height: 24px;
+    border-radius: 30px;
+    cursor: pointer; 
+    margin-left: auto; /* Move o botão para a direita */
+    
+    &:hover  {
+        color:rgb(243, 106, 106); /* Cor ao passar o mouse */
+    }
+
+    &:hover .icon {
+        filter: brightness(0) saturate(100%) invert(55%) sepia(20%) saturate(1600%) hue-rotate(320deg) brightness(95%) contrast(90%);
+    }
+}

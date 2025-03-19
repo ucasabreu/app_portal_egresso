@@ -1,0 +1,14 @@
+/* Rodapé */
+.container_footer{
+    footer {
+        margin-top: auto;
+        padding: 10px;
+        width: 100%;
+        text-align: center;
+        background-color: #0077b6;
+        color: white;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+}
+

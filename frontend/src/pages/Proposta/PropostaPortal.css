@@ -1,0 +1,114 @@
+/* Estilos gerais */
+.proposta-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.proposta-header {
+    background-color: #0077b6;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.proposta-header h1 {
+    margin: 0;
+    font-size: 2.5em;
+}
+
+/* Seção de conteúdo */
+.proposta-content {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.proposta-content h2 {
+    color: #004080;
+}
+
+.proposta-content p {
+    font-size: 1.2em;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Estilo padrão para imagens */
+.proposta-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+/* Melhorias na seção de conteúdo */
+.info-box {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.info-box:hover {
+    transform: scale(1.05);
+}
+
+.info-box h2 {
+    margin-top: 15px;
+    font-size: 1.5em;
+    color: #004080;
+}
+
+.info-box p {
+    font-size: 1.1em;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Botão de chamada para ação */
+.proposta-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    background-color: #004080;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    text-decoration: none;
+}
+
+.proposta-btn:hover {
+    background-color:#0077b6;
+}
+
+/* Melhorias no botão de chamada para ação */
+.portal-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    background-color:var(--blue);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+    text-decoration: none;
+}
+
+.portal-button:hover {
+    background-color: var(--blue);
+    transform: scale(1.1);
+}

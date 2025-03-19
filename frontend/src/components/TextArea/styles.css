@@ -1,0 +1,15 @@
+.container-textarea{
+    height: 50px;
+    padding: 8px 15px;
+    
+    width: 100%;
+    color: var(--secondary);
+    letter-spacing: 0.1px;
+    font-size: 0.938rem;
+    margin-bottom: 10px;
+    outline: none;
+   
+    border:1px solid #d1d5db;
+    border-radius: 3px;
+    resize: both;
+}

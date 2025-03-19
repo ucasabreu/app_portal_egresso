@@ -1,0 +1,85 @@
+/* Configuração geral */
+.page-egressos {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Cabeçalho */
+.header {
+    background-color: #0077b6;
+    color: white;
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.search-input {
+    width: 80%;
+    max-width: 400px;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+/* Container dos egressos */
+.container-central {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    width: 90%;
+    max-width: 1200px;
+}
+
+/* Cartão do egresso */
+.egresso-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 180px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.egresso-card:hover {
+    transform: scale(1.05);
+}
+
+.egresso-foto {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.egresso-nome {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Mensagem de nenhum resultado */
+.no-results {
+    font-size: 18px;
+    color: #888;
+}
+
+/* Mensagem de erro */
+.error {
+    color: rgb(224, 68, 68);
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+

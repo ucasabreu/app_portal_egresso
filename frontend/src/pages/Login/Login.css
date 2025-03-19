@@ -1,0 +1,72 @@
+/* Fundo da página de login */
+.container_login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Ocupa toda a altura da tela */
+    background: linear-gradient(135deg, #f0f0f5, #d9e4ea);
+}
+
+/* Estilização do cartão de login */
+.login {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Formulário de login */
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Campos de entrada */
+.login-form input,
+.login-form select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    margin-top: 10px;
+}
+
+/* Botão de login/cadastro */
+.login-form button {
+    background: #007bff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s ease;
+    margin-top: 15px;
+}
+
+/* Efeito no botão ao passar o mouse */
+.login-form button:hover {
+    background: #0056b3;
+}
+
+/* Mensagem de erro */
+.error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
+/* Link para alternar entre login e cadastro */
+.toggle-text {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: #007bff;
+}
+
+.toggle-text:hover {
+    text-decoration: underline;
+}
