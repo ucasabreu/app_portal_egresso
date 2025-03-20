@@ -7,6 +7,9 @@ WORKDIR /app
 # Copia todos os arquivos do projeto para o contêiner
 COPY . .
 
+# Garante que o Maven Wrapper tenha permissões de execução
+RUN chmod +x ./mvnw
+
 # Executa o Maven Wrapper para construir o projeto
 RUN ./mvnw clean package
 
@@ -15,4 +18,3 @@ EXPOSE 8080
 
 # Define o comando de entrada para executar a aplicação
 ENTRYPOINT ["java", "-jar", "target/backend-0.0.1-SNAPSHOT.jar"]
-

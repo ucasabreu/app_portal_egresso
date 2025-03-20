@@ -7,8 +7,8 @@ services:
       - "5432:5432"
     environment:
       - POSTGRES_DB=egressosdb
-      - POSTGRES_USER=egresso_owner
-      - POSTGRES_PASSWORD=r4MxdsKSH8eV
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=ucasdatabase
   
   spring-app:
     image: backend-egressos:latest
@@ -20,7 +20,7 @@ services:
       - postgres-db
   
   spa-app:
-    buid:
+    build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
