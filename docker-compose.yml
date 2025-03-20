@@ -10,9 +10,10 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ucasdarabase
-    restart: always
     volumes:
         - ./backend/src/main/resources/database:/docker-entrypoint-initdb.d
+    restart: always
+   
 
   
   spring-app:

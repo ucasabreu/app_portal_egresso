@@ -24,9 +24,9 @@ public class EgressoRepositorioTest {
                         .nome("lucas")
                         .descricao("novadescricao")
                         .foto("novafoto")
-                        .email("meuemail.com")
-                        .linkedin("linkparalinkedin")
-                        .instagram("linkparainstagram")
+                        .email("lucas.abreu@gmail.com")
+                        .linkedin("https://linkedin.com/in/lucasabreu")
+                        .instagram("https://instagram.com/lucasabreu")
                         .curriculo("meucurriculo")
                         .build();
 

@@ -1,10 +1,12 @@
+#!/bin/bash
+
 docker-compose down
 
-#build backend image
+# Build backend image
 docker build -t backend-egressos:latest ./backend
 
-#build frontend image
+# Build frontend image
 docker build -t frontend-egressos:latest ./frontend
 
-#start enviorment
-docker-compose up --build --force-recreate --remove-orphans
+# Start environment
+docker-compose up --build --force-recreate --remove-orphans -d
