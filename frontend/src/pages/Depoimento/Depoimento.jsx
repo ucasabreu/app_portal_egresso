@@ -4,7 +4,8 @@ import './Depoimento.css'; // Importa o arquivo CSS
 import Button from '../../components/Button/Button';
 import axios from 'axios'; // Importa axios para requisições HTTP
 
-const API_URL = 'http://localhost:8080'; // Define a URL base para a API
+const API_URL = "https://backend-seuprojeto.onrender.com";
+
 
 const Depoimento = () => {
     const [testimonials, setTestimonials] = useState([]); // Inicializa o estado para armazenar depoimentos

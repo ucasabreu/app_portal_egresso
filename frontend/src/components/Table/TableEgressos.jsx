@@ -4,7 +4,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../Table/Table.css";
 
-const API_URL = "http://localhost:8080";
+const API_URL = "https://backend-seuprojeto.onrender.com";
+
 
 const TableEgressos = () => {
   const [egressosData, setEgressosData] = useState([]);

@@ -3,7 +3,8 @@ import DataTable from "react-data-table-component";
 import axios from "axios";
 import "../Table/Table.css";
 
-const API_URL = "http://localhost:8080";
+const API_URL = "https://backend-seuprojeto.onrender.com";
+
 
 const TableCursos = () => {
   const [cursosData, setCursosData] = useState([]);

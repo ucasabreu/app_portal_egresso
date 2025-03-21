@@ -4,7 +4,8 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import "./Coordenador.css"; // Importação do CSS
 
-const API_URL = "http://localhost:8080";
+const API_URL = "https://backend-seuprojeto.onrender.com";
+
 
 const Coordenador = () => {
   const { id } = useParams();

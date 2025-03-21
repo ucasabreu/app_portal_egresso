@@ -6,7 +6,8 @@ import "../../pages/Egresso/styles.css";
 import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = "https://backend-seuprojeto.onrender.com";
+
 
 const EditEgresso = () => {
   const navigate = useNavigate();

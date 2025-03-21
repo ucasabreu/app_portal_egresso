@@ -3,7 +3,8 @@ import axios from "axios";
 import {useNavigate } from "react-router-dom"; // Import useHistory
 import "./EgressosPage.css";
 
-const API_URL = "http://localhost:8080";
+const API_URL = "https://backend-seuprojeto.onrender.com";
+
 
 const EgressosPage = () => {
     const [egressos, setEgressos] = useState([]);

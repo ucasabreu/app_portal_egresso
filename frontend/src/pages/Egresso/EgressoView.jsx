@@ -4,7 +4,8 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import "../../pages/Egresso/styles.css";
 
-const API_URL = 'http://localhost:8080';
+const API_URL = "https://backend-seuprojeto.onrender.com";
+
 
 const EgressoView = () => {
   const { id } = useParams();
