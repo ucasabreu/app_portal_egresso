@@ -3,7 +3,7 @@ import { FaEnvelope, FaLinkedin, FaInstagram, FaFileAlt } from 'react-icons/fa';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import "../../pages/Egresso/styles.css";
-import  { API_URL } from '../../config';
+import { API_URL } from '../../config/config.js';
 
 
 const Egresso = () => {

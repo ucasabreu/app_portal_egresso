@@ -3,7 +3,7 @@ import DataTable from "react-data-table-component";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import "./Coordenador.css"; // Importação do CSS
-import { API_URL } from "../../config";
+import { API_URL } from "../../config/config.js";
 
 
 const Coordenador = () => {

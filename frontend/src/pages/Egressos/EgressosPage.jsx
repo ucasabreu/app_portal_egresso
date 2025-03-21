@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {useNavigate } from "react-router-dom"; // Import useHistory
 import "./EgressosPage.css";
-import { API_URL } from "../../config";
+import { API_URL } from "../../config/config.js";
 
 
 const EgressosPage = () => {

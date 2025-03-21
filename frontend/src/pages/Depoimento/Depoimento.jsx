@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import './Depoimento.css'; // Importa o arquivo CSS
 import Button from '../../components/Button/Button';
 import axios from 'axios'; // Importa axios para requisições HTTP
-import { API_URL } from '../../config'; // Importa a URL base da API
+import { API_URL } from '../../config/config.js'; // Importa a URL base da API
 
 
 const Depoimento = () => {

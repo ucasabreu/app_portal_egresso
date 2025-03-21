@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Hook para redirecionamento
 import "./Login.css"; 
-import { API_URL } from "../../config";
+import { API_URL } from "../../config/config.js";
 
 
 const LoginCoordenador = () => {
