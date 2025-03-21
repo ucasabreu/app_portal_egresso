@@ -4,7 +4,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import "./CoordenadorGeral.css";
 
-const API_URL = "https://backend-seuprojeto.onrender.com";
+const API_URL = "https://backend-egressos.onrender.com";
 
 
 const CoordenadorGeral = () => {

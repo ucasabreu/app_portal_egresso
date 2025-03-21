@@ -4,7 +4,7 @@ import './Depoimento.css'; // Importa o arquivo CSS
 import Button from '../../components/Button/Button';
 import axios from 'axios'; // Importa axios para requisições HTTP
 
-const API_URL = "https://backend-seuprojeto.onrender.com";
+const API_URL = "https://backend-egressos.onrender.com";
 
 
 const Depoimento = () => {

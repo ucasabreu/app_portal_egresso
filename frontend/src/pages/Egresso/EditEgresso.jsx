@@ -6,7 +6,7 @@ import "../../pages/Egresso/styles.css";
 import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
 
-const API_URL = "https://backend-seuprojeto.onrender.com";
+const API_URL = "https://backend-egressos.onrender.com";
 
 
 const EditEgresso = () => {

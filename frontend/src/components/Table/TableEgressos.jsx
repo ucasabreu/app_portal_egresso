@@ -4,7 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../Table/Table.css";
 
-const API_URL = "https://backend-seuprojeto.onrender.com";
+const API_URL = "https://backend-egressos.onrender.com";
 
 
 const TableEgressos = () => {

@@ -3,7 +3,7 @@ import axios from "axios";
 import {useNavigate } from "react-router-dom"; // Import useHistory
 import "./EgressosPage.css";
 
-const API_URL = "https://backend-seuprojeto.onrender.com";
+const API_URL = "https://backend-egressos.onrender.com";
 
 
 const EgressosPage = () => {
