@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import './Depoimento.css'; // Importa o arquivo CSS
 import Button from '../../components/Button/Button';
 import axios from 'axios'; // Importa axios para requisições HTTP
-
-const API_URL = "https://backend-egressos.onrender.com";
+import { API_URL } from '../../config/config'; // Importa a URL da API
 
 
 const Depoimento = () => {

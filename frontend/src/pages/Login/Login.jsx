@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Hook para redirecionamento
 import "./Login.css"; 
-
-const API_URL = "https://backend-egressos.onrender.com";
+import API_URL from "../../config/config";
 
 
 const LoginCoordenador = () => {
