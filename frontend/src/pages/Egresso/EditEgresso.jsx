@@ -5,8 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import "../../pages/Egresso/styles.css";
 import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
-
-const API_URL = "https://backend-egressos.onrender.com";
+import { API_URL } from '../../config/config.js';
 
 
 const EditEgresso = () => {
