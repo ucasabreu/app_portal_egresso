@@ -1,5 +1,5 @@
 -- Tabela "egresso"
-CREATE TABLE "egresso" (
+CREATE TABLE IF NOT EXISTS "egresso" (
   "id_egresso" serial PRIMARY KEY,
   "nome" text NOT NULL,
   "email" text NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE "egresso" (
 );
 
 -- Tabela "cargo"
-CREATE TABLE "cargo" (
+CREATE TABLE IF NOT EXISTS "cargo" (
   "id_cargo" serial PRIMARY KEY,
   "id_egresso" integer NOT NULL,
   "descricao" text NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE "cargo" (
 );
 
 -- Tabela "coordenador"
-CREATE TABLE "coordenador" (
+CREATE TABLE IF NOT EXISTS "coordenador" (
   "id_coordenador" serial PRIMARY KEY,
   "login" text NOT NULL UNIQUE,
   "senha" text NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE "coordenador" (
 );
 
 -- Tabela "curso"
-CREATE TABLE "curso" (
+CREATE TABLE IF NOT EXISTS "curso" (
   "id_curso" serial PRIMARY KEY,
   "id_coordenador" integer,
   "nome" text NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE "curso" (
 );
 
 -- Tabela "curso_egresso"
-CREATE TABLE "curso_egresso" (
+CREATE TABLE IF NOT EXISTS "curso_egresso" (
   "id_curso_egresso" serial PRIMARY KEY,
   "id_egresso" integer NOT NULL,
   "id_curso" integer NOT NULL,
@@ -50,11 +50,10 @@ CREATE TABLE "curso_egresso" (
 );
 
 -- Tabela "depoimento"
-CREATE TABLE "depoimento" (
+CREATE TABLE IF NOT EXISTS "depoimento" (
   "id_depoimento" serial PRIMARY KEY,
   "id_egresso" integer NOT NULL,
   "texto" text,
   "data" date,
   CONSTRAINT "depoimento_egresso_fk" FOREIGN KEY ("id_egresso") REFERENCES "egresso" ("id_egresso") ON DELETE CASCADE
 );
-
