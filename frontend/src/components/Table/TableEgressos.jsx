@@ -3,8 +3,7 @@ import DataTable from "react-data-table-component";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../Table/Table.css";
-
-const API_URL = "https://backend-egressos.onrender.com";
+import { API_URL } from "../../config/config.js";
 
 
 const TableEgressos = () => {

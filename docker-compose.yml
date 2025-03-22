@@ -12,12 +12,13 @@ services:
       POSTGRES_PASSWORD: ucasdarabase
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/src/main/resources/database:/docker-entrypoint-initdb.d
+      - ./backend/scripts:/docker-entrypoint-initdb.d
     restart: always
-   
 
   spring-app:
-    image: backend-egressos:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: spring-app
     ports:
       - "8080:8080"
@@ -28,7 +29,7 @@ services:
     depends_on:
       - postgres-db
     restart: always
-  
+
   spa-app:
     build:
       context: ./frontend
@@ -36,6 +37,8 @@ services:
     container_name: spa-app
     ports:
       - "9090:9090"
+    environment:
+      - REACT_APP_API_URL=http://spring-app:8080
     depends_on:
       - spring-app
     restart: always
