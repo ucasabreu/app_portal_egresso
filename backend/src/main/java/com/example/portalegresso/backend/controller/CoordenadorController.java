@@ -16,9 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.portalegresso.backend.dto.CoordenadorDTO;
 import com.example.portalegresso.backend.dto.CursoDTO;
+import com.example.portalegresso.backend.dto.DestaqueEgressoDTO;
 import com.example.portalegresso.backend.model.entidades.Coordenador;
 import com.example.portalegresso.backend.model.entidades.Curso;
 import com.example.portalegresso.backend.model.entidades.CursoEgresso;
+import com.example.portalegresso.backend.model.entidades.DestaqueEgresso;
+import com.example.portalegresso.backend.model.entidades.Egresso;
 import com.example.portalegresso.backend.model.repository.CargoRepositorio;
 import com.example.portalegresso.backend.service.CoordenadorService;
 import com.example.portalegresso.backend.service.RegraNegocioRunTime;
@@ -26,9 +29,8 @@ import com.example.portalegresso.backend.service.RegraNegocioRunTime;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
-@RequestMapping("/api/coordenadores")
 @RestController
+@RequestMapping("/api/coordenadores")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 
 public class CoordenadorController {
@@ -69,6 +71,28 @@ public class CoordenadorController {
         }
     }
 
+    @PostMapping("/{id_coord}/egresso/{id_egresso}/destaque")
+    public ResponseEntity<?> salvarDestaque(@PathVariable("id_egresso") Integer idEgresso, @PathVariable("id_coord") Integer idCoord, @RequestBody DestaqueEgressoDTO dto){
+        DestaqueEgresso destaque = DestaqueEgresso.builder()
+                        .egresso(Egresso.builder().id_egresso(idEgresso).build())
+                        .coordenador(Coordenador.builder().id_coordenador(idCoord).build())
+                        .titulo(dto.getTitulo())
+                        .noticia(dto.getNoticia())
+                        .imagem(dto.getImagem())
+                        .feitoDestaque(dto.getFeitoDestaque())
+                        .build();
+        try {
+            DestaqueEgresso salvo = coordenadorService.salvarDestaque(destaque);
+            return new ResponseEntity<>(salvo, HttpStatus.CREATED);
+
+
+        } catch (RegraNegocioRunTime e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+                            
+    }
+    
+
     @PostMapping("/salvar/curso") // ok
     public ResponseEntity<?> salvarCurso(@RequestBody CursoDTO dto) {
         Curso curso = Curso.builder()
@@ -108,6 +132,27 @@ public class CoordenadorController {
         }
     }
 
+    @GetMapping("/buscar/destaque/{id}")
+    public ResponseEntity<?> buscarDestaque(@PathVariable("id") Long idDestaque){
+        try {
+            DestaqueEgresso destaque = coordenadorService.buscarDestaquePorId(idDestaque);
+            return new ResponseEntity<>(destaque, HttpStatus.OK);
+        } catch (RegraNegocioRunTime e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/destaque/listar")
+public ResponseEntity<?> listarDestaquePorNomeOuCurso(@RequestParam("nome") String nome) {
+    try {
+        List<DestaqueEgresso> destaques = coordenadorService.buscarDestaquesPorNomeOuCurso(nome);
+        return new ResponseEntity<>(destaques, HttpStatus.OK);
+    } catch (RegraNegocioRunTime e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+}
+    
+
     @GetMapping("/coordenador/{id}/egressos_curso")
     public ResponseEntity<?> buscarEgressosPorCursoId(@PathVariable("id") Integer idCurso){
         try{
@@ -138,6 +183,17 @@ public class CoordenadorController {
         try {
             Curso curso = Curso.builder().id_curso(idCurso).build();
             coordenadorService.remover(curso);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (RegraNegocioRunTime e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/deletar/destaque/{id}")
+    public ResponseEntity<?> removerDestaque(@PathVariable("id") Long idDestaque){
+        try {
+            DestaqueEgresso destaque = DestaqueEgresso.builder().id(idDestaque).build();
+            coordenadorService.remover(destaque);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (RegraNegocioRunTime e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

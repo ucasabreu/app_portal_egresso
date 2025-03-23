@@ -57,3 +57,16 @@ CREATE TABLE IF NOT EXISTS "depoimento" (
   "data" date,
   CONSTRAINT "depoimento_egresso_fk" FOREIGN KEY ("id_egresso") REFERENCES "egresso" ("id_egresso") ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS "destaque" (
+  "id_destaque" serial PRIMARY KEY,
+  "id_egresso" integer NOT NULL,
+  "id_coordenador" integer NOT NULL,
+  "titulo" text NOT NULL,
+  "texto" text NOT NULL,
+  "data_publicacao" date DEFAULT CURRENT_DATE,
+  "imagem" text,  -- Caso o coordenador queira uma imagem personalizada
+  "feito_destaque" text, -- Exemplo: "Premiação nacional em 2023"
+  CONSTRAINT "destaque_egresso_fk" FOREIGN KEY ("id_egresso") REFERENCES "egresso" ("id_egresso") ON DELETE CASCADE,
+  CONSTRAINT "destaque_coordenador_fk" FOREIGN KEY ("id_coordenador") REFERENCES "coordenador" ("id_coordenador") ON DELETE SET NULL
+);
