@@ -1,0 +1,57 @@
+.linha_tempo_container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+  }
+  
+  .timeline {
+    position: relative;
+    padding: 20px 0;
+    border-left: 4px solid #3498db;
+  }
+  
+  .timeline_item {
+    margin-bottom: 40px;
+    position: relative;
+    padding-left: 30px;
+  }
+  
+  .timeline_item::before {
+    content: "";
+    width: 15px;
+    height: 15px;
+    background-color: #3498db;
+    border-radius: 50%;
+    position: absolute;
+    left: -9px;
+    top: 5px;
+  }
+  
+  .timeline_date {
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .timeline_content {
+    background-color: #f1f1f1;
+    padding: 15px;
+    border-radius: 8px;
+  }
+  
+  .timeline_content img {
+    width: 100%;
+    max-height: 250px;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+  
+  .api_error {
+    background-color: #ffe0e0;
+    color: #b30000;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 15px 0;
+    text-align: center;
+    font-weight: bold;
+  }
+  

@@ -1,6 +1,5 @@
 package com.example.portalegresso.backend.service;
 
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -82,13 +81,13 @@ public class CoordenadorService {
         return cursoRepositorio.save(curso);
     }
 
-     // ✅ Salvar um novo destaque
+    // ✅ Salvar um novo destaque
     public DestaqueEgresso salvarDestaque(DestaqueEgresso destaque) {
         buscarCoordenadorPorId(destaque.getCoordenador().getId_coordenador());
         buscarEgressoPorId(destaque.getEgresso().getId_egresso());
 
         verificarDestaqueEgresso(destaque);
-        
+
         return destaqueEgressoRepositorio.save(destaque);
     }
 
@@ -130,19 +129,19 @@ public class CoordenadorService {
         if (destaque == null) {
             throw new RegraNegocioRunTime("Destaque não pode ser nulo.");
         }
-    
+
         if (destaque.getEgresso() == null || destaque.getEgresso().getId_egresso() == null) {
             throw new RegraNegocioRunTime("Um egresso válido deve ser selecionado para o destaque.");
         }
-    
+
         if (destaque.getTitulo() == null || destaque.getTitulo().trim().isEmpty()) {
             throw new RegraNegocioRunTime("O título do destaque deve ser informado.");
         }
-    
+
         if (destaque.getNoticia() == null || destaque.getNoticia().trim().isEmpty()) {
             throw new RegraNegocioRunTime("O texto da notícia deve ser informado.");
         }
-    
+
     }
 
     private void verificarCurso(Curso curso) {
@@ -154,7 +153,7 @@ public class CoordenadorService {
             throw new RegraNegocioRunTime("Um nome deve ser infomado.");
         }
 
-        if(cursoRepositorio.existsByNome(curso.getNome())){
+        if (cursoRepositorio.existsByNome(curso.getNome())) {
             throw new RegraNegocioRunTime("Nome do curso já existe.");
         }
 
@@ -209,47 +208,62 @@ public class CoordenadorService {
                 .orElseThrow(() -> new RegraNegocioRunTime("Coordenador não encontrado com o ID: " + id));
     }
 
-     // ✅ Buscar destaque por ID
-     public DestaqueEgresso buscarDestaquePorId(Long id) {
+    // ✅ Buscar destaque por ID
+    public DestaqueEgresso buscarDestaquePorId(Long id) {
         return destaqueEgressoRepositorio.findById(id)
                 .orElseThrow(() -> new RuntimeException("Destaque não encontrado para o ID:" + id));
     }
 
+    public List<DestaqueEgresso> buscarDestaquesPorEgresso(Integer idEgresso) {
+        Optional<Egresso> egressoOpt = egressoRepositorio.findById(idEgresso);
+        if (egressoOpt.isEmpty()) {
+            throw new RegraNegocioRunTime("Egresso não encontrado.");
+        }
+        return destaqueEgressoRepositorio.findByEgresso(egressoOpt.get());
+    }
 
     public Curso buscarCursoPorId(Integer id) {
         return cursoRepositorio.findById(id)
                 .orElseThrow(() -> new RegraNegocioRunTime("Curso não encontrado com o ID: " + id));
     }
 
-    public Egresso buscarEgressoPorId(Integer id){
+    public Egresso buscarEgressoPorId(Integer id) {
         return egressoRepositorio.findById(id)
-                .orElseThrow(() -> new RegraNegocioRunTime("Egresso não encontrado com ID: "+ id));
+                .orElseThrow(() -> new RegraNegocioRunTime("Egresso não encontrado com ID: " + id));
     }
 
-    public Coordenador buscarCoordenadorPorLoginESenha(String login,String senha) {
+    public Coordenador buscarCoordenadorPorLoginESenha(String login, String senha) {
         if (senha == null || senha.isEmpty()) {
             throw new RegraNegocioRunTime("Senha deve ser informada.");
         }
 
-        return coordenadorRepositorio.findByLoginAndSenha(login,senha)
-                .orElseThrow(() -> new RegraNegocioRunTime("Coordenador não encontrado com o login e senha fornecido."));
+        return coordenadorRepositorio.findByLoginAndSenha(login, senha)
+                .orElseThrow(
+                        () -> new RegraNegocioRunTime("Coordenador não encontrado com o login e senha fornecido."));
     }
 
     public List<DestaqueEgresso> buscarDestaquesPorNomeOuCurso(String nomeOuCurso) {
         if (nomeOuCurso == null || nomeOuCurso.isEmpty()) {
             throw new RegraNegocioRunTime("O termo de busca não pode ser vazio.");
         }
-    
+
         return destaqueEgressoRepositorio.buscarPorNomeOuCurso(nomeOuCurso);
-                
+
+    }
+
+    public List<DestaqueEgresso> listarDestaques() {
+        if (destaqueEgressoRepositorio.count() == 0) {
+            throw new RegraNegocioRunTime("Não há destaques cadastrados.");
+        }
+        return destaqueEgressoRepositorio.findAll();
     }
 
     public List<CursoEgresso> buscarEgressosPorCursoId(Integer id) {
-        if(id == null){
+        if (id == null) {
             throw new RegraNegocioRunTime("ID não pode ser nulo.");
         }
         Curso curso = buscarCursoPorId(id);
-        
+
         return cursoEgressoRepositorio.findCursoEgressoByCursoId(curso.getId_curso());
     }
 }

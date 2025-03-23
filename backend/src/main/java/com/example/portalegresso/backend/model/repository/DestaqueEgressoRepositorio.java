@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.portalegresso.backend.model.entidades.DestaqueEgresso;
+import com.example.portalegresso.backend.model.entidades.Egresso;
 
 @Repository
 public interface DestaqueEgressoRepositorio extends JpaRepository<DestaqueEgresso,Long>{
@@ -18,4 +19,5 @@ public interface DestaqueEgressoRepositorio extends JpaRepository<DestaqueEgress
        "WHERE LOWER(e.nome) LIKE LOWER(CONCAT('%', :nomeOuCurso, '%')) " +
        "OR LOWER(c.nome) LIKE LOWER(CONCAT('%', :nomeOuCurso, '%'))")
     List<DestaqueEgresso> buscarPorNomeOuCurso(@Param("nomeOuCurso") String nomeOuCurso);
+    List<DestaqueEgresso> findByEgresso(Egresso egresso);;
 }

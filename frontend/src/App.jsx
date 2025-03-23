@@ -16,6 +16,8 @@ import CoordenadorGeral from './pages/Coordenador/CoordenadorGeral';
 import LoginCoordenador from './pages/Login/Login';
 import HomePage from './pages/Home/HomePage';
 import PropostaPortal from './pages/Proposta/PropostaPortal';
+import EgressoDestaque from './pages/Egresso_Destaque/EgressoDestaque';
+import Destaques from './pages/Egresso_Destaque/Destaques';
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
           <Route path="/egressos/listar" element={<EgressosPage />} />
           <Route path="/egressos/depoimentos" element={<Depoimento />} />
           <Route path='/proposta' element={<PropostaPortal />} />
+          <Route path="/destaques" element={<Destaques />} />
+          <Route path="/egresso/:id/destaques" element={<EgressoDestaque />} />
         </Route>
 
         {/* 🔹 Rotas sem Header/Footer */}
