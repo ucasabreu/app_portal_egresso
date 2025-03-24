@@ -55,7 +55,7 @@ const Destaques = () => {
         {destaques.length > 0 ? (
           destaques.map((d) => (
             <div className="destaque_card" key={d.id}>
-              <img src={d.imagem || "https://via.placeholder.com/400x200"} alt={d.titulo} className="destaque_imagem" />
+              <img src={d.egresso.foto} alt={d.titulo} className="destaque_imagem" />
               <h2>{d.titulo}</h2>
               <p><strong>Egresso:</strong> {d.egresso?.nome || "Nome não disponível"}</p>
               <p>{d.noticia}</p>

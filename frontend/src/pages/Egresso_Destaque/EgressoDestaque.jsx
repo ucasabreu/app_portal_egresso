@@ -37,13 +37,33 @@ const EgressoDestaque = () => {
         {destaques.length > 0 ? (
           destaques.map((d) => (
             <div className="timeline_item" key={d.id}>
-              <div className="timeline_date">{d.data || "Data não informada"}</div>
+              {/* Data de publicação */}
+              <div className="timeline_date">
+                {d.dataPublicacao ? new Date(d.dataPublicacao).toLocaleDateString('pt-BR') : "Data não informada"}
+              </div>
+
+              {/* Estrutura com imagem à esquerda e informações à direita */}
               <div className="timeline_content">
-                <img src={d.imagem || "https://via.placeholder.com/600x300"} alt={d.titulo} />
-                <h2>{d.titulo}</h2>
-                <p><strong>Egresso:</strong> {d.egresso?.nome || "Nome não disponível"}</p>
-                <p>{d.noticia}</p>
-                <p><strong>Feito:</strong> {d.feitoDestaque}</p>
+                {/* Foto do Egresso */}
+                <img 
+                  className="egresso_foto" 
+                  src={d.egresso.foto || "https://via.placeholder.com/150"} 
+                  alt={d.egresso?.nome || "Egresso"} 
+                />
+
+                {/* Informações do destaque */}
+                <div className="timeline_text">
+                  <h2>{d.titulo}</h2>
+                  {/* Imagem relacionada ao destaque */}
+                  <img 
+                    className="destaque_imagem"
+                    src={d.foto || "https://via.placeholder.com/600x300"} 
+                    alt="Imagem do destaque" 
+                  />
+                  <p>{d.noticia}</p>
+                  <p><strong>Feito:</strong> {d.feitoDestaque}</p>
+                  <p><strong>Egresso:</strong> {d.egresso.nome}</p>
+                </div>
               </div>
             </div>
           ))
