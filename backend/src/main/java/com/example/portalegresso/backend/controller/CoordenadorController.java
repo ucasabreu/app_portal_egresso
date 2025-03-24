@@ -35,12 +35,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 public class CoordenadorController {
 
+   
     private final CargoRepositorio cargoRepositorio;
-    @Autowired
-    CoordenadorService coordenadorService;
+    private final CoordenadorService coordenadorService;
 
-    CoordenadorController(CargoRepositorio cargoRepositorio) {
+    @Autowired
+    public CoordenadorController(CargoRepositorio cargoRepositorio, CoordenadorService coordenadorService) {
         this.cargoRepositorio = cargoRepositorio;
+        this.coordenadorService = coordenadorService;
     }
 
     // POST
