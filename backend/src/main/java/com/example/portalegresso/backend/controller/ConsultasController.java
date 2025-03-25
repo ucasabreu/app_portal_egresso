@@ -31,7 +31,6 @@ public class ConsultasController {
     ConsultasService consultasService;
 
     //GET
-
     // -> CURSOS
     @GetMapping("/listar/cursos")
     public ResponseEntity<?> listarTodosCursos(){

@@ -44,8 +44,8 @@ public class CargoRepositorioTest {
                 .descricao("testedescricao")
                 .egresso(egressoSalvo)
                 .local("esseeolocal")
-                .ano_inicio(0)
-                .ano_fim(2024)
+                .ano_inicio(2024)
+                .ano_fim(2022)
                 .build();
 
         // Ação
