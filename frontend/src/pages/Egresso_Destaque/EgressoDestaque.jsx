@@ -4,7 +4,7 @@ import "./EgressoDestaque.css";
 import { API_URL } from "../../config/config.js";
 
 const EgressoDestaque = () => {
-  const { id } = useParams(); // id do Egresso
+  const { id } = useParams(); 
   const [destaques, setDestaques] = useState([]);
   const [error, setError] = useState("");
 
@@ -27,34 +27,43 @@ const EgressoDestaque = () => {
     fetchTimeline();
   }, [id]);
 
+  // Pega o egresso apenas do primeiro destaque
+  const egresso = destaques[0]?.egresso;
+
   return (
+
     <div className="linha_tempo_container">
-      <h1>Histórico de Destaques</h1>
+
+      <header className="header_destaque">
+          <h1>Histórico de Destaques</h1>
+      </header>
+      
 
       {error && <div className="api_error">⚠️ {error}</div>}
+
+      {/* Exibe a foto e o nome do egresso só no topo */}
+      {egresso && (
+        <div className="egresso_topo">
+          <img
+            className="egresso_foto_topo"
+            src={egresso.foto || "https://via.placeholder.com/200"}
+            alt={egresso.nome || "Egresso"}
+          />
+          <h2>{egresso.nome}</h2>
+        </div>
+      )}
 
       <div className="timeline">
         {destaques.length > 0 ? (
           destaques.map((d) => (
             <div className="timeline_item" key={d.id}>
-              {/* Data de publicação */}
               <div className="timeline_date">
                 {d.dataPublicacao ? new Date(d.dataPublicacao).toLocaleDateString('pt-BR') : "Data não informada"}
               </div>
 
-              {/* Estrutura com imagem à esquerda e informações à direita */}
               <div className="timeline_content">
-                {/* Foto do Egresso */}
-                <img 
-                  className="egresso_foto" 
-                  src={d.egresso.foto || "https://via.placeholder.com/150"} 
-                  alt={d.egresso?.nome || "Egresso"} 
-                />
-
-                {/* Informações do destaque */}
                 <div className="timeline_text">
                   <h2>{d.titulo}</h2>
-                  {/* Imagem relacionada ao destaque */}
                   <img 
                     className="destaque_imagem"
                     src={d.foto || "https://via.placeholder.com/600x300"} 
@@ -62,7 +71,6 @@ const EgressoDestaque = () => {
                   />
                   <p>{d.noticia}</p>
                   <p><strong>Feito:</strong> {d.feitoDestaque}</p>
-                  <p><strong>Egresso:</strong> {d.egresso.nome}</p>
                 </div>
               </div>
             </div>
