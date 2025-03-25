@@ -26,6 +26,8 @@ import com.example.portalegresso.backend.model.repository.CargoRepositorio;
 import com.example.portalegresso.backend.service.EgressoService;
 import com.example.portalegresso.backend.service.RegraNegocioRunTime;
 
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 @RequestMapping("/api/egressos")
@@ -53,7 +55,7 @@ public class EgressoController {
      */
 
     @PostMapping("/salvar/egresso") //ok
-    public ResponseEntity<?> salvar(@RequestBody EgressoDTO dto){
+    public ResponseEntity<?> salvar(@RequestBody @Valid EgressoDTO dto){
         Egresso egresso = Egresso.builder()
                 .nome(dto.getNome())
                 .email(dto.getEmail())
@@ -74,7 +76,7 @@ public class EgressoController {
     }
 
     @PostMapping("/salvar/egresso/{id}/salvar_depoimento")//ok
-    public ResponseEntity<?> salvarDepoimento(@PathVariable("id") Integer idEgresso, @RequestBody DepoimentoDTO dto) {
+    public ResponseEntity<?> salvarDepoimento(@PathVariable("id") Integer idEgresso, @RequestBody @Valid DepoimentoDTO dto) {
         Depoimento depoimento = Depoimento.builder()
                 .egresso(Egresso.builder().id_egresso(idEgresso).build())
                 .texto(dto.getTexto())
@@ -88,7 +90,7 @@ public class EgressoController {
     }
 
     @PostMapping("/salvar/egresso/{id}/salvar_cargo") //OK
-    public ResponseEntity<?> salvarCargo(@PathVariable("id") Integer idEgresso ,@RequestBody CargoDTO dto){
+    public ResponseEntity<?> salvarCargo(@PathVariable("id") Integer idEgresso ,@RequestBody @Valid CargoDTO dto){
         Cargo cargo = Cargo.builder()
                     .egresso(Egresso.builder().id_egresso(idEgresso).build())
                     .descricao(dto.getDescricao())
@@ -107,7 +109,7 @@ public class EgressoController {
     }
 
     @PostMapping("/salvar/egresso/{id_egresso}/curso/{id_curso}/curso_egresso")
-    public ResponseEntity<?> salvarCursoEgresso(@PathVariable("id_egresso") Integer idEgresso, @PathVariable("id_curso") Integer idCurso, @RequestBody CursoEgressoDTO dto) {
+    public ResponseEntity<?> salvarCursoEgresso(@PathVariable("id_egresso") Integer idEgresso, @PathVariable("id_curso") Integer idCurso, @RequestBody @Valid CursoEgressoDTO dto) {
         CursoEgresso cursoEgresso = CursoEgresso.builder()
                 .egresso(Egresso.builder().id_egresso(idEgresso).build())
                 .curso(Curso.builder().id_curso(idCurso).build())

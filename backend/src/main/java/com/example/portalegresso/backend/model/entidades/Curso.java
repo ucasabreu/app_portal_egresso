@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,9 +26,11 @@ public class Curso {
     @Column(name="id_curso")
     private Integer id_curso;
 
+    @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s]+$", message = "O nome  do cursro deve conter apenas letras e espaços")
     @Column(name="nome")
     private String nome;
 
+    @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s]+$", message = "O nivel deve conter apenas letras e espaços")
     @Column(name="nivel")
     private String nivel;
 

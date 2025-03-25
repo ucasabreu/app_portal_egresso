@@ -26,6 +26,8 @@ import com.example.portalegresso.backend.model.repository.CargoRepositorio;
 import com.example.portalegresso.backend.service.CoordenadorService;
 import com.example.portalegresso.backend.service.RegraNegocioRunTime;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -47,7 +49,7 @@ public class CoordenadorController {
 
     // POST
     @PostMapping("/salvar/coordenador") // OK
-    public ResponseEntity<?> salvar(@RequestBody CoordenadorDTO dto) {
+    public ResponseEntity<?> salvar(@RequestBody @Valid CoordenadorDTO dto) {
         Coordenador coordenador = Coordenador.builder()
                 // .id_coordenador(dto.getId_coordenador())
                 .login(dto.getLogin())
@@ -64,7 +66,7 @@ public class CoordenadorController {
     }
 
     @PostMapping("/autenticar/coordenador") // ok
-    public ResponseEntity<?> autenticar(@RequestBody CoordenadorDTO dto) {
+    public ResponseEntity<?> autenticar(@RequestBody @Valid CoordenadorDTO dto) {
         try {
             coordenadorService.efetuarLogin(dto.getLogin(), dto.getSenha());
             return ResponseEntity.ok(true);
@@ -75,7 +77,7 @@ public class CoordenadorController {
 
     @PostMapping("/{id_coord}/egresso/{id_egresso}/destaque")
     public ResponseEntity<?> salvarDestaque(@PathVariable("id_egresso") Integer idEgresso,
-            @PathVariable("id_coord") Integer idCoord, @RequestBody DestaqueEgressoDTO dto) {
+            @PathVariable("id_coord") Integer idCoord, @RequestBody @Valid DestaqueEgressoDTO dto) {
         DestaqueEgresso destaque = DestaqueEgresso.builder()
                 .egresso(Egresso.builder().id_egresso(idEgresso).build())
                 .coordenador(Coordenador.builder().id_coordenador(idCoord).build())
@@ -95,7 +97,7 @@ public class CoordenadorController {
     }
 
     @PostMapping("/salvar/curso") // ok
-    public ResponseEntity<?> salvarCurso(@RequestBody CursoDTO dto) {
+    public ResponseEntity<?> salvarCurso(@RequestBody @Valid CursoDTO dto) {
         Curso curso = Curso.builder()
                 .nome(dto.getNome())
                 .nivel(dto.getNivel())

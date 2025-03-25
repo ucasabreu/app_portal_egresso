@@ -36,7 +36,7 @@ public class Depoimento {
     @JoinColumn(name="id_egresso")
     private Egresso egresso;
 
-    @Column(name="texto")
+    @Column(name="texto", columnDefinition = "TEXT")
     private String texto;
     
     @CreatedDate

@@ -1,47 +1,50 @@
 package com.example.portalegresso.backend.model.entidades;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table( name="egresso")
+@Table(name = "egresso")
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Egresso {
+
     @Id
-    @Column(name="id_egresso")
+    @Column(name = "id_egresso")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id_egresso;
 
-    @Column(name="nome")
+    @NotBlank(message = "O nome é obrigatório")
+    @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s]+$", message = "O nome deve conter apenas letras e espaços")
+    @Column(name = "nome")
     private String nome;
 
-    @Column(name="email")
+    @Email(message = "Email inválido")
+    @Column(name = "email")
     private String email;
 
-    @Column(name="descricao")
+    @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;
 
-    @Column(name="foto")
+    @Column(name = "foto")
     private String foto;
 
-    @Column(name="linkedin")
+    @Pattern(regexp = "^(https?:\\/\\/)?([\\w]+\\.)?linkedin\\.com\\/.*$", message = "Informe um link válido do LinkedIn")
+    @Column(name = "linkedin")
     private String linkedin;
 
-    @Column(name="instagram")
+    @Pattern(regexp = "^(https?:\\/\\/)?(www\\.)?instagram\\.com\\/.*$", message = "Informe um link válido do Instagram")
+    @Column(name = "instagram")
     private String instagram;
 
-    @Column(name="curriculo")
+    @Column(name = "curriculo")
     private String curriculo;
-
 }

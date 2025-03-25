@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,10 +41,11 @@ public class DestaqueEgresso {
     @JoinColumn(name = "id_coordenador", nullable = false)
     private Coordenador coordenador; // Relacionamento com o Coordenador
 
+    @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s]+$", message = "O titulo deve conter apenas letras e espaços")
     @Column(name="titulo")
     private String titulo;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "noticia", columnDefinition = "TEXT")
     private String noticia;
 
     @CreatedDate
