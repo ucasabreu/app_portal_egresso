@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Hook para redirecionamento
-import "./Login.css"; 
+import "./Login.css";
 import { API_URL } from "../../config/config.js";
+import Button from "../../components/Button/Button.jsx";
 
 
 const LoginCoordenador = () => {
@@ -11,7 +12,7 @@ const LoginCoordenador = () => {
   const [tipo, setTipo] = useState("coordenador");
   const [error, setError] = useState("");
   const [isCadastro, setIsCadastro] = useState(false);
-  
+
   const navigate = useNavigate(); // Hook para navegação
 
   const handleAuth = async (e) => {
@@ -53,32 +54,35 @@ const LoginCoordenador = () => {
     <div className="container_login">
       <div className="login">
         <form className="login-form" onSubmit={handleAuth}>
-            <h2>{isCadastro ? "Cadastro de Coordenador" : "Login de Coordenador"}</h2>
-            {error && <p className="error-message">{error}</p>}
-            <input
-                type="text"
-                placeholder="Login"
-                value={login}
-                onChange={(e) => setLogin(e.target.value)}
-                required
-            />
-            <input
-                type="password"
-                placeholder="Senha"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                required
-            />
-            {isCadastro && (
+          <h2>{isCadastro ? "Cadastro de Coordenador" : "Login de Coordenador"}</h2>
+          {error && <p className="error-message">{error}</p>}
+          <input
+            type="text"
+            placeholder="Login"
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Senha"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            required
+          />
+          {isCadastro && (
             <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
-                <option value="coordenador">Coordenador</option>
-                <option value="geral">Coordenador Geral</option>
+              <option value="coordenador">Coordenador</option>
+              <option value="geral">Coordenador Geral</option>
             </select>
-            )}
-            <button type="submit">{isCadastro ? "Cadastrar" : "Login"}</button>
-            <p className="toggle-text" onClick={() => setIsCadastro(!isCadastro)}>
+          )}
+          <div className="login-button">
+            <Button type="submit">{isCadastro ? "Cadastrar" : "Login"}</Button>
+          </div>
+
+          <p className="toggle-text" onClick={() => setIsCadastro(!isCadastro)}>
             {isCadastro ? "Já tem uma conta? Faça login!" : "Não tem uma conta? Cadastre-se!"}
-            </p>
+          </p>
         </form>
       </div>
     </div>

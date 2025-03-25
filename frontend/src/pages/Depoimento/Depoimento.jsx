@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import './Depoimento.css'; // Importa o arquivo CSS
+import SmallRght from "../../assets/small-right.svg";
 import Button from '../../components/Button/Button';
 import axios from 'axios'; // Importa axios para requisições HTTP
 import { API_URL } from '../../config/config.js'; // Importa a URL base da API
@@ -13,7 +14,7 @@ const Depoimento = () => {
     const [error, setError] = useState(null); // Estado para armazenar erros
 
     const history = useNavigate(); // Initialize useNavigate
-    
+
     useEffect(() => {
         // Busca dados do banco de dados
         const fetchTestimonials = async () => {
@@ -32,7 +33,7 @@ const Depoimento = () => {
         fetchTestimonials(); // Chama a função para buscar depoimentos
     }, []); // Array de dependências vazio significa que este efeito roda uma vez após a renderização inicial
 
-    
+
     const handleProfileClick = (graduateId) => {
         history(`/egresso_view/${graduateId}`); // Navega para a página de perfil do graduado
     };
@@ -104,11 +105,16 @@ const Depoimento = () => {
                         <div key={testimonial.id_depoimento} className="testimonial">
                             <img src={testimonial.egresso.foto || 'default-image-path.jpg'} alt={testimonial.egresso.nome} className="graduate-photo" />
                             <h2>{testimonial.egresso.nome}</h2> {/* Nome do egresso */}
-                            <p className="posting-date">{testimonial.data}</p>
+                            <p className="posting-date">{testimonial.data ? new Date(testimonial.data).toLocaleDateString('pt-BR') : "Data não informada"}</p>
                             <p>{testimonial.texto}</p>
-                            <Button className="profile-button" onClick={() => handleProfileClick(testimonial.egresso.id_egresso)}>
-                                Ver Perfil
-                            </Button>
+
+                            <div className='profile-button'>
+                                <Button className="profile-button" onClick={() => handleProfileClick(testimonial.egresso.id_egresso)}>
+                                    Ver Perfil
+                                    <img src={SmallRght} alt="seta" />
+                                </Button>
+                            </div>
+
                         </div>
                     ))
                 ) : (

@@ -35,22 +35,13 @@
 }
 
 /* Botão de login/cadastro */
-.login-form button {
-    background: #007bff;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: 0.3s ease;
-    margin-top: 15px;
+.login-button Button {
+    width: 100%;
+    display: flex;             /* Flex para alinhar */
+    justify-content: center;   /* Alinha horizontal */   
+    
 }
 
-/* Efeito no botão ao passar o mouse */
-.login-form button:hover {
-    background: #0056b3;
-}
 
 /* Mensagem de erro */
 .error-message {

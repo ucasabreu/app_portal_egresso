@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import LogoImg from "../../assets/ufmalogo.png";
 import SearchImg from "../../assets/search.svg";
 import "../Header/styles.css";
+import Button from "../Button/Button";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -48,13 +49,21 @@ const Header = () => {
               CADASTRE-SE
             </span>
           </li>
+          <li>
+            <span 
+              onClick={() => navigate("/destaques")}
+              className={getMenuItemClass("/destaques")}
+            >
+              DESTAQUES
+            </span>
+          </li>
         </ul>
       </div>
 
       <div className="login-header">
-        <button onClick={() => navigate("/login")} className="login-button">
+        <Button onClick={() => navigate("/login")} className="login-button">
           Login coordenador
-        </button>
+        </Button>
       </div>
     </div>
   );

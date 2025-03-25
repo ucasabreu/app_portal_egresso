@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {useNavigate } from "react-router-dom"; // Import useHistory
+import { useNavigate } from "react-router-dom"; // Import useHistory
 import "./EgressosPage.css";
 import { API_URL } from "../../config/config.js";
 
@@ -189,41 +189,44 @@ const EgressosPage = () => {
         <div className="page-egressos">
             <header className="header">
                 <h1>Egressos</h1>
-                <input
-                    type="text"
-                    placeholder="Pesquisar por nome..."
-                    value={searchName}
-                    onChange={(e) => setSearchName(e.target.value)}
-                    className="search-input"
-                />
-                <input
-                    type="text"
-                    placeholder="Pesquisar por curso..."
-                    value={searchCourse}
-                    onChange={(e) => setSearchCourse(e.target.value)}
-                    className="search-input"
-                />
-                <input
-                    type="text"
-                    placeholder="Pesquisar por cargo..."
-                    value={searchCargo}
-                    onChange={(e) => setSearchCargo(e.target.value)}
-                    className="search-input"
-                />
-                <input
-                    type="text"
-                    placeholder="Pesquisar por ano de início..."
-                    value={searchAnoInicio}
-                    onChange={(e) => setSearchAnoInicio(e.target.value)}
-                    className="search-input"
-                />
-                <input
-                    type="text"
-                    placeholder="Pesquisar por ano de fim..."
-                    value={searchAnoFim}
-                    onChange={(e) => setSearchAnoFim(e.target.value)}
-                    className="search-input"
-                />
+
+                <div className="search-container">
+                    <input
+                        type="text"
+                        placeholder="Pesquisar por nome..."
+                        value={searchName}
+                        onChange={(e) => setSearchName(e.target.value)}
+                        className="search-input"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Pesquisar por curso..."
+                        value={searchCourse}
+                        onChange={(e) => setSearchCourse(e.target.value)}
+                        className="search-input"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Pesquisar por cargo..."
+                        value={searchCargo}
+                        onChange={(e) => setSearchCargo(e.target.value)}
+                        className="search-input"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Pesquisar por ano de início..."
+                        value={searchAnoInicio}
+                        onChange={(e) => setSearchAnoInicio(e.target.value)}
+                        className="search-input"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Pesquisar por ano de fim..."
+                        value={searchAnoFim}
+                        onChange={(e) => setSearchAnoFim(e.target.value)}
+                        className="search-input"
+                    />
+                </div>
             </header>
 
             <div className="container-central">
@@ -233,10 +236,10 @@ const EgressosPage = () => {
                     <p className="error">{error}</p>
                 ) : egressos.length > 0 ? (
                     egressos.map((egresso) => (
-                        <div 
-                            key={egresso.id} 
+                        <div
+                            key={egresso.id}
                             className="egresso-card"
-                            onClick={() => history(`/egresso_view/${egresso.id_egresso}`)} 
+                            onClick={() => history(`/egresso_view/${egresso.id_egresso}`)}
                         >
                             {egresso.foto ? (
                                 <img src={egresso.foto} alt={egresso.nome} className="egresso-foto" />
@@ -253,7 +256,7 @@ const EgressosPage = () => {
                 )}
             </div>
 
-            
+
         </div>
     );
 };

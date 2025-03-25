@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Button from '../../components/Button/Button';
+import SmallRght from "../../assets/small-right.svg";
 import "./Destaques.css";
 import { API_URL } from "../../config/config.js";
 
@@ -58,11 +60,16 @@ const Destaques = () => {
               <img src={d.egresso.foto} alt={d.titulo} className="destaque_imagem" />
               <h2>{d.titulo}</h2>
               <p><strong>Egresso:</strong> {d.egresso?.nome || "Nome não disponível"}</p>
-              <p>{d.noticia}</p>
               <p><strong>Destaque:</strong> {d.feitoDestaque}</p>
-              <button className="btn_timeline" onClick={() => handleViewTimeline(d.egresso.id_egresso)}>
-                Ver Linha do Tempo
-              </button>
+
+              <div className="btn_timeline">
+                <Button onClick={() => handleViewTimeline(d.egresso.id_egresso)}>
+                  Ver Linha do Tempo
+                  <img src={SmallRght} alt="seta" />
+                </Button>
+                
+              </div>
+
             </div>
           ))
         ) : (

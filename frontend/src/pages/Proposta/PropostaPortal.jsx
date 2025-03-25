@@ -39,7 +39,10 @@ const PropostaPortal = () => {
       <section className='call-to-action'>
         <h2>Junte-se à nossa comunidade!</h2>
         <p>Cadastre-se agora e tenha acesso a conteúdos exclusivos para sua trajetória profissional e acadêmica.</p>
-        <button onClick={() => navigate('/edit-egresso')} className='portal-button'>Cadastre-se</button>
+        <div  className='portal-button' >
+          <Button onClick={() => navigate('/edit-egresso')}>Cadastre-se</Button>
+        </div>
+        
       </section>
     </div>
   );

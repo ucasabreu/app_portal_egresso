@@ -1,81 +1,159 @@
-.container_home{
+.container_home {
     margin: 0 auto;
-    
-}
-
-.title{
+  }
+  
+  .title {
     display: flex;
     justify-content: flex-start;
     align-items: center;
     padding: 25px 150px;
-}
-
-.slide-item{
-    width: 100%;
-    height: 350px;
-    object-fit: cover;
-}
-
-.swiper-container{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
+  }
+  
+  .swiper-container {
     padding: 25px 150px;
-}
 
-.options-home{
+      .swiper-button-next,
+      .swiper-button-prev {
+        width: 30px;      
+        height: 30px;     
+        font-size: 18px;  
+        color: #0594e0;   
+      }
+
+      .swiper-button-prev:hover,
+      .swiper-button-next:hover {
+        color: #2c80b4;
+      }
+      
+  }
+
+  
+  
+  .slide-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    position: relative;
+    height: 350px;
+  }
+  
+  .slide-image {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-right: 30px;  /* Aproxima, mas mantém respiro */
+    margin-left: 80px;
+  }
+  
+  .slide-text-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    height: 100%;
+    padding: 10px;
+  }
+  
+  .slide-title {
+    font-size: 28px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .slide-text {
+    font-size: 20px;
+    color: #555;
+    text-align: center;
+    line-height: 1.6;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 100px;
+    margin-left: 100px;
+    margin-bottom: 20px;
+  }
+  
+  .btn-ver-perfil {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        padding-right: 40px;
+    }
+
+    .btn-ver-perfil img {
+        width: 16px;
+        height: 16px;
+        object-fit: contain;
+    }
+
+ 
+  
+  .options-home {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 25px 150px;
-    background-color: var(--white);
-    border-radius: 10px ;
-
-    ul{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 400px;
-        padding: 0;
-        margin: 0;
-        list-style: none;
-    }
-
-    li{
-        margin-right: 0px;
-        margin-top: 0px;
-        cursor: pointer;
-        
-        
-        span {
-            font-weight: 700;
-            font-size: 22px;
-            color: rgb(94, 144, 236);
-           
-        }
-
-        p{
-            font-weight: 400;
-            font-size: 18px;
-            color: rgb(165, 164, 164);
-        }
-
-    }
-
-    img{
-        width: 80px;
-        height: 80px;
-        justify-content: center;
-        object-fit: contain;
-        transition: filter 0.1s ease; /* Transição suave */
-        
-    }
-
-    img:hover{
-        filter: brightness(0) saturate(100%) invert(40%) sepia(88%) saturate(656%) hue-rotate(165deg) brightness(93%) contrast(90%);
- 
-    }
-    
-}
-
+    background-color: #fff;
+    border-radius: 10px;
+  }
+  
+  .options-home ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 400px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  
+  .options-home li {
+    cursor: pointer;
+  }
+  
+  .options-home li span {
+    font-weight: 700;
+    font-size: 22px;
+    color: rgb(94, 144, 236);
+  }
+  
+  .options-home li p {
+    font-weight: 400;
+    font-size: 18px;
+    color: rgb(165, 164, 164);
+  }
+  
+  .options-home img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    transition: filter 0.1s ease;
+  }
+  
+  .options-home img:hover {
+    filter: brightness(0) saturate(100%) invert(40%) sepia(88%) saturate(656%) hue-rotate(165deg) brightness(93%) contrast(90%);
+  }
+  
+  .loading-message {
+    text-align: center;
+    font-size: 18px;
+    color: #555;
+  }
+  
+  .api_error {
+    background-color: #ffe0e0;
+    color: #c0392b;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    margin: 20px auto;
+    width: 80%;
+  }
+  

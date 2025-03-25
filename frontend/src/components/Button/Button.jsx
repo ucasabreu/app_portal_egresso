@@ -4,7 +4,7 @@ import "../Button/Button.css";
 
 const Button = ({ children, props, onClick }) => {
   return (
-    <button className="button" {...props} onClick={onClick}>
+    <button className="button-geral" {...props} onClick={onClick}>
       {children}
     </button>
   );

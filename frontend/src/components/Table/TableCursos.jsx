@@ -3,6 +3,7 @@ import DataTable from "react-data-table-component";
 import axios from "axios";
 import "../Table/Table.css";
 import { API_URL } from "../../config/config.js";
+import Button from "../Button/Button.jsx";
 
 
 const TableCursos = () => {
@@ -70,7 +71,7 @@ const TableCursos = () => {
       {!loading && !errorMessage && (
         <>
           <div className="header_table">
-            <button className="reset-button" onClick={handleReset}>Resetar Filtros</button>
+            <Button className="reset-button" onClick={handleReset}>Resetar Filtros</Button>
           </div>
           <div className="filters-container-horizontal">
             <select className="search-input" value={searchNome} onChange={(e) => setSearchNome(e.target.value)}>

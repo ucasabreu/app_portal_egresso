@@ -5,7 +5,6 @@ import { useParams } from "react-router-dom";
 import "./CoordenadorGeral.css";
 import { API_URL } from "../../config/config.js";
 
-
 const CoordenadorGeral = () => {
   const { id } = useParams();
   const [coordenadorGeral, setCoordenadorGeral] = useState(null);
@@ -15,9 +14,7 @@ const CoordenadorGeral = () => {
   const [newCurso, setNewCurso] = useState({ nome: "", nivel: "", id_coordenador: "" });
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchCoordenadorGeral();
-  }, [id]);
+  useEffect(() => { fetchCoordenadorGeral(); }, [id]);
 
   const fetchCoordenadorGeral = async () => {
     if (!id) {
@@ -40,7 +37,7 @@ const CoordenadorGeral = () => {
     try {
       const responseCoordenadores = await axios.get(`${API_URL}/api/consultas/listar/coordenadores`);
       const responseCursos = await axios.get(`${API_URL}/api/consultas/listar/cursos`);
-      
+
       const listaCoordenadores = responseCoordenadores.data.filter(coord => coord.id_coordenador !== idCoordenadorGeral);
       setCoordenadores(listaCoordenadores);
       setCursos(responseCursos.data);
@@ -110,9 +107,12 @@ const CoordenadorGeral = () => {
     {
       name: "Ações",
       cell: (row) => (
-        <button onClick={() => deleteCoordenador(row.id_coordenador)} className="btn-delete">
-          Deletar
-        </button>
+        
+          <button onClick={() => deleteCoordenador(row.id_coordenador)} className="btn-delete">
+            Deletar
+          </button>
+        
+
       ),
     },
   ];
@@ -158,13 +158,14 @@ const CoordenadorGeral = () => {
                       <DataTable
                         columns={columnsCursos}
                         data={data.cursos}
-                        noHeader={false}
+                        noHeader
                         pagination={false}
                         highlightOnHover
                         striped
+                        className="tabela_cursos"
                       />
                     ) : (
-                      <p>Nenhum curso associado.</p>
+                      <p className="mensagem">Nenhum curso associado.</p>
                     )}
                   </div>
                 )}
@@ -214,9 +215,12 @@ const CoordenadorGeral = () => {
                   ))}
                 </select>
               </div>
-              <button type="button" onClick={handleSaveCurso}>
-                Salvar Curso
-              </button>
+              <div class="container_buttons">
+                <button type="button" onClick={handleSaveCurso} className="btn-save">
+                  Salvar Curso
+                </button>
+              </div>
+
             </form>
           </div>
         </>

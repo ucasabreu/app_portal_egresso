@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import "../../pages/Egresso/styles.css";
 import { API_URL } from '../../config/config.js';
+import Button from '../../components/Button/Button.jsx';
 
 
 const Egresso = () => {
@@ -38,7 +39,7 @@ const Egresso = () => {
       } catch (error) {
         console.error('Erro ao buscar dados do egresso:', error);
         const errorMessage =
-          error.response?.data || 
+          error.response?.data ||
           `Erro ${error.response?.status}: ${error.response?.statusText}` ||
           "Erro ao buscar dados do egresso. Verifique sua conexão ou tente novamente mais tarde.";
         setErrorMessage(errorMessage);
@@ -54,7 +55,7 @@ const Egresso = () => {
       } catch (error) {
         console.error('Erro ao buscar depoimentos do egresso:', error);
         const errorMessage =
-          error.response?.data || 
+          error.response?.data ||
           `Erro ${error.response?.status}: ${error.response?.statusText}` ||
           "Erro ao buscar depoimentos do egresso. Verifique sua conexão ou tente novamente mais tarde.";
         setErrorMessage(errorMessage);
@@ -68,7 +69,7 @@ const Egresso = () => {
       } catch (error) {
         console.error('Erro ao buscar cargos do egresso:', error);
         const errorMessage =
-          error.response?.data || 
+          error.response?.data ||
           `Erro ${error.response?.status}: ${error.response?.statusText}` ||
           "Erro ao buscar cargos do egresso. Verifique sua conexão ou tente novamente mais tarde.";
         setErrorMessage(errorMessage);
@@ -82,7 +83,7 @@ const Egresso = () => {
       } catch (error) {
         console.error('Erro ao buscar cursos do egresso:', error);
         const errorMessage =
-          error.response?.data || 
+          error.response?.data ||
           `Erro ${error.response?.status}: ${error.response?.statusText}` ||
           "Erro ao buscar cursos do egresso. Verifique sua conexão ou tente novamente mais tarde.";
         setErrorMessage(errorMessage);
@@ -96,7 +97,7 @@ const Egresso = () => {
       } catch (error) {
         console.error('Erro ao buscar lista de cursos:', error);
         const errorMessage =
-          error.response?.data || 
+          error.response?.data ||
           `Erro ${error.response?.status}: ${error.response?.statusText}` ||
           "Erro ao buscar lista de cursos. Verifique sua conexão ou tente novamente mais tarde.";
         setErrorMessage(errorMessage);
@@ -138,7 +139,7 @@ const Egresso = () => {
     } catch (error) {
       console.error('Erro ao salvar depoimento:', error);
       const errorMessage =
-        error.response?.data || 
+        error.response?.data ||
         `Erro ${error.response?.status}: ${error.response?.statusText}` ||
         "Erro ao salvar depoimento. Verifique os dados e tente novamente.";
       setFormErrorMessage(errorMessage);
@@ -158,7 +159,7 @@ const Egresso = () => {
     } catch (error) {
       console.error('Erro ao salvar cargo:', error);
       const errorMessage =
-        error.response?.data || 
+        error.response?.data ||
         `Erro ${error.response?.status}: ${error.response?.statusText}` ||
         "Erro ao salvar cargo. Verifique os dados e tente novamente.";
       setFormErrorMessage(errorMessage);
@@ -178,7 +179,7 @@ const Egresso = () => {
     } catch (error) {
       console.error('Erro ao salvar curso:', error);
       const errorMessage =
-        error.response?.data || 
+        error.response?.data ||
         `Erro ${error.response?.status}: ${error.response?.statusText}` ||
         "Erro ao salvar curso. Verifique os dados e tente novamente.";
       setFormErrorMessage(errorMessage);
@@ -268,7 +269,7 @@ const Egresso = () => {
                 <p>{cargo.descricao}</p>
                 <p>Local: {cargo.local}</p>
                 <p><em>Período: {cargo.ano_inicio} - {cargo.ano_fim}</em></p>
-                <button onClick={() => handleDeleteCargo(cargo.id_cargo)}>Deletar</button>
+                <Button onClick={() => handleDeleteCargo(cargo.id_cargo)}>Deletar</Button>
               </div>
             ))
           ) : (
@@ -304,7 +305,7 @@ const Egresso = () => {
                     name="ano_fim"
                     value={novoCargo.ano_fim}
                     onChange={handleCargoInputChange}
-                    required
+                    placeholder='(Opicional)'
                   />
                 </div>
                 <div className="form-group">
@@ -317,10 +318,14 @@ const Egresso = () => {
                     required
                   />
                 </div>
-                <button type="submit">Salvar Cargo</button>
+                <div className='button-confirm'>
+                  <Button type="submit">Salvar Cargo</Button>
+                </div>
+
               </form>
             ) : (
-              <button onClick={() => setShowCargoForm(true)}>Adicionar cargo</button>
+
+              <Button onClick={() => setShowCargoForm(true)}>Adicionar cargo</Button>
             )}
           </div>
         </div>
@@ -331,7 +336,7 @@ const Egresso = () => {
               <div key={curso.id || index} className="curso">
                 <p><strong>{curso.curso.nome}</strong></p>
                 <p><em>Período: {curso.ano_inicio} - {curso.ano_fim}</em></p>
-                <button onClick={() => handleDeleteCurso(curso.id_curso_egresso)}>Deletar</button>
+                <Button onClick={() => handleDeleteCurso(curso.id_curso_egresso)}>Deletar</Button>
               </div>
             ))
           ) : (
@@ -375,10 +380,13 @@ const Egresso = () => {
                     required
                   />
                 </div>
-                <button type="submit">Salvar Curso</button>
+                <div className='button-confirm'>
+                  <Button type="submit">Salvar Curso</Button>
+                </div>
+
               </form>
             ) : (
-              <button onClick={() => setShowCursoForm(true)}>Adicionar Novo Curso</button>
+              <Button onClick={() => setShowCursoForm(true)}>Adicionar Novo Curso</Button>
             )}
           </div>
         </div>
@@ -410,17 +418,20 @@ const Egresso = () => {
                   required
                 />
               </div>
-              <button type="submit">Salvar Depoimento</button>
+              <div className='button-confirm'>
+                <Button type="submit">Salvar Depoimento</Button>
+              </div>
+
             </form>
           ) : (
-            <button onClick={() => setShowForm(true)}>Adicionar depoimento</button>
+            <Button onClick={() => setShowForm(true)}>Adicionar depoimento</Button>
           )}
         </div>
       </div>
-      <div className="confirm-button-container">
-        <button onClick={handleConfirm} className="confirm-button">
+      <div className="button-confirm">
+        <Button onClick={handleConfirm} className="confirm-button">
           Confirmar e Visualizar
-        </button>
+        </Button>
       </div>
     </div>
   );

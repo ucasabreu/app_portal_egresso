@@ -4,7 +4,7 @@
     margin: 0 auto;
     padding: 40px;
     text-align: center;
-    font-family: Arial, sans-serif;
+    
 }
 
 .proposta-header {
@@ -97,18 +97,11 @@
 .portal-button {
     display: inline-block;
     margin-top: 20px;
-    padding: 15px 30px;
-    font-size: 1.2em;
-    background-color:var(--blue);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
     transition: background 0.3s, transform 0.3s;
-    text-decoration: none;
+    
 }
 
 .portal-button:hover {
-    background-color: var(--blue);
+    
     transform: scale(1.1);
 }

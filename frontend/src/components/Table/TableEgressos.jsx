@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../Table/Table.css";
 import  { API_URL } from "../../config/config.js";
+import Button from "../Button/Button.jsx";
 
 
 const TableEgressos = () => {
@@ -114,7 +115,7 @@ const TableEgressos = () => {
       {!loading && !errorMessage && (
         <>
           <div className="header_table">
-            <button className="reset-button" onClick={handleReset}>Resetar Filtros</button>
+            <Button className="reset-button" onClick={handleReset}>Resetar Filtros</Button>
           </div>
 
           <div className="filters-container-horizontal">

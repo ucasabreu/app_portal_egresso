@@ -1,150 +1,136 @@
-/* Estilo geral da página */
 .container_coordenador_geral {
     width: 90%;
-    max-width: 1200px;
-    margin: 20px auto;
+    margin: auto;
+    padding: 20px;
     font-family: Arial, sans-serif;
-    color: #333;
-}
-
-/* Título principal */
-.titulo {
+  }
+  
+  .titulo {
     text-align: center;
     font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-
-/* Seção de coordenadores */
-.container_manager_coordenadores {
-    background: #f9f9f9;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.subtitulo {
+    color: #333;
+  }
+  
+  .subtitulo {
     font-size: 20px;
-    font-weight: bold;
     margin-bottom: 15px;
-    color: #007bff;
-}
-
-/* Mensagem de carregamento */
-.loading {
+    color: #444;
+  }
+  
+  .loading {
     text-align: center;
     font-size: 18px;
-    color: #ff6600;
-}
-
-/* Mensagem de erro ou aviso */
-.mensagem {
+    color: #666;
+  }
+  
+  .mensagem {
     text-align: center;
     font-size: 16px;
-    color: #777;
-}
-
-/* Tabela principal */
-.rdt_Table {
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-/* Cabeçalho da tabela */
-.rdt_TableHead {
-    background-color: #007bff;
-    color: white;
+    color: #888;
+  }
+  
+  .error {
+    text-align: center;
+    color: red;
     font-weight: bold;
-}
-
-/* Linhas da tabela */
-.rdt_TableRow {
-    background-color: white;
-    transition: background 0.3s;
-}
-
-.rdt_TableRow:hover {
-    background-color: #e6f2ff;
-}
-
-/* Subtabela de cursos */
-.subtabela_cursos {
-    background: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 10px;
-    margin: 10px 0;
-}
-
-.subtabela_cursos h4 {
-    font-size: 16px;
-    font-weight: bold;
-    color: #444;
-    margin-bottom: 8px;
-}
-
-/* Ajustes na subtabela */
-.rdt_ExpanderRow {
-    background-color: #f1faff;
-}
-
-/* Estilos para a subtabela */
-.subtabela_cursos .rdt_Table {
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.subtabela_cursos .rdt_TableHead {
-    background-color: #007bff;
-    color: #333;
-    font-weight: bold;
-}
-
-.subtabela_cursos .rdt_TableRow {
-    background-color: white;
-    transition: background 0.3s;
-}
-
-.subtabela_cursos .rdt_TableRow:hover {
-    background-color: #e6f2ff;
-}
-
-/* Seção de adicionar cursos */
-.container_manager_cursos {
-    background: #f9f9f9;
+    margin-bottom: 20px;
+  }
+  
+  /* Gerenciamento de Coordenadores */
+  .container_manager_coordenadores,
+  .container_manager_cursos {
+    background: #fff;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
-}
-
-.container_manager_cursos .form-group {
+  }
+  
+  .tabela_coordenadores,
+  .tabela_cursos {
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .subtabela_cursos {
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+  
+  .subtabela_cursos h4 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  /* Formulário */
+  form {
+    margin-top: 20px;
+  }
+  
+  .form-group {
     margin-bottom: 15px;
-}
-
-.container_manager_cursos label {
-    display: block;
+  }
+  
+  .form-group label {
     font-weight: bold;
+    display: block;
     margin-bottom: 5px;
-}
-
-.container_manager_cursos input,
-.container_manager_cursos select {
+  }
+  
+  .form-group input,
+  .form-group select {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.container_manager_cursos button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+  }
+  
+  /* Botões */
+  .btn-delete {
+    background-color: #dc3545;
+    color: #fff;
+    padding: 8px 14px;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
+    margin-right: 8px;
+  }
+  
+  .btn-delete:hover {
+    background-color: #c82333;
+  }
+  
+  .btn-save {
+    background-color: #28a745;
+    color: white;
+    padding: 16px 12px;
+    width: 130px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
 }
 
-.container_manager_cursos button:hover {
-    background-color: #0056b3;
+.container_buttons {
+    display: flex;
+    justify-content: center;
 }
+  .btn-save:hover {
+    background-color: #218838;
+  }
+  /* Tabela interna */
+  .tabela_cursos .rdt_TableRow,
+  .tabela_coordenadores .rdt_TableRow {
+    background-color: #fff;
+  }
+  
+  .tabela_cursos .rdt_TableHeadRow,
+  .tabela_coordenadores .rdt_TableHeadRow {
+    background-color: #f1f1f1;
+    font-weight: bold;
+  }
+  

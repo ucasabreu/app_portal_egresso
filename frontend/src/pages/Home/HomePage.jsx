@@ -6,9 +6,10 @@ import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
 import { register } from 'swiper/element/bundle';
 import StudentImg from '../../assets/student.svg';
 import CourseImg from '../../assets/course.svg';
+import SmallRght from "../../assets/small-right.svg";
 import TableEgressos from '../../components/Table/TableEgressos';
+import Button from '../../components/Button/Button';
 import TableCursos from '../../components/Table/TableCursos';
-import Card from '../../components/Card';
 import { API_URL } from '../../config/config.js';
 
 import 'swiper/css';
@@ -28,7 +29,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchDestaques = async () => {
       try {
-        setError(""); // Limpa erro anterior
+        setError("");
         const response = await fetch(`${API_URL}/api/coordenadores/destaque/listar`);
         if (!response.ok) {
           const errorData = await response.json();
@@ -43,11 +44,13 @@ const HomePage = () => {
     };
 
     fetchDestaques();
-
-    // Simular carregamento das tabelas
     const timer = setTimeout(() => setLoading(false), 2000);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleViewTimeline = (idEgresso) => {
+    navigate(`/egresso/${idEgresso}/destaques`);
+  };
 
   return (
     <div className='container_home'>
@@ -55,7 +58,6 @@ const HomePage = () => {
         <h2 className='title'>Destaques da Nossa Comunidade Acadêmica!</h2>
       </div>
 
-      {/* Exibir erro da API se houver */}
       {error && <div className="api_error">⚠️ {error}</div>}
 
       <div className='swiper-container'>
@@ -71,21 +73,42 @@ const HomePage = () => {
           {destaques.length > 0 ? (
             destaques.map((item) => (
               <SwiperSlide key={item.id}>
-                <Card
-                  image={item.egresso.foto || "https://via.placeholder.com/600x300"}
-                  titulo={item.titulo}
-                  text={item.noticia}
-                />
+                <div className="slide-content">
+                  <img
+                    src={item.egresso?.foto || "https://via.placeholder.com/600x300"}
+                    alt={item.titulo}
+                    className="slide-image"
+                  />
+                  <div className="slide-text-content">
+                    <h3 className="slide-title">{item.titulo}</h3>
+                    <p className="slide-text">{item.noticia}</p>
+                    <div  className="btn-ver-perfil">
+                      <Button
+                        onClick={() => handleViewTimeline(item.egresso.id_egresso)}
+                      >
+                        Leia mais
+                        <img src={SmallRght} alt="seta" />
+                      </Button>
+                    </div>
+
+                  </div>
+                </div>
               </SwiperSlide>
             ))
           ) : (
             !error && (
               <SwiperSlide>
-                <Card
-                  image="https://via.placeholder.com/600x300"
-                  titulo="Nenhum destaque disponível"
-                  text="Ainda não há destaques cadastrados."
-                />
+                <div className="slide-content">
+                  <img
+                    src="https://via.placeholder.com/600x300"
+                    alt="Sem Destaques"
+                    className="slide-image"
+                  />
+                  <div className="slide-text-content">
+                    <h3 className="slide-title">Nenhum destaque disponível</h3>
+                    <p className="slide-text">Ainda não há destaques cadastrados.</p>
+                  </div>
+                </div>
               </SwiperSlide>
             )
           )}

@@ -6,13 +6,19 @@
   }
   
   .header_destaque {
+    background-color: #0077b6;
+    color: white;
+    width: 100%;
     text-align: center;
+    padding: 30px;
+    border-radius: 10px;
     margin-bottom: 30px;
   }
   
   .header_destaque h1 {
     font-size: 36px;
-    color: #2c3e50;
+    color: #ffffff;
+    
   }
   
   .search-bar {
@@ -64,20 +70,12 @@
     color: #2980b9;
   }
 
-  .btn_timeline {
-  background-color: #007bff;
-  color: white;
-  padding: 12px 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 15px;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-}
 
-.btn_timeline:hover {
-  background-color: #0056b3;
+
+.btn_timeline img{
+  width: 18px;
+  height: 18px;
+  margin-left: 8px;
 }
 
 .api_error {

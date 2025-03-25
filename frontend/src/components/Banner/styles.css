@@ -31,32 +31,5 @@
         color: var(--white);
         margin-bottom: 25px;
     }
-    span {
-        display: inline-flex;
-        align-items: center;
-        background-color: var(--blue);
-        border: 0;
-        gap: 10px;
-        color: var(--white);
-        font-size: 16px;
-        font-weight: 600;
-        padding: 12px 30px;
-        line-height: 24px;
-        border-radius: 30px;
-        cursor: pointer;
-
-        img {
-           width: 20px;
-           height: auto;
-        }
-         
-        &:hover  {
-            color:rgb(243, 106, 106); /* Cor ao passar o mouse */
-        }
-    
-        &:hover img {
-            filter: brightness(0) saturate(100%) invert(55%) sepia(20%) saturate(1600%) hue-rotate(320deg) brightness(95%) contrast(90%);
-        }
-        
-    }
+  
 }

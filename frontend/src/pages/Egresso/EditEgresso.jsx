@@ -7,7 +7,6 @@ import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
 import { API_URL } from '../../config/config.js';
 
-
 const EditEgresso = () => {
   const navigate = useNavigate();
   const [egresso, setEgresso] = useState({
@@ -17,9 +16,10 @@ const EditEgresso = () => {
     linkedin: '',
     instagram: '',
     curriculo: '',
+    descricao: '' // Adicionado o campo descrição
   });
   const [isConfirmed, setIsConfirmed] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(""); // Adiciona estado para mensagens de erro
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,7 +38,7 @@ const EditEgresso = () => {
   };
 
   const handleSaveEgresso = async () => {
-    setErrorMessage(""); // Limpa mensagens de erro antes de salvarb
+    setErrorMessage("");
     try {
       const response = await axios.post(`${API_URL}/api/egressos/salvar/egresso`, {
         nome: egresso.nome,
@@ -47,15 +47,12 @@ const EditEgresso = () => {
         email: egresso.email,
         curriculo: egresso.curriculo,
         foto: egresso.foto,
+        descricao: egresso.descricao // Envia a descrição
       });
 
       const savedEgresso = response.data;
-
       console.log('Dados do egresso salvos:', savedEgresso);
-
-      // Navegar para a página do egresso com o ID correto
       navigate(`/egresso/${savedEgresso.id_egresso}`);
-
     } catch (error) {
       console.error('Erro ao salvar os dados do egresso:', error);
       const errorMessage =
@@ -71,13 +68,12 @@ const EditEgresso = () => {
   };
 
   return (
-
     <div className="container_principal">
       <header className='header_egressoview'>
         <h1>Editar Egresso</h1>
       </header>
       <div className='container_egresso'>
-        {errorMessage && <div className="error-message">{errorMessage}</div>} {/* Exibe mensagem de erro */}
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
         <form onSubmit={(e) => e.preventDefault()}>
           <div className="egresso-header">
             <img 
@@ -110,13 +106,30 @@ const EditEgresso = () => {
                 <FaFileAlt className="icon" /> Currículo:
                 <Input type="url" name="curriculo" value={egresso.curriculo} onChange={handleChange} placeholder="Link do Currículo" />
               </label>
+
+              {/* Campo Descrição */}
+              <label>
+                Descrição:
+                <textarea 
+                  name="descricao" 
+                  value={egresso.descricao} 
+                  onChange={handleChange} 
+                  placeholder="Escreva uma breve descrição sobre você"
+                  rows="4"
+                  style={{ width: "100%", padding: "10px", borderRadius: "8px" }}
+                />
+              </label>
             </div>
           </div>
 
           {!isConfirmed ? (
-            <Button type="button" onClick={handleConfirm}>Confirmar Dados</Button>
+            <div className='button-confirm'>
+              <Button type="button" onClick={handleConfirm}>Confirmar Dados</Button>
+            </div>
           ) : (
-            <Button type="button" onClick={handleSaveEgresso}>Salvar Egresso</Button>
+            <div className='button-confirm'>
+              <Button type="button" onClick={handleSaveEgresso}>Salvar Egresso</Button>
+            </div>
           )}
         </form>
       </div>

@@ -80,10 +80,6 @@ public class EgressoService {
             throw new RegraNegocioRunTime("O ano de inicio deve ser válido.");
         }
 
-        if (cursoEgresso.getAno_fim() == null) {
-            throw new RegraNegocioRunTime("O ano de fim deve ser informado.");
-        }
-
         if (cursoEgresso.getAno_fim() < cursoEgresso.getAno_inicio()
                 || cursoEgresso.getAno_fim() > LocalDate.now().getYear()) {
             throw new RegraNegocioRunTime("O ano de fim deve ser maior ou igual ao ano de inicio e válido.");

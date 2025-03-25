@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaEnvelope, FaLinkedin, FaInstagram, FaFileAlt } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import "../../pages/Egresso/styles.css";
+import "../../pages/Egresso/EgressoView.css";
 import { API_URL } from '../../config/config.js';
 
 
