@@ -43,12 +43,32 @@
 }
 
 
-/* Mensagem de erro */
-.error-message {
-    color: red;
-    font-size: 0.9rem;
-    margin-top: 10px;
-}
+.error-box {
+    background-color: #ffe6e6;
+    border: 1px solid #ff4d4d;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    width: 100%;
+  }
+  
+  .error-text {
+    color: #cc0000;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .login-rules {
+    background-color: #e8f0fe;
+    border-left: 4px solid #4a90e2;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    color: #333;
+    font-size: 14px;
+  }
+  
 
 /* Link para alternar entre login e cadastro */
 .toggle-text {

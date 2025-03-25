@@ -14,14 +14,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="destaque_egresso")
+@Table(name = "destaque_egresso")
 @Builder
 @Data
 @NoArgsConstructor
@@ -35,14 +37,16 @@ public class DestaqueEgresso {
 
     @ManyToOne
     @JoinColumn(name = "id_egresso", nullable = false)
-    private Egresso egresso;  // Relacionamento com o Egresso
+    private Egresso egresso; // Relacionamento com o Egresso
 
     @ManyToOne
     @JoinColumn(name = "id_coordenador", nullable = false)
     private Coordenador coordenador; // Relacionamento com o Coordenador
 
-    @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s]+$", message = "O titulo deve conter apenas letras e espaços")
-    @Column(name="titulo")
+    @NotBlank(message = "O título é obrigatório")
+    @Size(max = 100, message = "O título deve ter no máximo 100 caracteres")
+    @Pattern(regexp = "^[A-Za-zÀ-ÿ0-9\\s]+$", message = "O título deve conter apenas letras, números e espaços")
+    @Column(name = "titulo")
     private String titulo;
 
     @Column(name = "noticia", columnDefinition = "TEXT")
@@ -52,7 +56,7 @@ public class DestaqueEgresso {
     @Column(name = "data_publicacao", updatable = false)
     private LocalDate dataPublicacao;
 
-    @Column(name ="imagem")
+    @Column(name = "imagem")
     private String imagem;
 
     @Column(name = "feito_destaque")

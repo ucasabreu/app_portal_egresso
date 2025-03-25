@@ -16,7 +16,7 @@ const EditEgresso = () => {
     linkedin: '',
     instagram: '',
     curriculo: '',
-    descricao: '' // Adicionado o campo descrição
+    descricao: ''
   });
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -47,7 +47,7 @@ const EditEgresso = () => {
         email: egresso.email,
         curriculo: egresso.curriculo,
         foto: egresso.foto,
-        descricao: egresso.descricao // Envia a descrição
+        descricao: egresso.descricao
       });
 
       const savedEgresso = response.data;
@@ -55,11 +55,20 @@ const EditEgresso = () => {
       navigate(`/egresso/${savedEgresso.id_egresso}`);
     } catch (error) {
       console.error('Erro ao salvar os dados do egresso:', error);
-      const errorMessage =
-        error.response?.data || 
-        `Erro ${error.response?.status}: ${error.response?.statusText}` ||
-        "Erro ao salvar os dados do egresso. Verifique sua conexão ou tente novamente mais tarde.";
-      setErrorMessage(errorMessage);
+      if (error.response?.data) {
+        const data = error.response.data;
+        if (typeof data === 'object' && !Array.isArray(data)) {
+          // Converte o objeto em array de mensagens
+          const messages = Object.values(data);
+          setErrorMessage(messages);
+        } else if (typeof data === 'string') {
+          setErrorMessage([data]);
+        } else {
+          setErrorMessage(["Erro ao salvar os dados do egresso."]);
+        }
+      } else {
+        setErrorMessage(["Erro ao salvar os dados do egresso."]);
+      }
     }
   };
 
@@ -72,48 +81,65 @@ const EditEgresso = () => {
       <header className='header_egressoview'>
         <h1>Editar Egresso</h1>
       </header>
+
       <div className='container_egresso'>
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
+        {/* ✅ Exibe erro de forma estilizada */}
+        {errorMessage && (
+          <div className="error-message">
+            {Array.isArray(errorMessage) ? (
+              errorMessage.map((msg, index) => (
+                <p key={index}>⚠ Atenção: {msg}</p>
+              ))
+            ) : (
+              <p key={index}>⚠ Atenção: {msg}</p>
+            )}
+          </div>
+        )}
+
         <form onSubmit={(e) => e.preventDefault()}>
           <div className="egresso-header">
-            <img 
-              src={egresso.foto || "default-image-path.jpg"} 
-              alt={egresso.nome || "Foto do egresso"} 
-              className="egresso-photo" 
+            <img
+              src={egresso.foto || "default-image-path.jpg"}
+              alt={egresso.nome || "Foto do egresso"}
+              className="egresso-photo"
             />
             <div>
               <label>
                 Foto:
                 <input type="file" accept="image/*" onChange={handlePhotoUpload} />
               </label>
+
               <label>
                 Nome:
                 <Input type="text" name="nome" value={egresso.nome} onChange={handleChange} placeholder="Insira seu nome" />
               </label>
+
               <label>
                 <FaEnvelope className="icon" /> Email:
                 <Input type="email" name="email" value={egresso.email} onChange={handleChange} placeholder="E-mail" />
               </label>
+
               <label>
                 <FaLinkedin className="icon" /> LinkedIn:
                 <Input type="url" name="linkedin" value={egresso.linkedin} onChange={handleChange} placeholder="Link do LinkedIn" />
               </label>
+
               <label>
                 <FaInstagram className="icon" /> Instagram:
                 <Input type="url" name="instagram" value={egresso.instagram} onChange={handleChange} placeholder="Link do Instagram" />
               </label>
+
               <label>
                 <FaFileAlt className="icon" /> Currículo:
                 <Input type="url" name="curriculo" value={egresso.curriculo} onChange={handleChange} placeholder="Link do Currículo" />
               </label>
 
-              {/* Campo Descrição */}
               <label>
                 Descrição:
-                <textarea 
-                  name="descricao" 
-                  value={egresso.descricao} 
-                  onChange={handleChange} 
+                <textarea
+                  name="descricao"
+                  value={egresso.descricao}
+                  onChange={handleChange}
                   placeholder="Escreva uma breve descrição sobre você"
                   rows="4"
                   style={{ width: "100%", padding: "10px", borderRadius: "8px" }}

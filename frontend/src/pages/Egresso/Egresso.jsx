@@ -24,6 +24,7 @@ const Egresso = () => {
   const [showCursoForm, setShowCursoForm] = useState(false); // Adiciona o estado para controlar a exibição do formulário de curso
   const [errorMessage, setErrorMessage] = useState(""); // Adiciona estado para mensagens de erro
   const [formErrorMessage, setFormErrorMessage] = useState(""); // Adiciona estado para erros de formulário
+  const [restErrors, setRestErrors] = useState([]);
 
   useEffect(() => {
     const fetchEgresso = async () => {
@@ -137,32 +138,50 @@ const Egresso = () => {
       setDepoimentos(response.data);
       setShowForm(false); // Esconde o formulário após salvar o depoimento
     } catch (error) {
-      console.error('Erro ao salvar depoimento:', error);
-      const errorMessage =
-        error.response?.data ||
-        `Erro ${error.response?.status}: ${error.response?.statusText}` ||
-        "Erro ao salvar depoimento. Verifique os dados e tente novamente.";
-      setFormErrorMessage(errorMessage);
+      console.error('Erro ao salvar curso:', error);
+      if (error.response?.data && typeof error.response.data === 'object') {
+        const messages = Object.values(error.response.data);
+        setRestErrors(messages);
+      } else {
+        setRestErrors(["Erro ao salvar curso. Verifique os dados e tente novamente."]);
+      }
     }
   };
 
   const handleSubmitCargo = async (e) => {
     e.preventDefault();
-    setFormErrorMessage(""); // Limpa mensagens de erro antes de salvar
+
+    // Limpa todos os erros antes da tentativa
+    setFormErrorMessage("");
+    setErrorMessage("");
+    setRestErrors([]);
+
     try {
       await axios.post(`${API_URL}/api/egressos/salvar/egresso/${id}/salvar_cargo`, novoCargo);
+
       alert('Cargo salvo com sucesso!');
       setNovoCargo({ descricao: '', ano_inicio: '', ano_fim: '', local: '' });
+
       const cargosResponse = await axios.get(`${API_URL}/api/egressos/egresso/${id}/cargos`);
       setCargos(cargosResponse.data);
-      setShowCargoForm(false); // Esconde o formulário após salvar o cargo
+      setShowCargoForm(false);
+
     } catch (error) {
       console.error('Erro ao salvar cargo:', error);
-      const errorMessage =
-        error.response?.data ||
-        `Erro ${error.response?.status}: ${error.response?.statusText}` ||
-        "Erro ao salvar cargo. Verifique os dados e tente novamente.";
-      setFormErrorMessage(errorMessage);
+
+      // ✅ Trata RestControllerAdvice (Erros de validação enviados como Map pelo backend)
+      if (error.response?.data && typeof error.response.data === 'object' && !Array.isArray(error.response.data)) {
+        const messages = Object.values(error.response.data);
+        setRestErrors(messages); // Preenche o array de restErrors
+      }
+      // ✅ Se vier um erro textual ou exceção conhecida da API
+      else if (typeof error.response?.data === 'string') {
+        setFormErrorMessage(error.response.data); // Exibe no formErrorMessage
+      }
+      // ✅ Qualquer outro erro inesperado
+      else {
+        setErrorMessage("Erro inesperado. Tente novamente.");
+      }
     }
   };
 
@@ -244,8 +263,26 @@ const Egresso = () => {
         <h1>Dados do Egresso</h1>
       </header>
       <div className='container_egresso'>
-        {errorMessage && <div className="error-message">{errorMessage}</div>} {/* Exibe mensagem de erro geral */}
-        {formErrorMessage && <div className="error-message">{formErrorMessage}</div>} {/* Exibe mensagem de erro de formulário */}
+        {restErrors.length > 0 && (
+          <div className="error-message">
+            {restErrors.map((msg, index) => (
+              <p key={index}>⚠ Atenção: {msg}</p>
+            ))}
+          </div>
+        )}
+
+        {formErrorMessage && (
+          <div className="error-message">
+            ⚠ Atenção: {formErrorMessage}
+          </div>
+        )}
+
+        {errorMessage && (
+          <div className="error-message">
+            ⚠ Atenção: {errorMessage}
+          </div>
+        )}
+
         <div className="egresso-header">
           <img src={egresso.foto || 'default-image-path.jpg'} alt={egresso.nome} className="egresso-photo" />
           <div className="egresso-info">

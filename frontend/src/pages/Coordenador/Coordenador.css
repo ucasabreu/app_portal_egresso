@@ -176,3 +176,19 @@
 .destaque_card .btn-delete:hover {
   background-color: #c82333;
 }
+
+.error-messages {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #ffe6e6;
+  border: 1px solid #ff4d4d;
+  border-radius: 5px;
+}
+
+.error-text {
+  color: #cc0000;
+  font-weight: bold;
+  margin: 5px 0;
+  font-size: 14px;
+}
+

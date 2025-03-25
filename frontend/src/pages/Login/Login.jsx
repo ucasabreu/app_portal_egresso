@@ -46,7 +46,20 @@ const LoginCoordenador = () => {
         }
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Erro ao processar a solicitação.");
+      // ✅ Atualizado para tratar as mensagens de validação do backend
+      if (err.response?.data) {
+        const data = err.response.data;
+        if (typeof data === 'object' && !Array.isArray(data)) {
+          const messages = Object.values(data).join(' | ');
+          setError(messages);
+        } else if (typeof data === 'string') {
+          setError(data);
+        } else {
+          setError("Erro ao processar a solicitação.");
+        }
+      } else {
+        setError("Erro ao processar a solicitação.");
+      }
     }
   };
 
@@ -55,7 +68,17 @@ const LoginCoordenador = () => {
       <div className="login">
         <form className="login-form" onSubmit={handleAuth}>
           <h2>{isCadastro ? "Cadastro de Coordenador" : "Login de Coordenador"}</h2>
-          {error && <p className="error-message">{error}</p>}
+          {isCadastro && (
+            <p className="login-rules">
+              O login deve conter entre 4 e 20 caracteres e pode incluir apenas letras, números, pontos ou underline (_).
+            </p>
+          )}
+
+          {error && (
+            <div className="error-box">
+              <p className="error-text">⚠️ {error}</p>
+            </div>
+          )}
           <input
             type="text"
             placeholder="Login"

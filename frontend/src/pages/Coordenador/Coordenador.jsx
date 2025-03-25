@@ -11,6 +11,7 @@ const Coordenador = () => {
   const [coordenador, setCoordenador] = useState(null);
   const [cursosComEgressos, setCursosComEgressos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [backendErrors, setBackendErrors] = useState([]);
 
   // Destaques
   const [selectedEgresso, setSelectedEgresso] = useState(null);
@@ -134,19 +135,19 @@ const Coordenador = () => {
   };
 
   const salvarDestaque = async () => {
+    setBackendErrors([]); // Limpa erros anteriores
     try {
       let payload = {
         titulo: destaqueData.titulo,
         noticia: destaqueData.noticia,
         feitoDestaque: destaqueData.feitoDestaque,
-        imagem: destaqueData.imagem, // valor da URL
+        imagem: destaqueData.imagem,
       };
 
-      // Se o usuário fez upload, prioriza o Base64
       if (destaqueData.imagemFile) {
         const reader = new FileReader();
         reader.onloadend = async () => {
-          payload.imagem = reader.result; // base64
+          payload.imagem = reader.result;
           await axios.post(`${API_URL}/api/coordenadores/${id}/egresso/${selectedEgresso.id}/destaque`, payload);
           alert("Destaque salvo com sucesso!");
           setSelectedEgresso(null);
@@ -161,9 +162,15 @@ const Coordenador = () => {
       }
     } catch (error) {
       console.error("Erro ao salvar destaque:", error);
-      alert("Erro ao salvar destaque");
+      const backendData = error.response?.data;
+      if (backendData && typeof backendData === 'object') {
+        setBackendErrors(Object.values(backendData)); // Salva todas as mensagens
+      } else {
+        setBackendErrors(["Erro ao salvar destaque."]);
+      }
     }
   };
+
 
   const cursoColumns = [
     { name: "Nome do Curso", selector: (row) => row.nome, sortable: true },
@@ -262,6 +269,15 @@ const Coordenador = () => {
 
               <button onClick={salvarDestaque} className="btn-salvar-destaque">Salvar Destaque</button>
               <button onClick={() => setSelectedEgresso(null)} className="btn-cancelar">Cancelar</button>
+
+              {/* ERRO ESTILIZADO AQUI */}
+              {backendErrors.length > 0 && (
+                <div className="error-messages">
+                  {backendErrors.map((msg, index) => (
+                    <p key={index} className="error-text">⚠️ {msg}</p>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

@@ -17,7 +17,6 @@ import com.example.portalegresso.backend.model.repository.CursoRepositorio;
 import com.example.portalegresso.backend.model.repository.DepoimentoRepositorio;
 import com.example.portalegresso.backend.model.repository.EgressoRepositorio;
 
-
 @Service
 public class EgressoService {
 
@@ -76,13 +75,19 @@ public class EgressoService {
             throw new RegraNegocioRunTime("O ano de inicio deve ser informado.");
         }
 
-        if (cursoEgresso.getAno_inicio() <= 1990 || cursoEgresso.getAno_inicio() > LocalDate.now().getYear()) {
+        if (cursoEgresso.getAno_inicio() <= 1900 || cursoEgresso.getAno_inicio() > LocalDate.now().getYear()) {
             throw new RegraNegocioRunTime("O ano de inicio deve ser válido.");
         }
 
-        if (cursoEgresso.getAno_fim() < cursoEgresso.getAno_inicio()
-                || cursoEgresso.getAno_fim() > LocalDate.now().getYear()) {
-            throw new RegraNegocioRunTime("O ano de fim deve ser maior ou igual ao ano de inicio e válido.");
+        if (cursoEgresso.getAno_fim() != null) {
+            if (cursoEgresso.getAno_fim() < 1900 || cursoEgresso.getAno_fim() > 2100) {
+                throw new RegraNegocioRunTime("O ano de fim deve estar entre 1900 e 2100.");
+            }
+            if (cursoEgresso.getAno_fim() < cursoEgresso.getAno_inicio()) {
+                throw new RegraNegocioRunTime(
+                        "O ano de encerramento deve ser maior ou igual ao ano de inicio.");
+            }
+
         }
 
         return cursoEgressoRepositorio.save(cursoEgresso);
@@ -145,6 +150,11 @@ public class EgressoService {
             if (cargo.getAno_fim() < cargo.getAno_inicio()) {
                 throw new RegraNegocioRunTime(
                         "O ano de encerramento deve ser maior ou igual ao ano de inicio e válido.");
+            }
+
+            if (cargo.getAno_fim() < 1900 || cargo.getAno_fim() > 2100) {
+                throw new RegraNegocioRunTime("O ano de fim deve estar entre 1900 e 2100.");
+
             }
         }
 
@@ -239,12 +249,13 @@ public class EgressoService {
         }
 
         // Remover todos os cursos (na tabela cursos egressos) vinculados ao egresso
-        List<CursoEgresso> cursoEgressoList = cursoEgressoRepositorio.findCursoEgressoByEgressoId(egressoExistente.getId_egresso());
-        
-        for (CursoEgresso cursoEgresso: cursoEgressoList){ 
+        List<CursoEgresso> cursoEgressoList = cursoEgressoRepositorio
+                .findCursoEgressoByEgressoId(egressoExistente.getId_egresso());
+
+        for (CursoEgresso cursoEgresso : cursoEgressoList) {
             cursoEgressoRepositorio.delete(cursoEgresso);
         }
-        
+
         egressoRepositorio.deleteById(egresso.getId_egresso());
     }
 
@@ -321,7 +332,5 @@ public class EgressoService {
         return cursoRepositorio.findById(id)
                 .orElseThrow(() -> new RegraNegocioRunTime("Curso não encontrado com o ID: " + id));
     }
-
-   
 
 }

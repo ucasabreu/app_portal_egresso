@@ -13,6 +13,10 @@ const CoordenadorGeral = () => {
   const [loading, setLoading] = useState(true);
   const [newCurso, setNewCurso] = useState({ nome: "", nivel: "", id_coordenador: "" });
   const [error, setError] = useState(null);
+  const [restErrors, setRestErrors] = useState([]);          // Erros do RestControllerAdvice
+  const [formErrorMessage, setFormErrorMessage] = useState(""); // Regras de negócio ou validação
+  const [errorMessage, setErrorMessage] = useState("");      // Erros inesperados ou genéricos
+
 
   useEffect(() => { fetchCoordenadorGeral(); }, [id]);
 
@@ -60,14 +64,22 @@ const CoordenadorGeral = () => {
 
   const validateCurso = () => {
     if (!newCurso.nome || !newCurso.nivel || !newCurso.id_coordenador) {
-      alert("Por favor, preencha todos os campos.");
+      setFormErrorMessage("Por favor, preencha todos os campos obrigatórios.");
       return false;
     }
     return true;
   };
 
   const handleSaveCurso = async () => {
-    if (!validateCurso()) return;
+    setRestErrors([]);
+    setFormErrorMessage("");
+    setErrorMessage("");
+
+    if (!validateCurso()) {
+      setFormErrorMessage("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
     try {
       await axios.post(`${API_URL}/api/coordenadores/salvar/curso`, newCurso);
       alert("Curso salvo com sucesso!");
@@ -75,18 +87,20 @@ const CoordenadorGeral = () => {
       setNewCurso({ nome: "", nivel: "", id_coordenador: "" });
     } catch (error) {
       console.error("Erro ao salvar curso:", error);
-      setError(error.response ? error.response.data : "Erro ao salvar curso.");
-    }
-  };
-
-  const deleteCoordenador = async (idCoordenador) => {
-    try {
-      await axios.delete(`${API_URL}/api/coordenadores/deletar/coordenador/${idCoordenador}`);
-      alert("Coordenador deletado com sucesso.");
-      fetchCoordenadoresECursos(coordenadorGeral.id_coordenador);
-    } catch (error) {
-      console.error("Erro ao deletar coordenador:", error);
-      setError(error.response ? error.response.data : "Erro ao deletar coordenador.");
+      if (error.response?.data) {
+        const data = error.response.data;
+        if (typeof data === 'object' && !Array.isArray(data)) {
+          // RestControllerAdvice JSON
+          setRestErrors(Object.values(data));
+        } else if (typeof data === 'string') {
+          // Regra de negócio ou string simples
+          setFormErrorMessage(data);
+        } else {
+          setErrorMessage("Erro inesperado. Tente novamente.");
+        }
+      } else {
+        setErrorMessage("Erro inesperado. Tente novamente.");
+      }
     }
   };
 
@@ -107,11 +121,11 @@ const CoordenadorGeral = () => {
     {
       name: "Ações",
       cell: (row) => (
-        
-          <button onClick={() => deleteCoordenador(row.id_coordenador)} className="btn-delete">
-            Deletar
-          </button>
-        
+
+        <button onClick={() => deleteCoordenador(row.id_coordenador)} className="btn-delete">
+          Deletar
+        </button>
+
 
       ),
     },
@@ -182,6 +196,31 @@ const CoordenadorGeral = () => {
           <div className="container_manager_cursos">
             <h3 className="subtitulo">Adicionar Novo Curso</h3>
             <form>
+
+              
+              {restErrors.length > 0 && (
+                <div className="error-message">
+                  {restErrors.map((err, index) => (
+                    <p key={index}>⚠️ <strong>Atenção:</strong> {err}</p>
+                  ))}
+                </div>
+              )}
+
+              {/* Exibir erro de regra ou textual */}
+              {formErrorMessage && (
+                <div className="error-message">
+                  ⚠️ <strong>Atenção:</strong> {formErrorMessage}
+                </div>
+              )}
+
+              {/* Exibir erro inesperado ou genérico */}
+              {errorMessage && (
+                <div className="error-message">
+                  ⚠️ <strong>Atenção:</strong> {errorMessage}
+                </div>
+              )}
+              
+
               <div className="form-group">
                 <label>Nome:</label>
                 <input
@@ -215,7 +254,7 @@ const CoordenadorGeral = () => {
                   ))}
                 </select>
               </div>
-              <div class="container_buttons">
+              <div className="container_buttons">
                 <button type="button" onClick={handleSaveCurso} className="btn-save">
                   Salvar Curso
                 </button>
