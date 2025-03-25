@@ -1,19 +1,41 @@
 version: '3.8'
 
 services:
-  postgres-db:
+  postgres-db: 
     image: postgres:15
     container_name: postgres-db
-    restart: always
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: egresso_db
+      POSTGRES_DB: postgres
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ucasdatabase
+      POSTGRES_PASSWORD: ucasdarabase
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backend/src/main/resources/database:/docker-entrypoint-initdb.d
+        - ./backend/src/main/resources/database:/docker-entrypoint-initdb.d
+    restart: always
+   
 
-volumes:
-  postgres_data:
+  
+  spring-app:
+    image: backend-egressos:latest
+    container_name: spring-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ucasdarabase
+    depends_on:
+      - postgres-db
+    restart: always
+  
+  spa-app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: spa-app
+    ports:
+      - "9090:9090"
+    depends_on:
+      - spring-app
+    restart: always
