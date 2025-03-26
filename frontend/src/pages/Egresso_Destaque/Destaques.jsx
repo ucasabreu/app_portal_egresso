@@ -62,7 +62,7 @@ const Destaques = () => {
         <h1>Egressos Destaque</h1>
         <input
           type="text"
-          placeholder="Buscar por nome ou título..."
+          placeholder="Buscar por nome ou curso..."
           className="search-bar"
           value={search}
           onChange={(e) => setSearch(e.target.value)}

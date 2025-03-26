@@ -1,4 +1,3 @@
--- Inserir dados na tabela "egresso"
 INSERT INTO "egresso" ("nome", "email", "descricao", "foto", "linkedin", "instagram", "curriculo")
 VALUES
 ('Carlos Eduardo', 'carlos.edu@gmail.com', 
@@ -38,8 +37,6 @@ VALUES
 
 ON CONFLICT DO NOTHING;
 
-
--- Inserir dados na tabela "coordenador"
 INSERT INTO "coordenador" ("login", "senha", "tipo")
 VALUES
 ('jorge.softw', 'jorge12', 'coordenador'),
@@ -49,7 +46,6 @@ VALUES
 ('lucas.master', 'lucas56', 'geral')
 ON CONFLICT DO NOTHING;
 
--- Inserir dados na tabela "curso"
 INSERT INTO "curso" ("id_coordenador", "nome", "nivel")
 SELECT c."id_coordenador", 'Engenharia de Software', 'Especialização'
 FROM "coordenador" c
@@ -99,7 +95,6 @@ AND NOT EXISTS (
 );
 
 
--- Inserir dados na tabela "cargo"
 INSERT INTO "cargo" ("id_egresso", "descricao", "local", "ano_inicio", "ano_fim")
 SELECT e."id_egresso", 'Desenvolvedor Full Stack', 'Google', 2016, 2021
 FROM "egresso" e
@@ -140,7 +135,7 @@ AND NOT EXISTS (
     SELECT 1 FROM "cargo" WHERE "descricao" = 'Engenheiro de Dados' AND "local" = 'Nubank'
 );
 
----curso_egresso
+
 INSERT INTO "curso_egresso" ("id_egresso", "id_curso", "ano_inicio", "ano_fim")
 SELECT e."id_egresso", c."id_curso", 2010, 2014
 FROM "egresso" e, "curso" c
@@ -191,32 +186,30 @@ WHERE e."email" = 'fernando.lima@gmail.com'
 );
 
 
--- Carlos Eduardo
 INSERT INTO "depoimento" ("id_egresso", "data", "texto")
 SELECT e."id_egresso", NOW(), 
-"Durante minha jornada como Desenvolvedor Full Stack, enfrentei inúmeros desafios que me tornaram um profissional mais completo. Liderar projetos em startups e empresas globais foi essencial para meu crescimento."
+'Durante minha jornada como Desenvolvedor Full Stack, enfrentei inúmeros desafios que me tornaram um profissional mais completo. Liderar projetos em startups e empresas globais foi essencial para meu crescimento.'
 FROM "egresso" e WHERE e."email" = 'carlos.edu@gmail.com';
 
--- Ana Beatriz
+
 INSERT INTO "depoimento" ("id_egresso", "data", "texto")
 SELECT e."id_egresso", NOW(), 
-"Trabalhar na criação de experiências digitais sempre foi minha paixão. Um dos maiores orgulhos da minha carreira foi liderar o redesign de um app financeiro utilizado por milhões de brasileiros."
+'Trabalhar na criação de experiências digitais sempre foi minha paixão. Um dos maiores orgulhos da minha carreira foi liderar o redesign de um app financeiro utilizado por milhões de brasileiros.'
 FROM "egresso" e WHERE e."email" = 'ana.beatriz@gmail.com';
 
--- João Pedro
+
 INSERT INTO "depoimento" ("id_egresso", "data", "texto")
 SELECT e."id_egresso", NOW(), 
-"A Ciência de Dados me abriu portas incríveis. Poder aplicar machine learning em projetos que impactam a saúde e o setor financeiro é gratificante e desafiador todos os dias."
+'A Ciência de Dados me abriu portas incríveis. Poder aplicar machine learning em projetos que impactam a saúde e o setor financeiro é gratificante e desafiador todos os dias.'
 FROM "egresso" e WHERE e."email" = 'joao.pedro@gmail.com';
 
--- Mariana Rocha
+
 INSERT INTO "depoimento" ("id_egresso", "data", "texto")
 SELECT e."id_egresso", NOW(), 
-"A arquitetura de software sempre me fascinou. Projetar sistemas robustos e escaláveis em Cloud Computing é mais do que trabalho, é a realização de um sonho profissional."
+'A arquitetura de software sempre me fascinou. Projetar sistemas robustos e escaláveis em Cloud Computing é mais do que trabalho, é a realização de um sonho profissional.'
 FROM "egresso" e WHERE e."email" = 'mariana.rocha@gmail.com';
 
--- Fernando Lima
 INSERT INTO "depoimento" ("id_egresso", "data", "texto")
 SELECT e."id_egresso", NOW(), 
-"Como Product Owner, aprendi que liderar times ágeis é mais do que entregar projetos: é criar soluções que realmente fazem diferença na vida das pessoas."
+'Como Product Owner, aprendi que liderar times ágeis é mais do que entregar projetos: é criar soluções que realmente fazem diferença na vida das pessoas.'
 FROM "egresso" e WHERE e."email" = 'fernando.lima@gmail.com';
