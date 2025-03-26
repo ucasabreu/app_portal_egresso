@@ -399,7 +399,7 @@ FROM "egresso" e, "coordenador" c
 WHERE e."email" = 'joao.pedro@gmail.com' AND c."login" = 'matheus.IA'
 ON CONFLICT DO NOTHING;
 
--- Mariana Rocha
+
 INSERT INTO "destaque_egresso" ("id_egresso"," id_coordenador", "titulo", "noticia"," data_publicacao", "imagem", "feito_destaque")
 SELECT e."id_egresso", c."id_coordenador", 'Referência em Arquitetura',
 'Mariana Rocha projetou arquiteturas de microsserviços para grandes empresas nacionais.
@@ -413,7 +413,7 @@ FROM "egresso" e, "coordenador" c
 WHERE e."email"= 'mariana.rocha@gmail.com' AND c."login" = 'geoger.geo'
 ON CONFLICT DO NOTHING;
 
--- Fernando Lima
+
 INSERT INTO "destaque_egresso" ("id_egresso"," id_coordenador", "titulo", "noticia"," data_publicacao", "imagem", "feito_destaque")
 SELECT e."id_egresso", c."id_coordenador", 'Liderança Ágil',
 'Fernando Lima tem experiência sólida como Product Owner em fintechs e startups.
