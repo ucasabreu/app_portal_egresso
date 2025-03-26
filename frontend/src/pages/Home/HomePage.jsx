@@ -67,7 +67,7 @@ const HomePage = () => {
           pagination={{ clickable: true }}
           navigation
           scrollbar={{ draggable: true }}
-          loop={true}
+          loop={destaques.length > 1}  // ✅ Loop só se houver mais de 1 slide
           className='custom-swiper'
         >
           {destaques.length > 0 ? (
@@ -82,7 +82,7 @@ const HomePage = () => {
                   <div className="slide-text-content">
                     <h3 className="slide-title">{item.titulo}</h3>
                     <p className="slide-text">{item.noticia}</p>
-                    <div  className="btn-ver-perfil">
+                    <div className="btn-ver-perfil">
                       <Button
                         onClick={() => handleViewTimeline(item.egresso.id_egresso)}
                       >
@@ -90,31 +90,27 @@ const HomePage = () => {
                         <img src={SmallRght} alt="seta" />
                       </Button>
                     </div>
-
                   </div>
                 </div>
               </SwiperSlide>
             ))
           ) : (
-            !error && (
-              <SwiperSlide>
-                <div className="slide-content">
-                  <img
-                    src="https://via.placeholder.com/600x300"
-                    alt="Sem Destaques"
-                    className="slide-image"
-                  />
-                  <div className="slide-text-content">
-                    <h3 className="slide-title">Nenhum destaque disponível</h3>
-                    <p className="slide-text">Ainda não há destaques cadastrados.</p>
-                  </div>
+            <SwiperSlide>
+              <div className="slide-content">
+                <img
+                  src="https://via.placeholder.com/600x300"
+                  alt="Sem Destaques"
+                  className="slide-image"
+                />
+                <div className="slide-text-content">
+                  <h3 className="slide-title">Nenhum destaque disponível</h3>
+                  <p className="slide-text">Ainda não há destaques cadastrados.</p>
                 </div>
-              </SwiperSlide>
-            )
+              </div>
+            </SwiperSlide>
           )}
         </Swiper>
       </div>
-
       {/* Seção de Tabelas */}
       <div className='table_container'>
         <div className='header'>
