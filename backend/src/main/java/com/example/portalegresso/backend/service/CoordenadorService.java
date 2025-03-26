@@ -176,31 +176,36 @@ public class CoordenadorService {
      */
 
     public void remover(Curso curso) {
-        buscarCursoPorId(curso.getId_curso());
-        curso.setCoordenador(null);
+        Curso cursoExistente = buscarCursoPorId(curso.getId_curso());
+
+        // 1. Remover vínculos de curso_egresso
+        List<CursoEgresso> vinculos = cursoEgressoRepositorio.findByCurso(cursoExistente);
+        cursoEgressoRepositorio.deleteAll(vinculos);
+
+        // 2. Agora sim, deletar o curso
         cursoRepositorio.deleteById(curso.getId_curso());
     }
 
     public void remover(Coordenador coordenador) {
         Coordenador coordenadorExistente = buscarCoordenadorPorId(coordenador.getId_coordenador());
-    
+
         // 1. Desvincular coordenador dos cursos (mas manter os cursos no banco)
         List<Curso> cursos = cursoRepositorio.findByCoordenador(coordenadorExistente);
         for (Curso curso : cursos) {
             curso.setCoordenador(null);
-            
+
         }
         cursoRepositorio.saveAll(cursos);
-    
+
         // 2. Desvincular coordenador dos destaques (mas manter os destaques no banco)
         List<DestaqueEgresso> destaques = destaqueEgressoRepositorio.findByCoordenador(coordenadorExistente);
         for (DestaqueEgresso destaque : destaques) {
             destaque.setCoordenador(null);
-            
+
         }
 
         destaqueEgressoRepositorio.saveAll(destaques);
-    
+
         // 3. Deletar coordenador
         coordenadorRepositorio.deleteById(coordenadorExistente.getId_coordenador());
     }

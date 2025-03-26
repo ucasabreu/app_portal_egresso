@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.example.portalegresso.backend.model.entidades.Curso;
 import com.example.portalegresso.backend.model.entidades.CursoEgresso;
 import com.example.portalegresso.backend.model.entidades.Egresso;
 
@@ -32,6 +33,8 @@ public interface CursoEgressoRepositorio extends JpaRepository<CursoEgresso,Inte
 
     @Query("SELECT ce FROM CursoEgresso ce WHERE ce.curso.id_curso = :id_curso")
     List<CursoEgresso> findCursoEgressoByCursoId(@Param("id_curso") Integer id_curso);
+
+    List<CursoEgresso> findByCurso(Curso curso);
     
 }
 
