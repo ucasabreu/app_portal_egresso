@@ -66,7 +66,7 @@ const EgressoDestaque = () => {
                   <h2>{d.titulo}</h2>
                   <img 
                     className="destaque_imagem"
-                    src={d.foto || "https://via.placeholder.com/600x300"} 
+                    src={d.imagem || "https://via.placeholder.com/600x300"} 
                     alt="Imagem do destaque" 
                   />
                   <p>{d.noticia}</p>
