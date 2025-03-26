@@ -26,8 +26,15 @@ const EditEgresso = () => {
     setEgresso({ ...egresso, [name]: value });
   };
 
-  const handlePhotoChange = (e) => {
-    setEgresso({ ...egresso, foto: e.target.value });
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setEgresso({ ...egresso, foto: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSaveEgresso = async () => {
@@ -98,14 +105,8 @@ const EditEgresso = () => {
             />
             <div>
               <label>
-                Link da Foto:
-                <input
-                  type="url"
-                  name="foto"
-                  value={egresso.foto}
-                  onChange={handlePhotoChange}
-                  placeholder="Cole o link da sua foto"
-                />
+                Foto:
+                <input type="file" accept="image/*" onChange={handlePhotoUpload} />
               </label>
 
               <label>
