@@ -34,13 +34,16 @@ const EditEgresso = () => {
   const handleSaveEgresso = async () => {
     setErrorMessage("");
     try {
+      
+      const fotoFinal = egresso.foto || placeholderImg;
+
       const response = await axios.post(`${API_URL}/api/egressos/salvar/egresso`, {
         nome: egresso.nome,
         instagram: egresso.instagram,
         linkedin: egresso.linkedin,
         email: egresso.email,
         curriculo: egresso.curriculo,
-        foto: egresso.foto,
+        foto: fotoFinal,
         descricao: egresso.descricao
       });
 
@@ -93,7 +96,7 @@ const EditEgresso = () => {
         <form onSubmit={(e) => e.preventDefault()}>
           <div className="egresso-header">
             <img
-              src={egresso.foto || placeholderImg}
+              src={egresso.foto}
               alt={egresso.nome || "Foto do egresso"}
               className="egresso-photo"
             />
