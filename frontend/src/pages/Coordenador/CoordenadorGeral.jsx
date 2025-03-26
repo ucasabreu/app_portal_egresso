@@ -115,6 +115,18 @@ const CoordenadorGeral = () => {
     }
   };
 
+
+  const deleteCoordenador = async(idCoordenador) => {
+    try {
+      await axios.delete(`${API_URL}/api/coordenadores/deletar/coordenador/${idCoordenador}`);
+      alert("Coordenador deletado com sucesso.");
+      fetchCoordenadoresECursos(coordenadorGeral.id_coordenador);
+    } catch (error) {
+      console.error("Erro ao deletar coordenador:", error);
+      setError(error.response ? error.response.data : "Erro ao deletar coordenador.");
+    }
+  };
+
   const columnsCoordenadores = [
     { name: "Login", selector: row => row.login, sortable: true },
     { name: "Tipo", selector: row => row.tipo, sortable: true },
@@ -125,7 +137,6 @@ const CoordenadorGeral = () => {
         <button onClick={() => deleteCoordenador(row.id_coordenador)} className="btn-delete">
           Deletar
         </button>
-
 
       ),
     },
