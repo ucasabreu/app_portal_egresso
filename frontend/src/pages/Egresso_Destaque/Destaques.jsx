@@ -18,22 +18,40 @@ const Destaques = () => {
         const url = search
           ? `${API_URL}/api/coordenadores/destaque/listar?nome=${encodeURIComponent(search)}`
           : `${API_URL}/api/coordenadores/destaque/listar`;
-
+  
         const response = await fetch(url);
+  
+        const contentType = response.headers.get('content-type');
+  
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Erro ao buscar destaques.");
+          let errorMessage = "Erro ao buscar destaques.";
+          if (contentType && contentType.includes('application/json')) {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorMessage;
+          } else {
+            const text = await response.text();
+            errorMessage = text || errorMessage;
+          }
+          throw new Error(errorMessage);
         }
-        const data = await response.json();
-        setDestaques(data);
+  
+        // Verifica se o retorno é JSON antes de fazer response.json()
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          setDestaques(data);
+        } else {
+          setDestaques([]);
+          setError("Nenhum destaque disponível.");
+        }
       } catch (err) {
         setDestaques([]);
         setError(err.message);
       }
     };
+  
     fetchDestaques();
   }, [search]);
-
+  
   const handleViewTimeline = (idEgresso) => {
     navigate(`/egresso/${idEgresso}/destaques`);
   };
