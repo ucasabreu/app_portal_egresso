@@ -96,7 +96,7 @@ const EditEgresso = () => {
         <form onSubmit={(e) => e.preventDefault()}>
           <div className="egresso-header">
             <img
-              src={egresso.foto}
+              src={egresso.foto || placeholderImg}
               alt={egresso.nome || "Foto do egresso"}
               className="egresso-photo"
             />
