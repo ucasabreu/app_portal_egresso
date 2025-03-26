@@ -3,6 +3,7 @@ import { FaEnvelope, FaLinkedin, FaInstagram, FaFileAlt } from 'react-icons/fa';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import "../../pages/Egresso/styles.css";
+import placeholderImg from "../../assets/ooui--user-avatar.png"
 import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
 import { API_URL } from '../../config/config.js';
@@ -92,7 +93,7 @@ const EditEgresso = () => {
         <form onSubmit={(e) => e.preventDefault()}>
           <div className="egresso-header">
             <img
-              src={egresso.foto || "default-image-path.jpg"}
+              src={egresso.foto || placeholderImg}
               alt={egresso.nome || "Foto do egresso"}
               className="egresso-photo"
             />
