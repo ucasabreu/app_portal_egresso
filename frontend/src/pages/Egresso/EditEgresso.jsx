@@ -26,7 +26,6 @@ const EditEgresso = () => {
     setEgresso({ ...egresso, [name]: value });
   };
 
-  // ✅ Agora a foto é um link (URL)
   const handlePhotoChange = (e) => {
     setEgresso({ ...egresso, foto: e.target.value });
   };
@@ -34,7 +33,16 @@ const EditEgresso = () => {
   const handleSaveEgresso = async () => {
     setErrorMessage("");
     try {
-      const response = await axios.post(`${API_URL}/api/egressos/salvar/egresso`, egresso);
+      const response = await axios.post(`${API_URL}/api/egressos/salvar/egresso`, {
+        nome: egresso.nome,
+        instagram: egresso.instagram,
+        linkedin: egresso.linkedin,
+        email: egresso.email,
+        curriculo: egresso.curriculo,
+        foto: egresso.foto,
+        descricao: egresso.descricao
+      });
+
       const savedEgresso = response.data;
       console.log('Dados do egresso salvos:', savedEgresso);
       navigate(`/egresso/${savedEgresso.id_egresso}`);
@@ -43,7 +51,9 @@ const EditEgresso = () => {
       if (error.response?.data) {
         const data = error.response.data;
         if (typeof data === 'object' && !Array.isArray(data)) {
-          setErrorMessage(Object.values(data));
+          // Converte o objeto em array de mensagens
+          const messages = Object.values(data);
+          setErrorMessage(messages);
         } else if (typeof data === 'string') {
           setErrorMessage([data]);
         } else {
@@ -66,12 +76,15 @@ const EditEgresso = () => {
       </header>
 
       <div className='container_egresso'>
+        {/* ✅ Exibe erro de forma estilizada */}
         {errorMessage && (
           <div className="error-message">
             {Array.isArray(errorMessage) ? (
-              errorMessage.map((msg, index) => <p key={index}>⚠ Atenção: {msg}</p>)
+              errorMessage.map((msg, index) => (
+                <p key={index}>⚠ Atenção: {msg}</p>
+              ))
             ) : (
-              <p>⚠ Atenção: {errorMessage}</p>
+              <p key={index}>⚠ Atenção: {msg}</p>
             )}
           </div>
         )}
@@ -79,59 +92,59 @@ const EditEgresso = () => {
         <form onSubmit={(e) => e.preventDefault()}>
           <div className="egresso-header">
             <img
-              src={egresso.foto || "https://via.placeholder.com/150"}
+              src={egresso.foto || "default-image-path.jpg"}
               alt={egresso.nome || "Foto do egresso"}
               className="egresso-photo"
             />
+            <div>
+              <label>
+                Link da Foto:
+                <input
+                  type="url"
+                  name="foto"
+                  value={egresso.foto}
+                  onChange={handlePhotoChange}
+                  placeholder="Cole o link da sua foto"
+                />
+              </label>
 
-            {/* ✅ Campo para receber o link da foto */}
-            <label>
-              Link da Foto:
-              <input
-                type="url"
-                name="foto"
-                value={egresso.foto}
-                onChange={handlePhotoChange}
-                placeholder="Cole o link da sua foto"
-              />
-            </label>
+              <label>
+                Nome:
+                <Input type="text" name="nome" value={egresso.nome} onChange={handleChange} placeholder="Insira seu nome" />
+              </label>
 
-            <label>
-              Nome:
-              <Input type="text" name="nome" value={egresso.nome} onChange={handleChange} placeholder="Insira seu nome" />
-            </label>
+              <label>
+                <FaEnvelope className="icon" /> Email:
+                <Input type="email" name="email" value={egresso.email} onChange={handleChange} placeholder="E-mail" />
+              </label>
 
-            <label>
-              <FaEnvelope className="icon" /> Email:
-              <Input type="email" name="email" value={egresso.email} onChange={handleChange} placeholder="E-mail" />
-            </label>
+              <label>
+                <FaLinkedin className="icon" /> LinkedIn:
+                <Input type="url" name="linkedin" value={egresso.linkedin} onChange={handleChange} placeholder="Link do LinkedIn" />
+              </label>
 
-            <label>
-              <FaLinkedin className="icon" /> LinkedIn:
-              <Input type="url" name="linkedin" value={egresso.linkedin} onChange={handleChange} placeholder="Link do LinkedIn" />
-            </label>
+              <label>
+                <FaInstagram className="icon" /> Instagram:
+                <Input type="url" name="instagram" value={egresso.instagram} onChange={handleChange} placeholder="Link do Instagram" />
+              </label>
 
-            <label>
-              <FaInstagram className="icon" /> Instagram:
-              <Input type="url" name="instagram" value={egresso.instagram} onChange={handleChange} placeholder="Link do Instagram" />
-            </label>
+              <label>
+                <FaFileAlt className="icon" /> Currículo:
+                <Input type="url" name="curriculo" value={egresso.curriculo} onChange={handleChange} placeholder="Link do Currículo" />
+              </label>
 
-            <label>
-              <FaFileAlt className="icon" /> Currículo:
-              <Input type="url" name="curriculo" value={egresso.curriculo} onChange={handleChange} placeholder="Link do Currículo" />
-            </label>
-
-            <label>
-              Descrição:
-              <textarea
-                name="descricao"
-                value={egresso.descricao}
-                onChange={handleChange}
-                placeholder="Escreva uma breve descrição sobre você"
-                rows="4"
-                style={{ width: "100%", padding: "10px", borderRadius: "8px" }}
-              />
-            </label>
+              <label>
+                Descrição:
+                <textarea
+                  name="descricao"
+                  value={egresso.descricao}
+                  onChange={handleChange}
+                  placeholder="Escreva uma breve descrição sobre você"
+                  rows="4"
+                  style={{ width: "100%", padding: "10px", borderRadius: "8px" }}
+                />
+              </label>
+            </div>
           </div>
 
           {!isConfirmed ? (
