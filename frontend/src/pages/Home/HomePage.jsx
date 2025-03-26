@@ -31,12 +31,31 @@ const HomePage = () => {
       try {
         setError("");
         const response = await fetch(`${API_URL}/api/coordenadores/destaque/listar`);
+
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Erro ao buscar destaques.");
+          // Checar se o conteúdo é JSON antes de tentar fazer response.json()
+          const contentType = response.headers.get('content-type');
+          let errorMessage = "Erro ao buscar destaques.";
+
+          if (contentType && contentType.includes('application/json')) {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorMessage;
+          } else {
+            const text = await response.text();
+            errorMessage = text || errorMessage;
+          }
+          throw new Error(errorMessage);
         }
-        const data = await response.json();
-        setDestaques(data);
+
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          setDestaques(data);
+        } else {
+          // Caso a API retorne texto puro
+          setDestaques([]);
+          setError("Nenhum destaque disponível.");
+        }
       } catch (err) {
         setDestaques([]);
         setError(err.message);
@@ -47,6 +66,7 @@ const HomePage = () => {
     const timer = setTimeout(() => setLoading(false), 2000);
     return () => clearTimeout(timer);
   }, []);
+
 
   const handleViewTimeline = (idEgresso) => {
     navigate(`/egresso/${idEgresso}/destaques`);
