@@ -435,7 +435,7 @@ const Egresso = () => {
                 <p>{depoimento.texto}</p>
                 <p><strong>{depoimento.autor}</strong></p>
                 <p><em>Publicado em: {new Date(depoimento.data).toLocaleDateString()}</em></p>
-                <button onClick={() => handleDeleteDepoimento(depoimento.id_depoimento)}>Deletar</button>
+                <Button onClick={() => handleDeleteDepoimento(depoimento.id_depoimento)}>Deletar</Button>
               </div>
             ))
           ) : (
