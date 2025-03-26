@@ -177,6 +177,7 @@ public class CoordenadorService {
 
     public void remover(Curso curso) {
         buscarCursoPorId(curso.getId_curso());
+        curso.setCoordenador(null);
         cursoRepositorio.deleteById(curso.getId_curso());
     }
 

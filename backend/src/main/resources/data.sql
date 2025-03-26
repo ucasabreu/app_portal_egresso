@@ -358,7 +358,7 @@ WHERE e."email" = 'fernando.lima@gmail.com'
 );
 
 
-INSERT INTO "destaque_egresso" ("id_egresso"," id_coordenador", "titulo", "noticia"," data_publicacao", "imagem", "feito_destaque")
+INSERT INTO "destaque_egresso" ("id_egresso","id_coordenador", "titulo", "noticia","data_publicacao", "imagem", "feito_destaque")
 SELECT e."id_egresso", c."id_coordenador", 'Liderança em Startups',
 'Carlos Eduardo liderou times de desenvolvimento em startups inovadoras no Brasil e no exterior.
 Com sua experiência em aplicações web e mobile, transformou ideias em produtos de alto impacto.
@@ -372,7 +372,7 @@ WHERE e."email" = 'carlos.edu@gmail.com' AND c."login" = 'jorge.softw'
 ON CONFLICT DO NOTHING;
 
 
-INSERT INTO "destaque_egresso" ("id_egresso"," id_coordenador", "titulo", "noticia"," data_publicacao", "imagem", "feito_destaque")
+INSERT INTO "destaque_egresso" ("id_egresso","id_coordenador", "titulo", "noticia","data_publicacao", "imagem", "feito_destaque")
 SELECT e."id_egresso", c."id_coordenador", 'Design premiado',
 'Ana Beatriz redesenhou a experiência de usuário de um dos principais apps financeiros do Brasil.
 Com foco em acessibilidade e usabilidade, suas soluções foram adotadas por milhões de usuários.
@@ -386,7 +386,7 @@ WHERE e."email" = 'ana.beatriz@gmail.com' AND c."login" = 'maria.comp'
 ON CONFLICT DO NOTHING;
 
 
-INSERT INTO "destaque_egresso" ("id_egresso"," id_coordenador", "titulo", "noticia"," data_publicacao", "imagem", "feito_destaque")
+INSERT INTO "destaque_egresso" ("id_egresso","id_coordenador", "titulo", "noticia","data_publicacao", "imagem", "feito_destaque")
 SELECT e."id_egresso", c."id_coordenador", 'Liderança em IA',
 'João Pedro aplicou modelos de inteligência artificial em projetos de saúde pública e setor bancário.
 Ele lidera times de cientistas de dados em tarefas complexas envolvendo predição e Big Data.
@@ -400,7 +400,7 @@ WHERE e."email" = 'joao.pedro@gmail.com' AND c."login" = 'matheus.IA'
 ON CONFLICT DO NOTHING;
 
 
-INSERT INTO "destaque_egresso" ("id_egresso"," id_coordenador", "titulo", "noticia"," data_publicacao", "imagem", "feito_destaque")
+INSERT INTO "destaque_egresso" ("id_egresso","id_coordenador", "titulo", "noticia","data_publicacao", "imagem", "feito_destaque")
 SELECT e."id_egresso", c."id_coordenador", 'Referência em Arquitetura',
 'Mariana Rocha projetou arquiteturas de microsserviços para grandes empresas nacionais.
 Com mais de 12 anos de experiência, é referência em soluções escaláveis na nuvem.
@@ -414,7 +414,7 @@ WHERE e."email"= 'mariana.rocha@gmail.com' AND c."login" = 'geoger.geo'
 ON CONFLICT DO NOTHING;
 
 
-INSERT INTO "destaque_egresso" ("id_egresso"," id_coordenador", "titulo", "noticia"," data_publicacao", "imagem", "feito_destaque")
+INSERT INTO "destaque_egresso" ("id_egresso","id_coordenador", "titulo", "noticia","data_publicacao", "imagem", "feito_destaque")
 SELECT e."id_egresso", c."id_coordenador", 'Liderança Ágil',
 'Fernando Lima tem experiência sólida como Product Owner em fintechs e startups.
 Implementou práticas ágeis com foco em entrega contínua e valor ao usuário.
