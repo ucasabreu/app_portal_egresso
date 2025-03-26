@@ -46,7 +46,14 @@ const Coordenador = () => {
       fetchCursosEgressos(response.data.id_coordenador);
     } catch (error) {
       console.error("Erro ao buscar coordenador:", error);
-      alert("Erro ao buscar dados do coordenador.");
+      const backendData = error.response?.data;
+      if (backendData && typeof backendData === 'object') {
+        setBackendErrors(Object.values(backendData));
+      } else if (typeof backendData === 'string') {
+        setBackendErrors([backendData]);
+      } else {
+        setBackendErrors(["Erro ao buscar dados do coordenador."]);
+      }
       setLoading(false);
     }
   };
@@ -75,8 +82,15 @@ const Coordenador = () => {
       setCursosComEgressos(cursosComEgressos);
       setLoading(false);
     } catch (error) {
-      console.error("Erro ao buscar cursos e egressos:", error);
-      alert("Erro ao buscar cursos e egressos.");
+      console.error("Erro ao buscar coordenador:", error);
+      const backendData = error.response?.data;
+      if (backendData && typeof backendData === 'object') {
+        setBackendErrors(Object.values(backendData));
+      } else if (typeof backendData === 'string') {
+        setBackendErrors([backendData]);
+      } else {
+        setBackendErrors(["Erro ao buscar dados do coordenador."]);
+      }
       setLoading(false);
     }
   };
@@ -87,8 +101,16 @@ const Coordenador = () => {
       const filtrados = response.data.filter((d) => d.coordenador.id_coordenador === coordenador.id_coordenador);
       setMeusDestaques(filtrados);
     } catch (error) {
-      console.error("Erro ao buscar destaques:", error);
-      alert("Erro ao buscar seus destaques.");
+      console.error("Erro ao buscar coordenador:", error);
+      const backendData = error.response?.data;
+      if (backendData && typeof backendData === 'object') {
+        setBackendErrors(Object.values(backendData));
+      } else if (typeof backendData === 'string') {
+        setBackendErrors([backendData]);
+      } else {
+        setBackendErrors(["Erro ao buscar dados do coordenador."]);
+      }
+      setLoading(false);
     }
   };
 
@@ -98,8 +120,16 @@ const Coordenador = () => {
       alert("Destaque removido com sucesso!");
       fetchMeusDestaques();
     } catch (error) {
-      console.error("Erro ao deletar destaque:", error);
-      alert("Erro ao deletar destaque.");
+      console.error("Erro ao buscar coordenador:", error);
+      const backendData = error.response?.data;
+      if (backendData && typeof backendData === 'object') {
+        setBackendErrors(Object.values(backendData));
+      } else if (typeof backendData === 'string') {
+        setBackendErrors([backendData]);
+      } else {
+        setBackendErrors(["Erro ao buscar dados do coordenador."]);
+      }
+      setLoading(false);
     }
   };
 
@@ -109,8 +139,16 @@ const Coordenador = () => {
       alert("Egresso deletado com sucesso.");
       fetchCoordenador();
     } catch (error) {
-      console.error("Erro ao deletar egresso:", error);
-      alert("Erro ao deletar egresso.");
+      console.error("Erro ao buscar coordenador:", error);
+      const backendData = error.response?.data;
+      if (backendData && typeof backendData === 'object') {
+        setBackendErrors(Object.values(backendData));
+      } else if (typeof backendData === 'string') {
+        setBackendErrors([backendData]);
+      } else {
+        setBackendErrors(["Erro ao buscar dados do coordenador."]);
+      }
+      setLoading(false);
     }
   };
 
@@ -161,13 +199,16 @@ const Coordenador = () => {
         fetchMeusDestaques();
       }
     } catch (error) {
-      console.error("Erro ao salvar destaque:", error);
+      console.error("Erro ao buscar coordenador:", error);
       const backendData = error.response?.data;
       if (backendData && typeof backendData === 'object') {
-        setBackendErrors(Object.values(backendData)); // Salva todas as mensagens
+        setBackendErrors(Object.values(backendData));
+      } else if (typeof backendData === 'string') {
+        setBackendErrors([backendData]);
       } else {
-        setBackendErrors(["Erro ao salvar destaque."]);
+        setBackendErrors(["Erro ao buscar dados do coordenador."]);
       }
+      setLoading(false);
     }
   };
 
@@ -204,6 +245,16 @@ const Coordenador = () => {
 
   return (
     <div className="container_coordenador">
+
+      {/* ✅ Exibir todos os erros da API aqui */}
+      {backendErrors.length > 0 && (
+        <div className="error-messages">
+          {backendErrors.map((err, index) => (
+            <p key={index} className="error-text">⚠️ {err}</p>
+          ))}
+        </div>
+      )}
+
       {loading ? (
         <p className="loading">Carregando...</p>
       ) : (

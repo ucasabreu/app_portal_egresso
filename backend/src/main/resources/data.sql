@@ -53,7 +53,7 @@ ON CONFLICT DO NOTHING;
 INSERT INTO "curso" ("id_coordenador", "nome", "nivel")
 SELECT c."id_coordenador", 'Engenharia de Software', 'Especialização'
 FROM "coordenador" c
-WHERE c."login" = 'jorge'
+WHERE c."login" = 'jorge.softw'
 AND NOT EXISTS (
     SELECT 1 FROM "curso" WHERE "nome" = 'Engenharia de Software'
 );
@@ -73,6 +73,31 @@ WHERE c."login" = 'matheus.IA'
 AND NOT EXISTS (
     SELECT 1 FROM "curso" WHERE "nome" = 'Ciência de Dados e Inteligência Artificial'
 );
+
+INSERT INTO "curso" ("id_coordenador", "nome", "nivel")
+SELECT c."id_coordenador", 'Sistemas de Informação', 'Mestrado'
+FROM "coordenador" c
+WHERE c."login" = 'maria.comp'
+AND NOT EXISTS (
+    SELECT 1 FROM "curso" WHERE "nome" = 'Sistemas de Informação'
+);
+
+INSERT INTO "curso" ("id_coordenador", "nome", "nivel")
+SELECT c."id_coordenador", 'Engenharia de Dados', 'Bacharelado'
+FROM "coordenador" c
+WHERE c."login" = 'geoger.geo'
+AND NOT EXISTS (
+    SELECT 1 FROM "curso" WHERE "nome" = 'Engenharia de Dados'
+);
+
+INSERT INTO "curso" ("id_coordenador", "nome", "nivel")
+SELECT c."id_coordenador", 'Análise e Desenvolvimento de Sistemas', 'Bacharelado'
+FROM "coordenador" c
+WHERE c."login" = 'jorge.softw'
+AND NOT EXISTS (
+    SELECT 1 FROM "curso" WHERE "nome" = 'Análise e Desenvolvimento de Sistemas'
+);
+
 
 -- Inserir dados na tabela "cargo"
 INSERT INTO "cargo" ("id_egresso", "descricao", "local", "ano_inicio", "ano_fim")
