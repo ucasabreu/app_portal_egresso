@@ -37,7 +37,7 @@ const CoordenadorGeral = () => {
     try {
       const response = await axios.get(`${API_URL}/api/coordenadores/buscar/coordenador/${id}`);
       setCoordenadorGeral(response.data);
-      fetchCoordenadoresECursos(response.data.id_coordenador);
+      
     } catch (error) {
       console.error("Erro ao buscar coordenador geral:", error);
       setError(error.response ? error.response.data : "Erro ao buscar dados do coordenador geral.");
