@@ -18,7 +18,15 @@ const CoordenadorGeral = () => {
   const [errorMessage, setErrorMessage] = useState("");      // Erros inesperados ou genéricos
 
 
-  useEffect(() => { fetchCoordenadorGeral(); }, [id]);
+  useEffect(() => {
+    fetchCoordenadorGeral();
+  }, [id]);
+  
+  useEffect(() => {
+    if (coordenadorGeral) {
+      fetchCoordenadoresECursos(coordenadorGeral.id_coordenador);
+    }
+  }, [coordenadorGeral]);
 
   const fetchCoordenadorGeral = async () => {
     if (!id) {
