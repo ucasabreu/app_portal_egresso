@@ -116,7 +116,6 @@ const CoordenadorGeral = () => {
     try {
       await axios.delete(`${API_URL}/api/coordenadores/deletar/curso/${idCurso}`);
       alert("Curso deletado com sucesso.");
-      fetchCoordenadoresECursos(coordenadorGeral.id_coordenador);
     } catch (error) {
       console.error("Erro ao deletar curso:", error);
       setError(error.response ? error.response.data : "Erro ao deletar curso.");
