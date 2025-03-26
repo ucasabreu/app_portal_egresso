@@ -25,9 +25,6 @@ public class EgressoService {
     CargoRepositorio cargoRepositorio;
 
     @Autowired
-    DestaqueEgresso destaqueEgresso;
-
-    @Autowired
     DepoimentoRepositorio depoimentoRepositorio;
 
     @Autowired
@@ -39,9 +36,6 @@ public class EgressoService {
     @Autowired
     DestaqueEgressoRepositorio destaqueEgressoRepositorio;
 
-    EgressoService(DestaqueEgressoRepositorio destaqueEgressoRepositorio) {
-        this.destaqueEgressoRepositorio = destaqueEgressoRepositorio;
-    }
 
     public Cargo salvar(Cargo cargo) {
         verificarCargo(cargo); // validação antes de salvar
