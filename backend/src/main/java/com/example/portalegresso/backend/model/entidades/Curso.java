@@ -38,7 +38,7 @@ public class Curso {
     private String nivel;
 
     @ManyToOne
-    @JoinColumn(name="id_coordenador")
+    @JoinColumn(name = "id_coordenador", nullable = true)
     private Coordenador coordenador;
     
 

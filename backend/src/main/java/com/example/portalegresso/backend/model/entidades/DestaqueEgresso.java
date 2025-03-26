@@ -40,7 +40,7 @@ public class DestaqueEgresso {
     private Egresso egresso; // Relacionamento com o Egresso
 
     @ManyToOne
-    @JoinColumn(name = "id_coordenador", nullable = false)
+    @JoinColumn(name = "id_coordenador", nullable = true)
     private Coordenador coordenador; // Relacionamento com o Coordenador
 
     @NotBlank(message = "O título é obrigatório")

@@ -182,15 +182,26 @@ public class CoordenadorService {
 
     public void remover(Coordenador coordenador) {
         Coordenador coordenadorExistente = buscarCoordenadorPorId(coordenador.getId_coordenador());
-
-        // Remover todos os cursos relacionados ao coordenador
+    
+        // 1. Desvincular coordenador dos cursos (mas manter os cursos no banco)
         List<Curso> cursos = cursoRepositorio.findByCoordenador(coordenadorExistente);
         for (Curso curso : cursos) {
-            cursoRepositorio.delete(curso);
+            curso.setCoordenador(null);
+            
+        }
+        cursoRepositorio.saveAll(cursos);
+    
+        // 2. Desvincular coordenador dos destaques (mas manter os destaques no banco)
+        List<DestaqueEgresso> destaques = destaqueEgressoRepositorio.findByCoordenador(coordenadorExistente);
+        for (DestaqueEgresso destaque : destaques) {
+            destaque.setCoordenador(null);
+            
         }
 
-        // Deletar dados do coordenador
-        coordenadorRepositorio.deleteById(coordenador.getId_coordenador());
+        destaqueEgressoRepositorio.saveAll(destaques);
+    
+        // 3. Deletar coordenador
+        coordenadorRepositorio.deleteById(coordenadorExistente.getId_coordenador());
     }
 
     // ✅ Excluir um destaque

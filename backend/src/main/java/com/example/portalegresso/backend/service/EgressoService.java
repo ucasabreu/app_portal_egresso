@@ -10,21 +10,22 @@ import com.example.portalegresso.backend.model.entidades.Cargo;
 import com.example.portalegresso.backend.model.entidades.Curso;
 import com.example.portalegresso.backend.model.entidades.CursoEgresso;
 import com.example.portalegresso.backend.model.entidades.Depoimento;
+import com.example.portalegresso.backend.model.entidades.DestaqueEgresso;
 import com.example.portalegresso.backend.model.entidades.Egresso;
-import com.example.portalegresso.backend.model.repository.CargoRepositorio;
-import com.example.portalegresso.backend.model.repository.CursoEgressoRepositorio;
-import com.example.portalegresso.backend.model.repository.CursoRepositorio;
-import com.example.portalegresso.backend.model.repository.DepoimentoRepositorio;
-import com.example.portalegresso.backend.model.repository.EgressoRepositorio;
+import com.example.portalegresso.backend.model.repository.*;
 
 @Service
 public class EgressoService {
+
 
     @Autowired
     EgressoRepositorio egressoRepositorio;
 
     @Autowired
     CargoRepositorio cargoRepositorio;
+
+    @Autowired
+    DestaqueEgresso destaqueEgresso;
 
     @Autowired
     DepoimentoRepositorio depoimentoRepositorio;
@@ -34,6 +35,13 @@ public class EgressoService {
 
     @Autowired
     CursoRepositorio cursoRepositorio;
+
+    @Autowired
+    DestaqueEgressoRepositorio destaqueEgressoRepositorio;
+
+    EgressoService(DestaqueEgressoRepositorio destaqueEgressoRepositorio) {
+        this.destaqueEgressoRepositorio = destaqueEgressoRepositorio;
+    }
 
     public Cargo salvar(Cargo cargo) {
         verificarCargo(cargo); // validação antes de salvar
@@ -254,6 +262,11 @@ public class EgressoService {
 
         for (CursoEgresso cursoEgresso : cursoEgressoList) {
             cursoEgressoRepositorio.delete(cursoEgresso);
+        }
+
+        List<DestaqueEgresso>  destaqueList = destaqueEgressoRepositorio.findByEgresso(egressoExistente);
+        for(DestaqueEgresso destaque : destaqueList){
+           destaqueEgressoRepositorio.delete(destaque);
         }
 
         egressoRepositorio.deleteById(egresso.getId_egresso());
