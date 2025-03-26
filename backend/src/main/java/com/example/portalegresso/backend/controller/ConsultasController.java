@@ -1,7 +1,9 @@
 package com.example.portalegresso.backend.controller;
 
-
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +23,6 @@ import com.example.portalegresso.backend.model.entidades.Egresso;
 import com.example.portalegresso.backend.service.ConsultasService;
 import com.example.portalegresso.backend.service.RegraNegocioRunTime;
 
-
 @RequestMapping("/api/consultas")
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -30,177 +31,237 @@ public class ConsultasController {
     @Autowired
     ConsultasService consultasService;
 
-    //GET
+    // GET
     // -> CURSOS
     @GetMapping("/listar/cursos")
-    public ResponseEntity<?> listarTodosCursos(){
-        try{
-            List<Curso> cursos = consultasService.listarTodosCursos();
-            return new ResponseEntity<>(cursos, HttpStatus.OK);
+    public ResponseEntity<?> listarTodosCursos() {
+        List<Curso> cursos = consultasService.listarTodosCursos();
+
+        if (cursos.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum curso encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        catch(RegraNegocioRunTime e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+
+        return new ResponseEntity<>(cursos, HttpStatus.OK);
     }
-   
+
     @GetMapping("/listar/cursos/nivel")
     public ResponseEntity<?> listarPorFiltros(String nivel) {
-        try {
-            List<Curso> cursos = consultasService.listarPorFiltros(nivel);
-            return new ResponseEntity<>(cursos, HttpStatus.OK);
-        } catch (RegraNegocioRunTime e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        List<Curso> cursos = consultasService.listarPorFiltros(nivel);
+        
+        if (cursos.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum curso encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
+
+        return new ResponseEntity<>(cursos, HttpStatus.OK);
     }
 
     // -> DEPOIMENTOS
 
     @GetMapping("/listar/depoimentos")
-    public ResponseEntity<?> listarDepoimentosRecentes(){
-        try{
-            List<Depoimento> depoimentos = consultasService.consultarRecentes();
-            return new ResponseEntity<>(depoimentos, HttpStatus.OK);
+    public ResponseEntity<?> listarDepoimentosRecentes() {
+        List<Depoimento> depoimentos = consultasService.consultarRecentes();
+
+        if (depoimentos.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum depoimento encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        catch(RegraNegocioRunTime e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+
+        return new ResponseEntity<>(depoimentos, HttpStatus.OK);
     }
 
     @GetMapping("/listar/depoimentos/limite")
-    public ResponseEntity<?> listarDepoimentosRecentesComLimite(Integer limite){
-        try{
-            List<Depoimento> depoimentos = consultasService.consultarRecentes(limite);
-            return new ResponseEntity<>(depoimentos, HttpStatus.OK);
+    public ResponseEntity<?> listarDepoimentosRecentesComLimite(Integer limite) {
+
+        List<Depoimento> depoimentos = consultasService.consultarRecentes(limite);
+        
+        if (depoimentos.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum depoimento encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        catch(RegraNegocioRunTime e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+
+        return new ResponseEntity<>(depoimentos, HttpStatus.OK);
     }
 
-    
-    @GetMapping("/listar/depoimentos/ano")//OK
+    @GetMapping("/listar/depoimentos/ano") // OK
     public ResponseEntity<?> listarDepoimentosPorAno(Integer ano) {
-        try {
-            List<Depoimento> depoimentos = consultasService.consultarPorAno(ano);
-            return new ResponseEntity<>(depoimentos, HttpStatus.OK);
-        } catch (RegraNegocioRunTime e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        List<Depoimento> depoimentos = consultasService.consultarPorAno(ano);
+        
+        if (depoimentos.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum depoimento encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
+
+        return new ResponseEntity<>(depoimentos, HttpStatus.OK);
     }
 
     @GetMapping("/listar/cargos")
-    public ResponseEntity<?> listarCargos(){
-        try{
-            List<Cargo> cargos = consultasService.listarCargos();
-            return new ResponseEntity<>(cargos, HttpStatus.OK);
+    public ResponseEntity<?> listarCargos() {
+        List<Cargo> cargos = consultasService.listarCargos();
+        
+        if (cargos.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum cargo encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        catch(RegraNegocioRunTime e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+
+        return new ResponseEntity<>(cargos, HttpStatus.OK);
     }
-    
+
     // -> EGRESSOS
 
     @GetMapping("/listar/egressos")
     public ResponseEntity<?> listarEgressos() {
-        try{
-            List<Egresso> egressos = consultasService.listarEgressos();
-            return new ResponseEntity<>(egressos, HttpStatus.OK);
+        List<Egresso> egressos = consultasService.listarEgressos();
+        
+        if (egressos.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum egresso encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        catch(RegraNegocioRunTime e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+
+        return new ResponseEntity<>(egressos, HttpStatus.OK);
     }
-    
 
     @GetMapping("/listar/egressos/nome")
-    public ResponseEntity<?> listarEgressosPorNome(String nome){
-        try{
-            List<Egresso> egressos = consultasService.consultarEgressosPorNome(nome);
-            return new ResponseEntity<>(egressos, HttpStatus.OK);
+    public ResponseEntity<?> listarEgressosPorNome(String nome) {
+        List<Egresso> egressos = consultasService.consultarEgressosPorNome(nome);
+        
+        if (egressos.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum egresso encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        catch(RegraNegocioRunTime e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+
+        return new ResponseEntity<>(egressos, HttpStatus.OK);
     }
 
-    //TODO: verificar pesquisa por cargo esta correta
+    // TODO: verificar pesquisa por cargo esta correta
     @GetMapping("/listar/egressos/cargo")
-    public ResponseEntity<?> listarEgressosPorCargo(String cargo){
-        try{
-            List<Egresso> egressos = consultasService.consultarEgressosPorCargo(cargo);
-            return new ResponseEntity<>(egressos, HttpStatus.OK);
+    public ResponseEntity<?> listarEgressosPorCargo(String cargo) {
+        List<Egresso> egressos = consultasService.consultarEgressosPorCargo(cargo);
+
+        if (egressos.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum egresso encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        catch(RegraNegocioRunTime e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+
+        return new ResponseEntity<>(egressos, HttpStatus.OK);
     }
 
     @GetMapping("/listar/egressos/curso")
-    public ResponseEntity<?> listarEgressosPorCurso(String curso){
-        try{
-            List<Egresso> egressos = consultasService.consultarEgressosPorCurso(curso);
-            return new ResponseEntity<>(egressos, HttpStatus.OK);
+    public ResponseEntity<?> listarEgressosPorCurso(String curso) {
+        List<Egresso> egressos = consultasService.consultarEgressosPorCurso(curso);
+
+        if (egressos.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum egresso encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        catch(RegraNegocioRunTime e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+
+        return new ResponseEntity<>(egressos, HttpStatus.OK);
     }
 
     @GetMapping("/listar/egressos/ano_inicio")
-    public ResponseEntity<?> listarEgressosPorAnoInicioCurso(Integer ano){
-        try{
-            List<Egresso> egressos = consultasService.consultarEgressosPorAnoInicio(ano);
-            return new ResponseEntity<>(egressos, HttpStatus.OK);
+    public ResponseEntity<?> listarEgressosPorAnoInicioCurso(Integer ano) {
+        List<Egresso> egressos = consultasService.consultarEgressosPorAnoInicio(ano);
+        
+        if (egressos.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum egresso encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        catch(RegraNegocioRunTime e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+
+        return new ResponseEntity<>(egressos, HttpStatus.OK);
     }
 
     @GetMapping("/listar/egressos/ano_fim")
-    public ResponseEntity<?> listarEgressosPorAnoFimCurso(Integer ano){
-        try{
-            List<Egresso> egressos = consultasService.consultarEgressosPorAnoFim(ano);
-            return new ResponseEntity<>(egressos, HttpStatus.OK);
+    public ResponseEntity<?> listarEgressosPorAnoFimCurso(Integer ano) {
+        List<Egresso> egressos = consultasService.consultarEgressosPorAnoFim(ano);
+        
+        if (egressos.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum egresso encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        catch(RegraNegocioRunTime e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+
+        return new ResponseEntity<>(egressos, HttpStatus.OK);
     }
 
     @GetMapping("/listar/egressos/nomes")
     public ResponseEntity<?> listarTodosNomesEgressos() {
-        try {
-            List<String> nomes = consultasService.listarTodosNomesEgressos();
-            return new ResponseEntity<>(nomes, HttpStatus.OK);
-        } catch (RegraNegocioRunTime e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
+        List<String> nomes = consultasService.listarTodosNomesEgressos();
 
+        if (nomes.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum egresso encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(nomes, HttpStatus.OK);
+    }
 
     @GetMapping("/listar/cursoegresso")
     public ResponseEntity<?> listarCursoEgresso() {
-        try {
-            List<CursoEgresso> cursoEgresso = consultasService.listarCursoEgresso();
-            return new ResponseEntity<>(cursoEgresso, HttpStatus.OK);
-        } catch (RegraNegocioRunTime e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        List<CursoEgresso> cursoEgresso = consultasService.listarCursoEgresso();
+
+        if (cursoEgresso.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum egresso matriculado em curso encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
+
+        return new ResponseEntity<>(cursoEgresso, HttpStatus.OK);
     }
 
     @GetMapping("/listar/coordenadores")
     public ResponseEntity<?> listarCoordenadores() {
-        try {
-            List<Coordenador> cursos = consultasService.listarCoordenadores();
-            return new ResponseEntity<>(cursos, HttpStatus.OK);
-        } catch (RegraNegocioRunTime e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        List<Coordenador> coordenadores = consultasService.listarCoordenadores();
+        
+        if (coordenadores.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Nenhum cordenador encontrado.");
+            response.put("data", Collections.emptyList());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-    }
-    
 
-    
+        return new ResponseEntity<>(coordenadores, HttpStatus.OK);
+    }
 
 }

@@ -69,9 +69,6 @@ public class ConsultasService {
     // opcao para adicionar o limite de depoimentos maximo (opcional), caso para sem
     // limite == null.
     public List<Depoimento> consultarRecentes(Integer limite) {
-        if (depoimentoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há depoimentos cadastrados.");
-        }
         if (limite > 0) {
             // Define a paginação para limitar os resultados
             Pageable pageable = PageRequest.of(0, limite);
@@ -82,9 +79,6 @@ public class ConsultasService {
     }
 
     public List<Depoimento> consultarRecentes() {
-        if (depoimentoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há depoimentos cadastrados.");
-        }
         return depoimentoRepositorio.findAllByOrderByDataDesc();
     }
 
@@ -101,24 +95,14 @@ public class ConsultasService {
         }
 
         List<Depoimento> depoimentos = depoimentoRepositorio.findByAno(ano);
-        if (depoimentos.isEmpty()) {
-            throw new RegraNegocioRunTime("Não há depoimentos para o ano informado.");
-        }
-
         return depoimentos;
     }
 
     public List<Cargo> listarCargos() {
-        if (cargoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há cargos cadastrados.");
-        }
         return cargoRepositorio.findAll();
     }
 
     public List<Egresso> listarEgressos() {
-        if (egressoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há egressos cadastrados.");
-        }
         return egressoRepositorio.findAll();
     }
 
@@ -140,10 +124,6 @@ public class ConsultasService {
         }
 
         List<Egresso> egressos = egressoRepositorio.findByNomeContainingIgnoreCase(nome);
-
-        if (egressos.isEmpty()) {
-            throw new RegraNegocioRunTime("Não há egressos com o nome informado.");
-        }
 
         return egressos;
     }
@@ -168,10 +148,6 @@ public class ConsultasService {
 
         List<Egresso> egressos = cargoRepositorio.findEgressosByCargoDescricao(cargo);
 
-        if (egressos.isEmpty()) {
-            throw new RegraNegocioRunTime("Não há egressos com o cargo informado.");
-        }
-
         return egressos;
     }
 
@@ -190,9 +166,6 @@ public class ConsultasService {
         }
 
         List<Egresso> egressos = cursoEgressoRepositorio.findEgressosByCursoNome(curso);
-        if (egressos.isEmpty()) {
-            throw new RegraNegocioRunTime("Não há egressos com o curso informado.");
-        }
 
         return egressos;
     }
@@ -211,10 +184,6 @@ public class ConsultasService {
         }
         List<Egresso> egressos = cursoEgressoRepositorio.findEgressosByAnoInicio(ano);
 
-        if (egressos.isEmpty()) {
-            throw new RegraNegocioRunTime("Não há egressos para o ano informado.");
-        }
-
         return egressos;
     }
 
@@ -231,32 +200,22 @@ public class ConsultasService {
         }
 
         List<Egresso> egressos = cursoEgressoRepositorio.findEgressosByAnoFim(ano);
-        if (egressos.isEmpty()) {
-            throw new RegraNegocioRunTime("Não há egressos para o ano informado.");
-        }
+
         return egressos;
     }
 
     public List<String> listarTodosNomesEgressos() {
-        if (egressoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há egressos cadastrados.");
-        }
         return egressoRepositorio.findAll().stream()
                 .map(Egresso::getNome)
                 .collect(Collectors.toList());
     }
 
     public List<CursoEgresso> listarCursoEgresso() {
-        if (cursoEgressoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há dados de curso egresso cadastrados.");
-        }
+        
         return cursoEgressoRepositorio.findAll();
     }
 
     public List<Coordenador> listarCoordenadores() {
-        if (coordenadorRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há coordenadores cadastrados.");
-        }
         return coordenadorRepositorio.findAll();
     }
 

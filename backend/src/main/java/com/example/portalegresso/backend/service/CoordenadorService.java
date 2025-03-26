@@ -252,9 +252,6 @@ public class CoordenadorService {
     }
 
     public List<DestaqueEgresso> listarDestaques() {
-        if (destaqueEgressoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há destaques cadastrados.");
-        }
         return destaqueEgressoRepositorio.findAll();
     }
 

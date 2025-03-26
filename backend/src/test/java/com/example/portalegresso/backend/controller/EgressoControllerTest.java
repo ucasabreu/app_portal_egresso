@@ -74,13 +74,13 @@ public class EgressoControllerTest {
         @Test
         public void testSalvarEgresso() throws Exception {
                 when(egressoService.salvar(any(Egresso.class))).thenReturn(egresso);
-                EgressoDTO dto = new EgressoDTO("Lucas", "lucas@email.com", "Descrição", "foto.png", "linkedin",
-                                "insta", "curriculo");
+                EgressoDTO dto = new EgressoDTO("Lucas", "lucas17@email.com", "Descrição", "foto.png", "https://www.linkedin.com/in/lucas",
+                                "https://www.instagram.com/lucas", "curriculo");
 
                 mockMvc.perform(post("/api/egressos/salvar/egresso")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(dto)))
-                                .andExpect(status().isOk())
+                                .andExpect(status().isCreated())
                                 .andExpect(jsonPath("$.nome").value("Lucas"));
         }
 

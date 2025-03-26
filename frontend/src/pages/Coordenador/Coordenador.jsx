@@ -47,12 +47,18 @@ const Coordenador = () => {
     } catch (error) {
       console.error("Erro ao buscar coordenador:", error);
       const backendData = error.response?.data;
+    
       if (backendData && typeof backendData === 'object') {
-        setBackendErrors(Object.values(backendData));
+        // Se o backend enviar { message: "Nenhum dado encontrado", data: [] }
+        if (backendData.message) {
+          setBackendErrors([backendData.message]);
+        } else {
+          setBackendErrors(Object.values(backendData));
+        }
       } else if (typeof backendData === 'string') {
         setBackendErrors([backendData]);
       } else {
-        setBackendErrors(["Erro ao buscar dados do coordenador."]);
+        setBackendErrors(["Erro ao buscar coordenador."]);
       }
       setLoading(false);
     }
@@ -82,14 +88,20 @@ const Coordenador = () => {
       setCursosComEgressos(cursosComEgressos);
       setLoading(false);
     } catch (error) {
-      console.error("Erro ao buscar coordenador:", error);
+      console.error("Erro ao buscar cursos dos egressos:", error);
       const backendData = error.response?.data;
+    
       if (backendData && typeof backendData === 'object') {
-        setBackendErrors(Object.values(backendData));
+        // Se o backend enviar { message: "Nenhum dado encontrado", data: [] }
+        if (backendData.message) {
+          setBackendErrors([backendData.message]);
+        } else {
+          setBackendErrors(Object.values(backendData));
+        }
       } else if (typeof backendData === 'string') {
         setBackendErrors([backendData]);
       } else {
-        setBackendErrors(["Erro ao buscar dados do coordenador."]);
+        setBackendErrors(["Erro ao buscar cursos dos egressos."]);
       }
       setLoading(false);
     }
@@ -101,14 +113,20 @@ const Coordenador = () => {
       const filtrados = response.data.filter((d) => d.coordenador.id_coordenador === coordenador.id_coordenador);
       setMeusDestaques(filtrados);
     } catch (error) {
-      console.error("Erro ao buscar coordenador:", error);
+      console.error("Erro ao buscar destaques:", error);
       const backendData = error.response?.data;
+    
       if (backendData && typeof backendData === 'object') {
-        setBackendErrors(Object.values(backendData));
+        // Se o backend enviar { message: "Nenhum dado encontrado", data: [] }
+        if (backendData.message) {
+          setBackendErrors([backendData.message]);
+        } else {
+          setBackendErrors(Object.values(backendData));
+        }
       } else if (typeof backendData === 'string') {
         setBackendErrors([backendData]);
       } else {
-        setBackendErrors(["Erro ao buscar dados do coordenador."]);
+        setBackendErrors(["Erro ao buscar destaque."]);
       }
       setLoading(false);
     }
@@ -120,14 +138,20 @@ const Coordenador = () => {
       alert("Destaque removido com sucesso!");
       fetchMeusDestaques();
     } catch (error) {
-      console.error("Erro ao buscar coordenador:", error);
+      console.error("Erro ao deletar destaque:", error);
       const backendData = error.response?.data;
+    
       if (backendData && typeof backendData === 'object') {
-        setBackendErrors(Object.values(backendData));
+        // Se o backend enviar { message: "Nenhum dado encontrado", data: [] }
+        if (backendData.message) {
+          setBackendErrors([backendData.message]);
+        } else {
+          setBackendErrors(Object.values(backendData));
+        }
       } else if (typeof backendData === 'string') {
         setBackendErrors([backendData]);
       } else {
-        setBackendErrors(["Erro ao buscar dados do coordenador."]);
+        setBackendErrors(["Erro ao deletar destaque."]);
       }
       setLoading(false);
     }
@@ -139,14 +163,20 @@ const Coordenador = () => {
       alert("Egresso deletado com sucesso.");
       fetchCoordenador();
     } catch (error) {
-      console.error("Erro ao buscar coordenador:", error);
+      console.error("Erro ao deletar egresso:", error);
       const backendData = error.response?.data;
+    
       if (backendData && typeof backendData === 'object') {
-        setBackendErrors(Object.values(backendData));
+        // Se o backend enviar { message: "Nenhum dado encontrado", data: [] }
+        if (backendData.message) {
+          setBackendErrors([backendData.message]);
+        } else {
+          setBackendErrors(Object.values(backendData));
+        }
       } else if (typeof backendData === 'string') {
         setBackendErrors([backendData]);
       } else {
-        setBackendErrors(["Erro ao buscar dados do coordenador."]);
+        setBackendErrors(["Erro ao deletar egresso."]);
       }
       setLoading(false);
     }
@@ -199,15 +229,22 @@ const Coordenador = () => {
         fetchMeusDestaques();
       }
     } catch (error) {
-      console.error("Erro ao buscar coordenador:", error);
+      console.error("Erro ao salvar destaque:", error);
       const backendData = error.response?.data;
+    
       if (backendData && typeof backendData === 'object') {
-        setBackendErrors(Object.values(backendData));
+        // Se o backend enviar { message: "Nenhum dado encontrado", data: [] }
+        if (backendData.message) {
+          setBackendErrors([backendData.message]);
+        } else {
+          setBackendErrors(Object.values(backendData));
+        }
       } else if (typeof backendData === 'string') {
         setBackendErrors([backendData]);
       } else {
-        setBackendErrors(["Erro ao buscar dados do coordenador."]);
+        setBackendErrors(["Erro ao buscar ao salvar destaque."]);
       }
+    
       setLoading(false);
     }
   };
@@ -245,15 +282,6 @@ const Coordenador = () => {
 
   return (
     <div className="container_coordenador">
-
-      {/* ✅ Exibir todos os erros da API aqui */}
-      {backendErrors.length > 0 && (
-        <div className="error-messages">
-          {backendErrors.map((err, index) => (
-            <p key={index} className="error-text">⚠️ {err}</p>
-          ))}
-        </div>
-      )}
 
       {loading ? (
         <p className="loading">Carregando...</p>
@@ -311,11 +339,8 @@ const Coordenador = () => {
               <input type="text" name="titulo" placeholder="Título" value={destaqueData.titulo} onChange={handleDestaqueChange} />
               <textarea name="noticia" placeholder="Notícia" value={destaqueData.noticia} onChange={handleDestaqueChange} />
               <input type="text" name="feitoDestaque" placeholder="Feito de Destaque" value={destaqueData.feitoDestaque} onChange={handleDestaqueChange} />
-
-              <label>Upload da Imagem:</label>
-              <input type="file" name="imagemFile" accept="image/*" onChange={handleImageUpload} />
-
-              <label>Ou informe uma URL da imagem:</label>
+              
+              <label>informe uma URL para imagem:</label>
               <input type="text" name="imagem" placeholder="URL da Imagem" value={destaqueData.imagem} onChange={handleDestaqueChange} />
 
               <button onClick={salvarDestaque} className="btn-salvar-destaque">Salvar Destaque</button>

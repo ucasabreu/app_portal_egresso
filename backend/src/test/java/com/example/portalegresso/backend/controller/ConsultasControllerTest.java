@@ -2,266 +2,147 @@ package com.example.portalegresso.backend.controller;
 
 import com.example.portalegresso.backend.model.entidades.*;
 import com.example.portalegresso.backend.service.ConsultasService;
-import com.example.portalegresso.backend.service.RegraNegocioRunTime;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
 public class ConsultasControllerTest {
 
     @InjectMocks
     private ConsultasController consultasController;
 
+    @Mock
     private ConsultasService consultasService;
+
+    private MockMvc mockMvc;
+    private ObjectMapper objectMapper;
+
+    private Curso curso;
+    private Egresso egresso;
+    private Coordenador coordenador;
+    private CursoEgresso cursoEgresso;
+    private Depoimento depoimento;
+    private Cargo cargo;
 
     @BeforeEach
     public void setup() {
-        consultasService = mock(ConsultasService.class);
-        consultasController = new ConsultasController();
-        consultasController.consultasService = consultasService;
-        MockitoAnnotations.openMocks(this);
-    }
+        mockMvc = MockMvcBuilders.standaloneSetup(consultasController).build();
+        objectMapper = new ObjectMapper();
 
-    // Exemplo CURSOS
-    @Test
-    public void testListarTodosCursos_Sucesso() {
-        List<Curso> cursos = Arrays.asList(new Curso(), new Curso());
-        when(consultasService.listarTodosCursos()).thenReturn(cursos);
+        coordenador = Coordenador.builder().id_coordenador(1).login("maria").build();
+        curso = Curso.builder().id_curso(1).nome("Engenharia").nivel("Superior").coordenador(coordenador).build();
+        egresso = Egresso.builder().id_egresso(1).nome("Lucas").email("lucas@email.com").build();
+        cursoEgresso = new CursoEgresso();
+        cursoEgresso.setCurso(curso);
+        cursoEgresso.setEgresso(egresso);
+        cursoEgresso.setAno_inicio(2010);
+        cursoEgresso.setAno_fim(2014);
 
-        ResponseEntity<?> response = consultasController.listarTodosCursos();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(cursos, response.getBody());
-    }
-
-    @Test
-    public void testListarTodosCursos_Erro() {
-        when(consultasService.listarTodosCursos()).thenThrow(new RegraNegocioRunTime("Erro cursos"));
-
-        ResponseEntity<?> response = consultasController.listarTodosCursos();
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Erro cursos", response.getBody());
-    }
-
-    // Exemplo DEPOIMENTOS
-    @Test
-    public void testListarDepoimentosRecentes_Sucesso() {
-        List<Depoimento> depoimentos = Arrays.asList(new Depoimento(), new Depoimento());
-        when(consultasService.consultarRecentes()).thenReturn(depoimentos);
-
-        ResponseEntity<?> response = consultasController.listarDepoimentosRecentes();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(depoimentos, response.getBody());
+        depoimento = Depoimento.builder().id_depoimento(1).egresso(egresso).texto("Depoimento teste").build();
+        cargo = Cargo.builder().id_cargo(1).descricao("Desenvolvedor").local("Empresa X").ano_inicio(2010).ano_fim(2014).egresso(egresso).build();
     }
 
     @Test
-    public void testListarDepoimentosRecentes_Erro() {
-        when(consultasService.consultarRecentes()).thenThrow(new RegraNegocioRunTime("Erro depoimentos"));
+    void testListarTodosCursos_sucesso() throws Exception {
+        when(consultasService.listarTodosCursos()).thenReturn(List.of(curso));
 
-        ResponseEntity<?> response = consultasController.listarDepoimentosRecentes();
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Erro depoimentos", response.getBody());
-    }
-
-    // Exemplo EGRESSOS
-    @Test
-    public void testListarEgressos_Sucesso() {
-        List<Egresso> egressos = Arrays.asList(new Egresso(), new Egresso());
-        when(consultasService.listarEgressos()).thenReturn(egressos);
-
-        ResponseEntity<?> response = consultasController.listarEgressos();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(egressos, response.getBody());
+        mockMvc.perform(get("/api/consultas/listar/cursos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nome").value("Engenharia"));
     }
 
     @Test
-    public void testListarEgressos_Erro() {
-        when(consultasService.listarEgressos()).thenThrow(new RegraNegocioRunTime("Erro egressos"));
+    void testListarTodosCursos_vazio() throws Exception {
+        when(consultasService.listarTodosCursos()).thenReturn(Collections.emptyList());
 
-        ResponseEntity<?> response = consultasController.listarEgressos();
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Erro egressos", response.getBody());
-    }
-
-    // Exemplo CARGOS
-    @Test
-    public void testListarCargos_Sucesso() {
-        List<Cargo> cargos = Arrays.asList(new Cargo(), new Cargo());
-        when(consultasService.listarCargos()).thenReturn(cargos);
-
-        ResponseEntity<?> response = consultasController.listarCargos();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(cargos, response.getBody());
+        mockMvc.perform(get("/api/consultas/listar/cursos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Nenhum curso encontrado."));
     }
 
     @Test
-    public void testListarCargos_Erro() {
-        when(consultasService.listarCargos()).thenThrow(new RegraNegocioRunTime("Erro cargos"));
+    void testListarDepoimentosRecentes_sucesso() throws Exception {
+        when(consultasService.consultarRecentes()).thenReturn(List.of(depoimento));
 
-        ResponseEntity<?> response = consultasController.listarCargos();
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Erro cargos", response.getBody());
-    }
-
-    // Exemplo COORDENADORES
-    @Test
-    public void testListarCoordenadores_Sucesso() {
-        List<Coordenador> coordenadores = Arrays.asList(new Coordenador(), new Coordenador());
-        when(consultasService.listarCoordenadores()).thenReturn(coordenadores);
-
-        ResponseEntity<?> response = consultasController.listarCoordenadores();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(coordenadores, response.getBody());
+        mockMvc.perform(get("/api/consultas/listar/depoimentos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].texto").value("Depoimento teste"));
     }
 
     @Test
-    public void testListarCoordenadores_Erro() {
-        when(consultasService.listarCoordenadores()).thenThrow(new RegraNegocioRunTime("Erro coordenadores"));
+    void testListarDepoimentosRecentes_vazio() throws Exception {
+        when(consultasService.consultarRecentes()).thenReturn(Collections.emptyList());
 
-        ResponseEntity<?> response = consultasController.listarCoordenadores();
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Erro coordenadores", response.getBody());
-    }
-
-    // Exemplo FILTROS por nome de egresso
-    @Test
-    public void testListarEgressosPorNome_Sucesso() {
-        List<Egresso> egressos = Arrays.asList(new Egresso(), new Egresso());
-        when(consultasService.consultarEgressosPorNome("Lucas")).thenReturn(egressos);
-
-        ResponseEntity<?> response = consultasController.listarEgressosPorNome("Lucas");
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(egressos, response.getBody());
+        mockMvc.perform(get("/api/consultas/listar/depoimentos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Nenhum depoimento encontrado."));
     }
 
     @Test
-    public void testListarEgressosPorNome_Erro() {
-        when(consultasService.consultarEgressosPorNome("Lucas"))
-                .thenThrow(new RegraNegocioRunTime("Egresso não encontrado"));
+    void testListarCargos_sucesso() throws Exception {
+        when(consultasService.listarCargos()).thenReturn(List.of(cargo));
 
-        ResponseEntity<?> response = consultasController.listarEgressosPorNome("Lucas");
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Egresso não encontrado", response.getBody());
-    }
-
-
-    @Test
-    void listarEgressosPorCargo_DeveRetornarListaEgressos() {
-        List<Egresso> egressosMock = Arrays.asList(new Egresso(), new Egresso());
-        when(consultasService.consultarEgressosPorCargo("Engenheiro")).thenReturn(egressosMock);
-
-        ResponseEntity<?> response = consultasController.listarEgressosPorCargo("Engenheiro");
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(egressosMock, response.getBody());
+        mockMvc.perform(get("/api/consultas/listar/cargos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].descricao").value("Desenvolvedor"));
     }
 
     @Test
-    void listarEgressosPorCargo_DeveRetornarErro() {
-        when(consultasService.consultarEgressosPorCargo("Engenheiro")).thenThrow(new RegraNegocioRunTime("Erro ao buscar por cargo"));
+    void testListarEgressosPorCurso_sucesso() throws Exception {
+        when(consultasService.consultarEgressosPorCurso("Engenharia")).thenReturn(List.of(egresso));
 
-        ResponseEntity<?> response = consultasController.listarEgressosPorCargo("Engenheiro");
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        mockMvc.perform(get("/api/consultas/listar/egressos/curso?curso=Engenharia"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nome").value("Lucas"));
     }
 
     @Test
-    void listarEgressosPorCurso_DeveRetornarListaEgressos() {
-        List<Egresso> egressosMock = Arrays.asList(new Egresso(), new Egresso());
-        when(consultasService.consultarEgressosPorCurso("Sistemas")).thenReturn(egressosMock);
+    void testListarCursoEgresso_sucesso() throws Exception {
+        when(consultasService.listarCursoEgresso()).thenReturn(List.of(cursoEgresso));
 
-        ResponseEntity<?> response = consultasController.listarEgressosPorCurso("Sistemas");
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(egressosMock, response.getBody());
+        mockMvc.perform(get("/api/consultas/listar/cursoegresso"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)));
     }
 
     @Test
-    void listarEgressosPorCurso_DeveRetornarErro() {
-        when(consultasService.consultarEgressosPorCurso("Sistemas")).thenThrow(new RegraNegocioRunTime("Erro ao buscar por curso"));
+    void testListarCursoEgresso_vazio() throws Exception {
+        when(consultasService.listarCursoEgresso()).thenReturn(Collections.emptyList());
 
-        ResponseEntity<?> response = consultasController.listarEgressosPorCurso("Sistemas");
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        mockMvc.perform(get("/api/consultas/listar/cursoegresso"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Nenhum egresso matriculado em curso encontrado."));
     }
 
     @Test
-    void listarEgressosPorAnoInicioCurso_DeveRetornarListaEgressos() {
-        List<Egresso> egressosMock = Arrays.asList(new Egresso(), new Egresso());
-        when(consultasService.consultarEgressosPorAnoInicio(2020)).thenReturn(egressosMock);
+    void testListarCoordenadores_vazio() throws Exception {
+        when(consultasService.listarCoordenadores()).thenReturn(Collections.emptyList());
 
-        ResponseEntity<?> response = consultasController.listarEgressosPorAnoInicioCurso(2020);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(egressosMock, response.getBody());
+        mockMvc.perform(get("/api/consultas/listar/coordenadores"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Nenhum cordenador encontrado."));
     }
 
     @Test
-    void listarEgressosPorAnoInicioCurso_DeveRetornarErro() {
-        when(consultasService.consultarEgressosPorAnoInicio(2020)).thenThrow(new RegraNegocioRunTime("Erro ao buscar por ano início"));
+    void testListarEgressosPorNome_vazio() throws Exception {
+        when(consultasService.consultarEgressosPorNome("Lucas")).thenReturn(Collections.emptyList());
 
-        ResponseEntity<?> response = consultasController.listarEgressosPorAnoInicioCurso(2020);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-
-    @Test
-    void listarEgressosPorAnoFimCurso_DeveRetornarListaEgressos() {
-        List<Egresso> egressosMock = Arrays.asList(new Egresso(), new Egresso());
-        when(consultasService.consultarEgressosPorAnoFim(2022)).thenReturn(egressosMock);
-
-        ResponseEntity<?> response = consultasController.listarEgressosPorAnoFimCurso(2022);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(egressosMock, response.getBody());
-    }
-
-    @Test
-    void listarEgressosPorAnoFimCurso_DeveRetornarErro() {
-        when(consultasService.consultarEgressosPorAnoFim(2022)).thenThrow(new RegraNegocioRunTime("Erro ao buscar por ano fim"));
-
-        ResponseEntity<?> response = consultasController.listarEgressosPorAnoFimCurso(2022);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-
-    @Test
-    void listarDepoimentosPorAno_DeveRetornarListaDepoimentos() {
-        List<Depoimento> depoimentosMock = Arrays.asList(new Depoimento(), new Depoimento());
-        when(consultasService.consultarPorAno(2023)).thenReturn(depoimentosMock);
-
-        ResponseEntity<?> response = consultasController.listarDepoimentosPorAno(2023);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(depoimentosMock, response.getBody());
-    }
-
-    @Test
-    void listarDepoimentosPorAno_DeveRetornarErro() {
-        when(consultasService.consultarPorAno(2023)).thenThrow(new RegraNegocioRunTime("Erro ao buscar depoimentos por ano"));
-
-        ResponseEntity<?> response = consultasController.listarDepoimentosPorAno(2023);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        mockMvc.perform(get("/api/consultas/listar/egressos/nome?nome=Lucas"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Nenhum egresso encontrado."));
     }
 }

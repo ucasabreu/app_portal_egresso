@@ -144,18 +144,16 @@ public class CoordenadorController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
     @GetMapping("/destaque/listar")
-    public ResponseEntity<?> listarDestaques(@RequestParam(value = "nome", required = false) String nome) {
-        try {
-            List<DestaqueEgresso> destaques = (nome != null && !nome.isEmpty())
-                    ? coordenadorService.buscarDestaquesPorNomeOuCurso(nome)
-                    : coordenadorService.listarDestaques();
-
-            return new ResponseEntity<>(destaques, HttpStatus.OK);
-        } catch (RegraNegocioRunTime e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<List<DestaqueEgresso>> listarDestaques(
+            @RequestParam(value = "nome", required = false) String nome) {
+    
+        List<DestaqueEgresso> destaques = 
+            (nome != null && !nome.isEmpty())
+                ? coordenadorService.buscarDestaquesPorNomeOuCurso(nome)
+                : coordenadorService.listarDestaques();
+    
+        return ResponseEntity.ok(destaques); // Sempre retorna 200 com lista (vazia ou não)
     }
 
     @GetMapping("/destaque/egresso/{idEgresso}")
