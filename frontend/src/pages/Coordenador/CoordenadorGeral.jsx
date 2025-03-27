@@ -66,7 +66,7 @@ const CoordenadorGeral = () => {
 
   const fetchDestaquesSemCoordenador = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/consultas/destaque/listar`);
+      const response = await axios.get(`${API_URL}/api/coordenadores/destaque/listar`);
       const listDestaquesSemCoord = response.data.filter((d) => !d.coordenador);
       setDestaquesSemCoordenador(listDestaquesSemCoord);
     } catch (error) {
@@ -74,7 +74,6 @@ const CoordenadorGeral = () => {
       setError(error.response?.data || "Erro ao buscar destaques.");
     }
   };
-
 
 
   const getCursosPorCoordenador = (idCoordenador) => {
