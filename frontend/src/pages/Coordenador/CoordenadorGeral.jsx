@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, cache } from "react";
 import DataTable from "react-data-table-component";
 import axios from "axios";
 import { useParams } from "react-router-dom";
@@ -13,6 +13,9 @@ const CoordenadorGeral = () => {
   const [loading, setLoading] = useState(true);
   const [newCurso, setNewCurso] = useState({ nome: "", nivel: "", id_coordenador: "" });
   const [cursosSemCoordenador, setCursosSemCoordenador] = useState([]);
+  const [destaquesSemCoordenador, setDestaquesSemCoordenador] = useState([]);
+  const [atribuirCoordenador, setAtribuirCoordenador] = useState({});
+
   const [error, setError] = useState(null);
   const [restErrors, setRestErrors] = useState([]);          // Erros do RestControllerAdvice
   const [formErrorMessage, setFormErrorMessage] = useState(""); // Regras de negócio ou validação
@@ -61,6 +64,18 @@ const CoordenadorGeral = () => {
     }
   };
 
+  const fetchDestaquesSemCoordenador = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/consultas/destaque/listar`);
+      const listDestaquesSemCoord = response.data.filter((d) => !d.coordenador);
+      setDestaquesSemCoordenador(listDestaquesSemCoord);
+    } catch (error) {
+      console.error("Erro ao buscar destaques sem coordenador:", error);
+      setError(error.response?.data || "Erro ao buscar destaques.");
+    }
+  };
+
+
 
   const getCursosPorCoordenador = (idCoordenador) => {
     return cursos.filter(curso => curso.coordenador.id_coordenador === idCoordenador);
@@ -78,6 +93,45 @@ const CoordenadorGeral = () => {
     }
     return true;
   };
+
+  const handleAtribuirCoordenador = (idDestaque, idCoordenador) => {
+    setAtribuirCoordenador((prev) => ({
+      ...prev,
+      [idDestaque]: idCoordenador
+    }));
+  };
+
+  const confirmarAtribuicao = async (idDestaque) => {
+    try {
+      const idCoordenador = atribuirCoordenador[idDestaque];
+      if (!idCoordenador) return;
+
+      await axios.put(`${API_URL}/api/coordenadores/destaque/atribuir/${idDestaque}/${idCoordenador}`);
+      alert("Coordenador atribuído com sucesso!");
+      fetchDestaquesSemCoordenador();
+      fetchCoordenadoresECursos(coordenadorGeral.id_coordenador);
+    } catch (error) {
+      console.error("Erro ao atribuir coordenador ao destaque:", error);
+    }
+  };
+
+  const confirmarAtribuicaoCurso = async (idCurso) => {
+    try {
+      const idCoordenador = atribuirCoordenador[idCurso];
+      if (!idCoordenador) return;
+  
+      await axios.put(`${API_URL}/api/coordenadores/atribuir/curso`, {
+        id_curso: idCurso,
+        id_coordenador: idCoordenador,
+      });
+      alert("Coordenador atribuído ao curso com sucesso!");
+      fetchCoordenadoresECursos(coordenadorGeral.id_coordenador);
+    } catch (error) {
+      console.error("Erro ao atribuir coordenador ao curso:", error);
+      alert("Erro ao atribuir coordenador.");
+    }
+  };
+  
 
   const handleSaveCurso = async () => {
     setRestErrors([]);
@@ -124,6 +178,15 @@ const CoordenadorGeral = () => {
     }
   };
 
+  const deleteDestaque = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/api/coordenadores/deletar/destaque/${id}`);
+      alert("Destaque excluído.");
+      fetchDestaquesSemCoordenador();
+    } catch (error) {
+      console.error("Erro ao excluir destaque:", error);
+    }
+  };
 
   const deleteCoordenador = async (idCoordenador) => {
     try {
@@ -142,11 +205,9 @@ const CoordenadorGeral = () => {
     {
       name: "Ações",
       cell: (row) => (
-
         <button onClick={() => deleteCoordenador(row.id_coordenador)} className="btn-delete">
           Deletar
         </button>
-
       ),
     },
   ];
@@ -222,20 +283,13 @@ const CoordenadorGeral = () => {
                   <p><strong>Nível:</strong> {curso.nivel}</p>
                   <label>Definir novo coordenador:</label>
                   <select
-                    onChange={async (e) => {
-                      const novoId = e.target.value;
-                      try {
-                        await axios.put(`${API_URL}/api/coordenadores/atribuir/curso`, {
-                          id_curso: curso.id_curso,
-                          id_coordenador: novoId,
-                        });
-                        alert("Coordenador atribuído com sucesso!");
-                        fetchCoordenadoresECursos(coordenadorGeral.id_coordenador);
-                      } catch (error) {
-                        console.error("Erro ao atribuir coordenador:", error);
-                        alert("Erro ao atribuir coordenador.");
-                      }
-                    }}
+                    value={atribuirCoordenador[curso.id_curso] || ""}
+                    onChange={(e) =>
+                      setAtribuirCoordenador((prev) => ({
+                        ...prev,
+                        [curso.id_curso]: e.target.value,
+                      }))
+                    }
                   >
                     <option value="">Selecionar coordenador</option>
                     {coordenadores.map((coord) => (
@@ -244,6 +298,21 @@ const CoordenadorGeral = () => {
                       </option>
                     ))}
                   </select>
+                  <div className="botoes-curso-orfao">
+                    <button
+                      className="btn-confirm"
+                      onClick={() => confirmarAtribuicaoCurso(curso.id_curso)}
+                      disabled={!atribuirCoordenador[curso.id_curso]}
+                    >
+                      Confirmar
+                    </button>
+                    <button
+                      className="btn-delete"
+                      onClick={() => deleteCurso(curso.id_curso)}
+                    >
+                      Excluir
+                    </button>
+                  </div>
                 </div>
               ))
             ) : (
@@ -251,12 +320,53 @@ const CoordenadorGeral = () => {
             )}
           </div>
 
+          <div className="container_manager_destaques_orfaos">
+            <h3 className="subtitulo">Destaques sem Coordenador</h3>
+            {destaquesSemCoordenador.length === 0 ? (
+              <p className="mensagem">Nenhum destaque órfão encontrado.</p>
+            ) : (
+              <table className="tabela_destaques_orfaos">
+                <thead>
+                  <tr>
+                    <th>Título</th>
+                    <th>Nome do Egresso</th>
+                    <th>Atribuir Coordenador</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {destaquesSemCoordenador.map((d) => (
+                    <tr key={d.id}>
+                      <td>{d.titulo}</td>
+                      <td>{d.egresso?.nome}</td>
+                      <td>
+                        <select
+                          value={atribuirCoordenador[d.id] || ""}
+                          onChange={(e) => handleAtribuirCoordenador(d.id, e.target.value)}
+                        >
+                          <option value="">Selecionar coordenador</option>
+                          {coordenadores.map((coord) => (
+                            <option key={coord.id_coordenador} value={coord.id_coordenador}>
+                              {coord.login}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                      <td>
+                        <button className="btn-confirm" onClick={() => confirmarAtribuicao(d.id)}>Confirmar</button>
+                        <button className="btn-delete" onClick={() => deleteDestaque(d.id)}>Excluir</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
 
           <div className="container_manager_cursos">
             <h3 className="subtitulo">Adicionar Novo Curso</h3>
             <form>
-
-
               {restErrors.length > 0 && (
                 <div className="error-message">
                   {restErrors.map((err, index) => (

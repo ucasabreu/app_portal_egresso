@@ -41,7 +41,6 @@ public class CoordenadorController {
 
     private final CargoRepositorio cargoRepositorio;
     private final CoordenadorService coordenadorService;
-    
 
     @Autowired
     public CoordenadorController(CargoRepositorio cargoRepositorio, CoordenadorService coordenadorService) {
@@ -98,7 +97,7 @@ public class CoordenadorController {
 
     }
 
-    //PUT
+    
     @PostMapping("/salvar/curso") // ok
     public ResponseEntity<?> salvarCurso(@RequestBody @Valid CursoDTO dto) {
         Curso curso = Curso.builder()
@@ -116,6 +115,7 @@ public class CoordenadorController {
 
     }
 
+    // PUT
     @PutMapping("/atribuir/curso")
     public ResponseEntity<?> atribuirCoordenadorAoCurso(@RequestBody Map<String, Integer> payload) {
         Integer idCurso = payload.get("id_curso");
@@ -124,6 +124,19 @@ public class CoordenadorController {
         try {
             coordenadorService.atribuirCoordenador(idCurso, idCoordenador);
             return ResponseEntity.ok("Coordenador atribuído com sucesso.");
+        } catch (RegraNegocioRunTime e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/destaque/atribuir/{idDestaque}/{idCoordenador}")
+    public ResponseEntity<?> atribuirCoordenadorParaDestaque(
+            @PathVariable Long idDestaque,
+            @PathVariable Integer idCoordenador) {
+        try {
+            DestaqueEgresso destaqueAtualizado = coordenadorService.atribuirCoordenadorAoDestaque(idDestaque,
+                    idCoordenador);
+            return ResponseEntity.ok(destaqueAtualizado);
         } catch (RegraNegocioRunTime e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

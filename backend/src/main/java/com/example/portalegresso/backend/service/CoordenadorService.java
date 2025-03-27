@@ -105,6 +105,17 @@ public class CoordenadorService {
         curso.setCoordenador(coordenador);
         cursoRepositorio.save(curso);
     }
+
+    public DestaqueEgresso atribuirCoordenadorAoDestaque(Long idDestaque, Integer idCoordenador) {
+        DestaqueEgresso destaque = destaqueEgressoRepositorio.findById(idDestaque)
+            .orElseThrow(() -> new RegraNegocioRunTime("Destaque não encontrado."));
+    
+        Coordenador novoCoordenador = coordenadorRepositorio.findById(idCoordenador)
+            .orElseThrow(() -> new RegraNegocioRunTime("Coordenador não encontrado."));
+    
+        destaque.setCoordenador(novoCoordenador);
+        return destaqueEgressoRepositorio.save(destaque);
+    }    
     
     /*
      * Funcões de verificação

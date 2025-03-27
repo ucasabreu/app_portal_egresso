@@ -113,7 +113,6 @@ const Coordenador = () => {
   const fetchMeusDestaques = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/coordenadores/destaque/listar`);
-  
       const filtrados = response.data.filter(
         (d) => d.coordenador?.id_coordenador === coordenador.id_coordenador
       );
@@ -139,7 +138,6 @@ const Coordenador = () => {
     }
   };
   
-
   const deletarDestaque = async (idDestaque) => {
     try {
       await axios.delete(`${API_URL}/api/coordenadores/deletar/destaque/${idDestaque}`);
