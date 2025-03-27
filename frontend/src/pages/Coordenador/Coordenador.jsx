@@ -67,15 +67,21 @@ const Coordenador = () => {
   const fetchCursosEgressos = async (id_coordenador) => {
     try {
       const responseCursos = await axios.get(`${API_URL}/api/consultas/listar/cursos`);
+  
+      //Garante que só cursos com coordenador válido sejam processados
       const cursosDoCoordenador = responseCursos.data.filter(
-        (curso) => curso.coordenador.id_coordenador === id_coordenador
+        (curso) =>
+          curso.coordenador?.id_coordenador !== undefined &&
+          curso.coordenador.id_coordenador === id_coordenador
       );
-
+  
       const cursosComEgressos = await Promise.all(
         cursosDoCoordenador.map(async (curso) => {
-          const responseCursoEgresso = await axios.get(`${API_URL}/api/coordenadores/coordenador/${curso.id_curso}/egressos_curso`);
+          const responseCursoEgresso = await axios.get(
+            `${API_URL}/api/coordenadores/coordenador/${curso.id_curso}/egressos_curso`
+          );
           const egressosDoCurso = responseCursoEgresso.data.map((ce) => ({
-            id: ce.egresso.id_egresso,
+            id: ce.egresso?.id_egresso,
             nome: ce.egresso?.nome || "Nome não disponível",
             email: ce.egresso?.email || "Email não disponível",
             anoInicio: ce.ano_inicio,
@@ -84,40 +90,40 @@ const Coordenador = () => {
           return { ...curso, egressos: egressosDoCurso };
         })
       );
-
+  
       setCursosComEgressos(cursosComEgressos);
       setLoading(false);
     } catch (error) {
       console.error("Erro ao buscar cursos dos egressos:", error);
       const backendData = error.response?.data;
-    
-      if (backendData && typeof backendData === 'object') {
-        // Se o backend enviar { message: "Nenhum dado encontrado", data: [] }
-        if (backendData.message) {
-          setBackendErrors([backendData.message]);
-        } else {
-          setBackendErrors(Object.values(backendData));
-        }
-      } else if (typeof backendData === 'string') {
+  
+      if (backendData && typeof backendData === "object") {
+        setBackendErrors([backendData.message || "Erro ao buscar cursos dos egressos."]);
+      } else if (typeof backendData === "string") {
         setBackendErrors([backendData]);
       } else {
         setBackendErrors(["Erro ao buscar cursos dos egressos."]);
       }
+  
       setLoading(false);
     }
   };
+  
 
   const fetchMeusDestaques = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/coordenadores/destaque/listar`);
-      const filtrados = response.data.filter((d) => d.coordenador.id_coordenador === coordenador.id_coordenador);
+  
+      const filtrados = response.data.filter(
+        (d) => d.coordenador?.id_coordenador === coordenador.id_coordenador
+      );
+  
       setMeusDestaques(filtrados);
     } catch (error) {
       console.error("Erro ao buscar destaques:", error);
       const backendData = error.response?.data;
-    
+  
       if (backendData && typeof backendData === 'object') {
-        // Se o backend enviar { message: "Nenhum dado encontrado", data: [] }
         if (backendData.message) {
           setBackendErrors([backendData.message]);
         } else {
@@ -128,9 +134,11 @@ const Coordenador = () => {
       } else {
         setBackendErrors(["Erro ao buscar destaque."]);
       }
+  
       setLoading(false);
     }
   };
+  
 
   const deletarDestaque = async (idDestaque) => {
     try {

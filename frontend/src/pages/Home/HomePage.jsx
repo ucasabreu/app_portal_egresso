@@ -154,12 +154,12 @@ const HomePage = () => {
           <li onClick={() => setTabelaAtiva('egressos')} style={{ cursor: 'pointer' }}>
             <img src={StudentImg} alt="egressos" />
             <h2><span>Egressos</span></h2>
-            <p>Texto sobre os egressos</p>
+            <p>Veja nossos egressos</p>
           </li>
           <li onClick={() => setTabelaAtiva('cursos')} style={{ cursor: 'pointer' }}>
             <img src={CourseImg} alt="curso" />
             <h2><span>Cursos</span></h2>
-            <p>Texto sobre os cursos</p>
+            <p>Veja nossos cursos</p>
           </li>
         </ul>
       </div>

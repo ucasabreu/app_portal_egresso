@@ -139,4 +139,32 @@
     background-color: #f1f1f1;
     font-weight: bold;
   }
+
+  .container_manager_cursos_sem_coord {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  }
+  
+  .card_curso_sem_coord {
+    background-color: white;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+  
+  .card_curso_sem_coord p {
+    margin: 0.5rem 0;
+  }
+  
+  .card_curso_sem_coord select {
+    padding: 0.4rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-top: 0.5rem;
+  }
+  
   

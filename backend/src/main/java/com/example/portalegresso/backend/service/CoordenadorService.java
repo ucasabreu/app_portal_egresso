@@ -96,6 +96,16 @@ public class CoordenadorService {
         buscarDestaquePorId(destaque.getId());
         return destaqueEgressoRepositorio.save(destaque);
     }
+
+
+
+    public void atribuirCoordenador(Integer idCurso, Integer idCoordenador) {
+        Curso curso = buscarCursoPorId(idCurso);
+        Coordenador coordenador = buscarCoordenadorPorId(idCoordenador);
+        curso.setCoordenador(coordenador);
+        cursoRepositorio.save(curso);
+    }
+    
     /*
      * Funcões de verificação
      */
@@ -171,6 +181,8 @@ public class CoordenadorService {
         }
     }
 
+    
+
     /*
      * Funcões para remover
      */
@@ -210,7 +222,7 @@ public class CoordenadorService {
         coordenadorRepositorio.deleteById(coordenadorExistente.getId_coordenador());
     }
 
-    // ✅ Excluir um destaque
+    // Excluir um destaque
     public void remover(DestaqueEgresso destaque) {
         buscarDestaquePorId(destaque.getId());
         destaqueEgressoRepositorio.delete(destaque);

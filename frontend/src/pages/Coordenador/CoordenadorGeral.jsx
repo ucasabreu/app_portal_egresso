@@ -12,6 +12,7 @@ const CoordenadorGeral = () => {
   const [cursos, setCursos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newCurso, setNewCurso] = useState({ nome: "", nivel: "", id_coordenador: "" });
+  const [cursosSemCoordenador, setCursosSemCoordenador] = useState([]);
   const [error, setError] = useState(null);
   const [restErrors, setRestErrors] = useState([]);          // Erros do RestControllerAdvice
   const [formErrorMessage, setFormErrorMessage] = useState(""); // Regras de negócio ou validação
@@ -42,9 +43,16 @@ const CoordenadorGeral = () => {
       const responseCoordenadores = await axios.get(`${API_URL}/api/consultas/listar/coordenadores`);
       const responseCursos = await axios.get(`${API_URL}/api/consultas/listar/cursos`);
 
-      const listaCoordenadores = responseCoordenadores.data.filter(coord => coord.id_coordenador !== idCoordenadorGeral);
+      const listaCoordenadores = responseCoordenadores.data.filter(
+        (coord) => coord?.id_coordenador !== idCoordenadorGeral
+      );
+
+      const cursosComCoordenador = responseCursos.data.filter((curso) => curso.coordenador !== null);
+      const cursosSemCoord = responseCursos.data.filter((curso) => curso.coordenador === null);
+
       setCoordenadores(listaCoordenadores);
-      setCursos(responseCursos.data);
+      setCursos(cursosComCoordenador);
+      setCursosSemCoordenador(cursosSemCoord);
       setLoading(false);
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
@@ -52,6 +60,7 @@ const CoordenadorGeral = () => {
       setLoading(false);
     }
   };
+
 
   const getCursosPorCoordenador = (idCoordenador) => {
     return cursos.filter(curso => curso.coordenador.id_coordenador === idCoordenador);
@@ -116,7 +125,7 @@ const CoordenadorGeral = () => {
   };
 
 
-  const deleteCoordenador = async(idCoordenador) => {
+  const deleteCoordenador = async (idCoordenador) => {
     try {
       await axios.delete(`${API_URL}/api/coordenadores/deletar/coordenador/${idCoordenador}`);
       alert("Coordenador deletado com sucesso.");
@@ -204,11 +213,50 @@ const CoordenadorGeral = () => {
             )}
           </div>
 
+          <div className="container_manager_cursos_sem_coord">
+            <h3 className="subtitulo">Cursos Sem Coordenador</h3>
+            {cursosSemCoordenador.length > 0 ? (
+              cursosSemCoordenador.map((curso) => (
+                <div key={curso.id_curso} className="card_curso_sem_coord">
+                  <p><strong>Curso:</strong> {curso.nome}</p>
+                  <p><strong>Nível:</strong> {curso.nivel}</p>
+                  <label>Definir novo coordenador:</label>
+                  <select
+                    onChange={async (e) => {
+                      const novoId = e.target.value;
+                      try {
+                        await axios.put(`${API_URL}/api/coordenadores/atribuir/curso`, {
+                          id_curso: curso.id_curso,
+                          id_coordenador: novoId,
+                        });
+                        alert("Coordenador atribuído com sucesso!");
+                        fetchCoordenadoresECursos(coordenadorGeral.id_coordenador);
+                      } catch (error) {
+                        console.error("Erro ao atribuir coordenador:", error);
+                        alert("Erro ao atribuir coordenador.");
+                      }
+                    }}
+                  >
+                    <option value="">Selecionar coordenador</option>
+                    {coordenadores.map((coord) => (
+                      <option key={coord.id_coordenador} value={coord.id_coordenador}>
+                        {coord.login}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))
+            ) : (
+              <p className="mensagem">Todos os cursos estão atribuídos.</p>
+            )}
+          </div>
+
+
           <div className="container_manager_cursos">
             <h3 className="subtitulo">Adicionar Novo Curso</h3>
             <form>
 
-              
+
               {restErrors.length > 0 && (
                 <div className="error-message">
                   {restErrors.map((err, index) => (
@@ -230,7 +278,7 @@ const CoordenadorGeral = () => {
                   ⚠️ <strong>Atenção:</strong> {errorMessage}
                 </div>
               )}
-              
+
 
               <div className="form-group">
                 <label>Nome:</label>

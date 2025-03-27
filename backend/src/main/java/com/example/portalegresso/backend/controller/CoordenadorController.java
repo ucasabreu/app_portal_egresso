@@ -1,6 +1,7 @@
 package com.example.portalegresso.backend.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,9 +39,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 public class CoordenadorController {
 
-   
     private final CargoRepositorio cargoRepositorio;
     private final CoordenadorService coordenadorService;
+    
 
     @Autowired
     public CoordenadorController(CargoRepositorio cargoRepositorio, CoordenadorService coordenadorService) {
@@ -96,6 +98,7 @@ public class CoordenadorController {
 
     }
 
+    //PUT
     @PostMapping("/salvar/curso") // ok
     public ResponseEntity<?> salvarCurso(@RequestBody @Valid CursoDTO dto) {
         Curso curso = Curso.builder()
@@ -111,6 +114,19 @@ public class CoordenadorController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
+    }
+
+    @PutMapping("/atribuir/curso")
+    public ResponseEntity<?> atribuirCoordenadorAoCurso(@RequestBody Map<String, Integer> payload) {
+        Integer idCurso = payload.get("id_curso");
+        Integer idCoordenador = payload.get("id_coordenador");
+
+        try {
+            coordenadorService.atribuirCoordenador(idCurso, idCoordenador);
+            return ResponseEntity.ok("Coordenador atribuído com sucesso.");
+        } catch (RegraNegocioRunTime e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/buscar/coordenador")
@@ -144,15 +160,15 @@ public class CoordenadorController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
     @GetMapping("/destaque/listar")
     public ResponseEntity<List<DestaqueEgresso>> listarDestaques(
             @RequestParam(value = "nome", required = false) String nome) {
-    
-        List<DestaqueEgresso> destaques = 
-            (nome != null && !nome.isEmpty())
+
+        List<DestaqueEgresso> destaques = (nome != null && !nome.isEmpty())
                 ? coordenadorService.buscarDestaquesPorNomeOuCurso(nome)
                 : coordenadorService.listarDestaques();
-    
+
         return ResponseEntity.ok(destaques); // Sempre retorna 200 com lista (vazia ou não)
     }
 
