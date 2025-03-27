@@ -67,7 +67,9 @@ const CoordenadorGeral = () => {
   const fetchDestaquesSemCoordenador = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/coordenadores/destaque/listar`);
-      const listDestaquesSemCoord = response.data.filter((d) => !d.coordenador);
+      const listDestaquesSemCoord = response.data.filter(
+        (d) => !d.coordenador || d.coordenador.id_coordenador == null
+      );
       setDestaquesSemCoordenador(listDestaquesSemCoord);
     } catch (error) {
       console.error("Erro ao buscar destaques sem coordenador:", error);
