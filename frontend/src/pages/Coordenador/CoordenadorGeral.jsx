@@ -15,7 +15,6 @@ const CoordenadorGeral = () => {
   const [cursosSemCoordenador, setCursosSemCoordenador] = useState([]);
   const [destaquesSemCoordenador, setDestaquesSemCoordenador] = useState([]);
   const [atribuirCoordenador, setAtribuirCoordenador] = useState({});
-
   const [error, setError] = useState(null);
   const [restErrors, setRestErrors] = useState([]);          // Erros do RestControllerAdvice
   const [formErrorMessage, setFormErrorMessage] = useState(""); // Regras de negócio ou validação
@@ -23,6 +22,9 @@ const CoordenadorGeral = () => {
 
 
   useEffect(() => { fetchCoordenadorGeral(); }, [id]);
+  
+  useEffect(() => { fetchDestaquesSemCoordenador(); }, []);
+  
 
   const fetchCoordenadorGeral = async () => {
     if (!id) {
@@ -67,7 +69,7 @@ const CoordenadorGeral = () => {
   const fetchDestaquesSemCoordenador = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/coordenadores/destaque/listar`);
-      
+
       console.log("Destaques recebidos:", response.data);
 
       const listDestaquesSemCoord = response.data.filter(
