@@ -67,6 +67,9 @@ const CoordenadorGeral = () => {
   const fetchDestaquesSemCoordenador = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/coordenadores/destaque/listar`);
+      
+      console.log("Destaques recebidos:", response.data);
+
       const listDestaquesSemCoord = response.data.filter(
         (d) => !d.coordenador || d.coordenador.id_coordenador == null
       );
