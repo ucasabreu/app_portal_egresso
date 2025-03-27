@@ -18,15 +18,7 @@ const CoordenadorGeral = () => {
   const [errorMessage, setErrorMessage] = useState("");      // Erros inesperados ou genéricos
 
 
-  useEffect(() => {
-    fetchCoordenadorGeral();
-  }, [id]);
-  
-  useEffect(() => {
-    if (coordenadorGeral) {
-      fetchCoordenadoresECursos(coordenadorGeral.id_coordenador);
-    }
-  }, [coordenadorGeral]);
+  useEffect(() => { fetchCoordenadorGeral(); }, [id]);
 
   const fetchCoordenadorGeral = async () => {
     if (!id) {
@@ -37,7 +29,7 @@ const CoordenadorGeral = () => {
     try {
       const response = await axios.get(`${API_URL}/api/coordenadores/buscar/coordenador/${id}`);
       setCoordenadorGeral(response.data);
-      
+      fetchCoordenadoresECursos(response.data.id_coordenador);
     } catch (error) {
       console.error("Erro ao buscar coordenador geral:", error);
       setError(error.response ? error.response.data : "Erro ao buscar dados do coordenador geral.");
@@ -116,6 +108,7 @@ const CoordenadorGeral = () => {
     try {
       await axios.delete(`${API_URL}/api/coordenadores/deletar/curso/${idCurso}`);
       alert("Curso deletado com sucesso.");
+      fetchCoordenadoresECursos(coordenadorGeral.id_coordenador);
     } catch (error) {
       console.error("Erro ao deletar curso:", error);
       setError(error.response ? error.response.data : "Erro ao deletar curso.");
@@ -127,6 +120,7 @@ const CoordenadorGeral = () => {
     try {
       await axios.delete(`${API_URL}/api/coordenadores/deletar/coordenador/${idCoordenador}`);
       alert("Coordenador deletado com sucesso.");
+      fetchCoordenadoresECursos(coordenadorGeral.id_coordenador);
     } catch (error) {
       console.error("Erro ao deletar coordenador:", error);
       setError(error.response ? error.response.data : "Erro ao deletar coordenador.");
