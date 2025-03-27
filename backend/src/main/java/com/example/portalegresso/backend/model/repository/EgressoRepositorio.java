@@ -12,6 +12,10 @@ import com.example.portalegresso.backend.model.entidades.Egresso;
 @Repository
 public interface EgressoRepositorio extends JpaRepository<Egresso,Integer>{
     boolean existsByEmail(String email);
+
+    boolean existsByInstagram(String instagram);
+
+    boolean existsByLinkedin(String linkedin);
     
     List<Egresso> findByNomeContainingIgnoreCase(String nome);
 

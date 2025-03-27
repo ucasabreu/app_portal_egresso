@@ -211,21 +211,25 @@ public class EgressoService {
             throw new RegraNegocioRunTime("O email informado já está em uso por outro egresso.");
         }
 
+        if(egressoRepositorio.existsByLinkedin(egresso.getLinkedin())){
+            throw new RegraNegocioRunTime("O linkedin informado já está em uso por outro egresso.");
+        }
+
         if (egresso.getLinkedin() != null && !egresso.getLinkedin().isEmpty()) {
             if (!egresso.getLinkedin().matches("^(https?:\\/\\/)?([\\w.-]+\\.)?linkedin\\.com\\/.*$")) {
                 throw new RegraNegocioRunTime("O link do LinkedIn é inválido.");
             }
         }
 
-        // verificar se o linkedin ja foi usado...
+        if(egressoRepositorio.existsByInstagram(egresso.getInstagram())){
+            throw new RegraNegocioRunTime("O Instagram informado já está em uso por outro egresso.");
+        }
 
         if (egresso.getInstagram() != null && !egresso.getInstagram().isEmpty()) {
             if (!egresso.getInstagram().matches("^(https?:\\/\\/)?(www\\.)?instagram\\.com\\/.*$")) {
                 throw new RegraNegocioRunTime("O link do Instagram é inválido.");
             }
         }
-
-        // verificar se o instagram ja foi usado...
 
         /* fim de verificação */
     }
