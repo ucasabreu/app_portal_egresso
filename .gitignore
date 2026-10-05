@@ -1,0 +1,9 @@
+/.env.local
+/.local-run/
+/.env
+**/.env
+**/.env.*
+!**/.env.example
+**/__pycache__/
+.vscode/
+/demo.log

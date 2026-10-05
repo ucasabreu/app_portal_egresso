@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -72,6 +73,19 @@ public class EgressoController {
         }
         catch(RegraNegocioRunTime e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/atualizar/egresso/{id}")
+    public ResponseEntity<?> atualizarEgresso(@PathVariable Integer id, @RequestBody @Valid EgressoDTO dto) {
+        Egresso egresso = Egresso.builder().id_egresso(id)
+                .nome(dto.getNome()).email(dto.getEmail()).descricao(dto.getDescricao())
+                .foto(dto.getFoto()).linkedin(dto.getLinkedin()).instagram(dto.getInstagram())
+                .curriculo(dto.getCurriculo()).build();
+        try {
+            return ResponseEntity.ok(egressoService.atualizar(egresso));
+        } catch (RegraNegocioRunTime error) {
+            return ResponseEntity.badRequest().body(error.getMessage());
         }
     }
 

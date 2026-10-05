@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+  <title id="title">Portal de Egressos</title>
+  <desc id="desc">Capa de apresentação: formação, pessoas e trajetória profissional. React, Spring Boot e PostgreSQL.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0c233b"/><stop offset="1" stop-color="#173f58"/></linearGradient>
+  </defs>
+  <rect width="1200" height="420" rx="20" fill="url(#bg)"/>
+  <circle cx="1130" cy="0" r="270" fill="#218c86" opacity=".12"/>
+  <circle cx="1170" cy="420" r="180" fill="#218c86" opacity=".1"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <rect x="60" y="58" width="230" height="32" rx="16" fill="#285264"/>
+    <text x="175" y="79" text-anchor="middle" font-size="12" font-weight="700" fill="#b8f1e8" letter-spacing="2">PORTFÓLIO FULL STACK</text>
+    <text x="60" y="156" font-size="53" font-weight="700" fill="#ffffff">Portal de Egressos</text>
+    <text x="62" y="201" font-size="21" fill="#d2e0ec">Formação, pessoas e trajetória profissional.</text>
+    <text x="62" y="246" font-size="16" fill="#b6cbd9">Perfis · Cursos · Experiências · Depoimentos</text>
+    <g font-size="14" font-weight="700" text-anchor="middle">
+      <rect x="60" y="302" width="105" height="40" rx="8" fill="#1b455c" stroke="#50768a"/><text x="112" y="327" fill="#d8f1ff">React</text>
+      <rect x="178" y="302" width="150" height="40" rx="8" fill="#1b455c" stroke="#50768a"/><text x="253" y="327" fill="#d8f1ff">Spring Boot</text>
+      <rect x="341" y="302" width="150" height="40" rx="8" fill="#1b455c" stroke="#50768a"/><text x="416" y="327" fill="#d8f1ff">PostgreSQL</text>
+    </g>
+    <g stroke="#519b9e" stroke-width="2" fill="none">
+      <path d="M864 126 L1020 206 L875 300 Z"/><path d="M875 300 L800 211 L864 126"/>
+    </g>
+    <g>
+      <circle cx="864" cy="126" r="34" fill="#2c696f" stroke="#70c9bd" stroke-width="2"/>
+      <path d="M844 124 L864 114 L884 124 L864 134 Z M851 130 V138 Q864 147 877 138 V130" fill="none" stroke="#e0fcf6" stroke-width="2"/>
+      <circle cx="1020" cy="206" r="34" fill="#2c696f" stroke="#70c9bd" stroke-width="2"/>
+      <circle cx="1020" cy="197" r="7" fill="none" stroke="#e0fcf6" stroke-width="2"/><path d="M1007 219 V215 Q1020 201 1033 215 V219" fill="none" stroke="#e0fcf6" stroke-width="2"/>
+      <circle cx="875" cy="300" r="34" fill="#2c696f" stroke="#70c9bd" stroke-width="2"/>
+      <path d="M859 292 H891 V311 H859 Z M870 292 V286 H880 V292 M859 301 H891" fill="none" stroke="#e0fcf6" stroke-width="2"/>
+      <circle cx="800" cy="211" r="9" fill="#9fe3d5"/>
+    </g>
+    <text x="913" y="373" text-anchor="middle" font-size="12" letter-spacing="2" fill="#b6cbd9">CONEXÕES QUE CONTINUAM</text>
+  </g>
+</svg>

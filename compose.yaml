@@ -1,0 +1,54 @@
+name: portal-egressos-demo
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: portal_demo
+      POSTGRES_USER: portal_demo
+      POSTGRES_PASSWORD: portal_demo
+    volumes:
+      - demo_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portal_demo -d portal_demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    environment:
+      SPRING_PROFILES_ACTIVE: demo
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/portal_demo
+      SPRING_DATASOURCE_USERNAME: portal_demo
+      SPRING_DATASOURCE_PASSWORD: portal_demo
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/api/demo/health"]
+      interval: 5s
+      timeout: 5s
+      start_period: 30s
+      retries: 30
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "127.0.0.1:5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/api/demo/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  demo_data:

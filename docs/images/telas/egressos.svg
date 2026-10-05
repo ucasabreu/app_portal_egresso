@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="405" viewBox="0 0 720 405" role="img" aria-labelledby="title desc">
+  <title id="title">Consulta de egressos — espaço reservado</title>
+  <desc id="desc">Adicionar captura real desta tela. Este quadro não representa a interface do software.</desc>
+  <rect x="1" y="1" width="718" height="403" rx="16" fill="#f1f6f8" stroke="#cbd8e0" stroke-width="2"/>
+  <path d="M28 72 H692" stroke="#d7e2e8"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="30" y="45" font-size="14" font-weight="700" letter-spacing="2" fill="#395a6e">PORTAL DE EGRESSOS</text>
+    <text x="688" y="45" text-anchor="end" font-size="14" fill="#557386">02 / 06</text>
+    <g fill="none" stroke="#52788c" stroke-width="2">
+      <rect x="333" y="110" width="54" height="40" rx="5"/>
+      <circle cx="372" cy="122" r="4"/>
+      <path d="M340 142 L350 128 L365 142 L373 134 L380 142"/>
+    </g>
+    <text x="360" y="195" text-anchor="middle" font-size="27" font-weight="700" fill="#173b52">Consulta de egressos</text>
+    <text x="360" y="229" text-anchor="middle" font-size="16" fill="#47677b">Filtros e acesso aos perfis</text>
+    <rect x="190" y="267" width="340" height="38" rx="19" fill="#dfeaf0"/>
+    <text x="360" y="291" text-anchor="middle" font-size="14" font-weight="700" fill="#34596f">CAPTURA REAL A ADICIONAR</text>
+    <text x="360" y="367" text-anchor="middle" font-size="13" fill="#567488">docs/images/telas/egressos.png · Consulte README.md</text>
+  </g>
+</svg>

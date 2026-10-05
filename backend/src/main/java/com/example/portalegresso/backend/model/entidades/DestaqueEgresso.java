@@ -56,7 +56,7 @@ public class DestaqueEgresso {
     @Column(name = "data_publicacao", updatable = false)
     private LocalDate dataPublicacao;
 
-    @Column(name = "imagem")
+    @Column(name = "imagem", columnDefinition = "TEXT")
     private String imagem;
 
     @Column(name = "feito_destaque")

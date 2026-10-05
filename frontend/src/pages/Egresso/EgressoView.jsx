@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaEnvelope, FaLinkedin, FaInstagram, FaFileAlt } from 'react-icons/fa';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import "../../pages/Egresso/EgressoView.css";
 import { API_URL } from '../../config/config.js';
@@ -82,10 +82,11 @@ const EgressoView = () => {
     <div className='container_principal'>
         <header className='header_egressoview'>
             <h1>Dados do Egresso</h1>
+            <Link to={`/edit-egresso/${id}`}>Editar perfil</Link>
         </header>
         <div className="container_egresso">
             <div className="egresso-header">
-                <img src={egresso.foto || 'default-image-path.jpg'} alt={egresso.nome} className="egresso-photo" />
+                <img src={egresso.foto || '/demo/avatar.svg'} alt={egresso.nome} className="egresso-photo" />
                 <div className="egresso-info">
                 <p><strong>Nome:</strong> {egresso.nome}</p>
                 <p><FaEnvelope className="icon" /> {egresso.email}</p>

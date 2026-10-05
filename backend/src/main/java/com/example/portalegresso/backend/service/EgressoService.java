@@ -16,6 +16,7 @@ import com.example.portalegresso.backend.model.repository.CursoEgressoRepositori
 import com.example.portalegresso.backend.model.repository.CursoRepositorio;
 import com.example.portalegresso.backend.model.repository.DepoimentoRepositorio;
 import com.example.portalegresso.backend.model.repository.EgressoRepositorio;
+import com.example.portalegresso.backend.model.repository.DestaqueEgressoRepositorio;
 
 @Service
 public class EgressoService {
@@ -34,6 +35,9 @@ public class EgressoService {
 
     @Autowired
     CursoRepositorio cursoRepositorio;
+
+    @Autowired
+    DestaqueEgressoRepositorio destaqueEgressoRepositorio;
 
     public Cargo salvar(Cargo cargo) {
         verificarCargo(cargo); // validação antes de salvar
@@ -205,7 +209,9 @@ public class EgressoService {
         }
 
         // Verifica se o e-mail ja foi usado
-        if (egressoRepositorio.existsByEmail(egresso.getEmail())) {
+        if (egressoRepositorio.findByEmail(egresso.getEmail())
+                .filter(existente -> !java.util.Objects.equals(existente.getId_egresso(), egresso.getId_egresso()))
+                .isPresent()) {
             throw new RegraNegocioRunTime("O email informado já está em uso por outro egresso.");
         }
 
@@ -233,8 +239,11 @@ public class EgressoService {
         cargoRepositorio.deleteById(cargo.getId_cargo());
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public void remover(Egresso egresso) {
         Egresso egressoExistente = buscarEgressoPorId(egresso.getId_egresso());
+
+        destaqueEgressoRepositorio.deleteAll(destaqueEgressoRepositorio.findByEgresso(egressoExistente));
 
         // Remover todos os cargos vinculados ao egresso
         List<Cargo> cargos = cargoRepositorio.findByEgresso(egressoExistente);

@@ -27,7 +27,7 @@ public interface CursoEgressoRepositorio extends JpaRepository<CursoEgresso,Inte
     @Query("SELECT ce.egresso FROM CursoEgresso ce WHERE ce.ano_fim = :ano")
     List<Egresso> findEgressosByAnoFim(@Param("ano") int ano);
     
-    @Query("SELECT ce FROM CursoEgresso ce WHERE ce.egresso.id = :idEgresso")
+    @Query("SELECT ce FROM CursoEgresso ce WHERE ce.egresso.id_egresso = :idEgresso")
     List<CursoEgresso> findCursoEgressoByEgressoId(@Param("idEgresso") Integer idEgresso);
 
     @Query("SELECT ce FROM CursoEgresso ce WHERE ce.curso.id_curso = :id_curso")

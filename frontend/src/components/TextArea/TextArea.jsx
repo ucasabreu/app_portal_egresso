@@ -4,7 +4,7 @@ import "../TextArea/styles.css";
 
 const TextArea = ({rows = 4, ...props}) => {
     return (
-        <textarea className="container-textarea" {...props}/>
+        <textarea className="container-textarea" rows={rows} {...props}/>
     )
 }
 
