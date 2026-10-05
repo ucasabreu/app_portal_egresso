@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaEnvelope, FaLinkedin, FaInstagram, FaFileAlt } from 'react-icons/fa';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import "../../pages/Egresso/styles.css";
 import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
@@ -9,6 +9,7 @@ import { API_URL } from '../../config/config.js';
 
 const EditEgresso = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [egresso, setEgresso] = useState({
     foto: '',
     nome: '',
@@ -20,6 +21,18 @@ const EditEgresso = () => {
   });
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [loading, setLoading] = useState(Boolean(id));
+
+  useEffect(() => {
+    if (!id) return;
+    let active = true;
+    axios.get(`${API_URL}/api/egressos/buscar/egresso/${id}`)
+      .then(({ data }) => { if (active) setEgresso(data); })
+      .catch(() => { if (active) setErrorMessage(['Não foi possível carregar este perfil.']); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,7 +53,7 @@ const EditEgresso = () => {
   const handleSaveEgresso = async () => {
     setErrorMessage("");
     try {
-      const response = await axios.post(`${API_URL}/api/egressos/salvar/egresso`, {
+      const payload = {
         nome: egresso.nome,
         instagram: egresso.instagram,
         linkedin: egresso.linkedin,
@@ -48,7 +61,10 @@ const EditEgresso = () => {
         curriculo: egresso.curriculo,
         foto: egresso.foto,
         descricao: egresso.descricao
-      });
+      };
+      const response = id
+        ? await axios.put(`${API_URL}/api/egressos/atualizar/egresso/${id}`, payload)
+        : await axios.post(`${API_URL}/api/egressos/salvar/egresso`, payload);
 
       const savedEgresso = response.data;
       console.log('Dados do egresso salvos:', savedEgresso);
@@ -76,10 +92,12 @@ const EditEgresso = () => {
     setIsConfirmed(true);
   };
 
+  if (loading) return <p>Carregando perfil...</p>;
+
   return (
     <div className="container_principal">
       <header className='header_egressoview'>
-        <h1>Editar Egresso</h1>
+        <h1>{id ? 'Editar Egresso' : 'Cadastrar Egresso'}</h1>
       </header>
 
       <div className='container_egresso'>
@@ -91,7 +109,7 @@ const EditEgresso = () => {
                 <p key={index}>⚠ Atenção: {msg}</p>
               ))
             ) : (
-              <p key={index}>⚠ Atenção: {msg}</p>
+              <p>⚠ Atenção: {errorMessage}</p>
             )}
           </div>
         )}
@@ -99,7 +117,7 @@ const EditEgresso = () => {
         <form onSubmit={(e) => e.preventDefault()}>
           <div className="egresso-header">
             <img
-              src={egresso.foto || "default-image-path.jpg"}
+              src={egresso.foto || "/demo/avatar.svg"}
               alt={egresso.nome || "Foto do egresso"}
               className="egresso-photo"
             />

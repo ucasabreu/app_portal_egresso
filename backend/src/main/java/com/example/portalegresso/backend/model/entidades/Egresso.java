@@ -34,14 +34,14 @@ public class Egresso {
     @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;
 
-    @Column(name = "foto")
+    @Column(name = "foto", columnDefinition = "TEXT")
     private String foto;
 
-    @Pattern(regexp = "^(https?:\\/\\/)?([\\w]+\\.)?linkedin\\.com\\/.*$", message = "Informe um link válido do LinkedIn")
+    @Pattern(regexp = "^$|^(https?:\\/\\/)?([\\w]+\\.)?linkedin\\.com\\/.*$", message = "Informe um link válido do LinkedIn")
     @Column(name = "linkedin")
     private String linkedin;
 
-    @Pattern(regexp = "^(https?:\\/\\/)?(www\\.)?instagram\\.com\\/.*$", message = "Informe um link válido do Instagram")
+    @Pattern(regexp = "^$|^(https?:\\/\\/)?(www\\.)?instagram\\.com\\/.*$", message = "Informe um link válido do Instagram")
     @Column(name = "instagram")
     private String instagram;
 

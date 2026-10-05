@@ -30,6 +30,8 @@ function App() {
           <Route path="/" element={<><Banner /><HomePage /></>} />
           <Route path="/egresso/:id" element={<Egresso />} />
           <Route path="/edit-egresso" element={<EditEgresso />} />
+          <Route path="/edit-egresso/:id" element={<EditEgresso />} />
+          <Route path="/edit-egresso/:id" element={<EditEgresso />} />
           <Route path="/egresso_view/:id" element={<EgressoView />} />
           <Route path="/egressos/listar" element={<EgressosPage />} />
           <Route path="/egressos/depoimentos" element={<Depoimento />} />

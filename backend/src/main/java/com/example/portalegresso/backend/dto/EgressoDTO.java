@@ -22,10 +22,10 @@ public class EgressoDTO {
     private String descricao;
     private String foto;
 
-    @Pattern(regexp = "^(https?:\\/\\/)?([\\w]+\\.)?linkedin\\.com\\/.*$", message = "Informe um link válido do LinkedIn")
+    @Pattern(regexp = "^$|^(https?:\\/\\/)?([\\w]+\\.)?linkedin\\.com\\/.*$", message = "Informe um link válido do LinkedIn")
     private String linkedin;
 
-    @Pattern(regexp = "^(https?:\\/\\/)?(www\\.)?instagram\\.com\\/.*$", message = "Informe um link válido do Instagram")
+    @Pattern(regexp = "^$|^(https?:\\/\\/)?(www\\.)?instagram\\.com\\/.*$", message = "Informe um link válido do Instagram")
     private String instagram;
     
     private String curriculo;

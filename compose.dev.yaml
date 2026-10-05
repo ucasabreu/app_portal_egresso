@@ -1,0 +1,5 @@
+# Publica somente o banco para executar Java e Node diretamente no WSL/Linux.
+services:
+  db:
+    ports:
+      - "127.0.0.1:5432:5432"

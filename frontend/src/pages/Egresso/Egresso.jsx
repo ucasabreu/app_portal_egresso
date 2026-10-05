@@ -261,6 +261,7 @@ const Egresso = () => {
     <div className="container_principal">
       <header className='header_egressoview'>
         <h1>Dados do Egresso</h1>
+        <button type="button" onClick={() => navigate(`/edit-egresso/${id}`)}>Editar perfil</button>
       </header>
       <div className='container_egresso'>
         {restErrors.length > 0 && (
@@ -284,7 +285,7 @@ const Egresso = () => {
         )}
 
         <div className="egresso-header">
-          <img src={egresso.foto || 'default-image-path.jpg'} alt={egresso.nome} className="egresso-photo" />
+          <img src={egresso.foto || '/demo/avatar.svg'} alt={egresso.nome} className="egresso-photo" />
           <div className="egresso-info">
             <p><strong>Nome:</strong> {egresso.nome}</p>
             <p><FaEnvelope className="icon" /> {egresso.email}</p>
