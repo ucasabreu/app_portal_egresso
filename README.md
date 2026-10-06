@@ -42,12 +42,22 @@ preparação de um ambiente reproduzível para apresentar o software.
 | Página inicial | Descobrir conquistas publicadas, conhecer até seis pessoas da comunidade e ler até três depoimentos recentes. |
 | Consulta de egressos | Explorar cartões com formação e experiência, pesquisar por nome/curso/cargo/anos, remover filtros, ordenar e paginar; compartilhar a consulta e retomá-la ao voltar de um perfil. |
 | Perfil do egresso | Consultar apresentação, foto, formação, experiências e conquistas; acessar currículo, redes e copiar o link do perfil. |
-| Cadastro e edição | Criar um perfil e atualizar seus dados pela interface integrada à API. |
-| Trajetória acadêmica e profissional | Associar cursos e cargos ao egresso, informando os períodos. |
+| Cadastro e edição | Preencher identificação, apresentação e contatos em três etapas, conferir os dados e salvar; receber avisos ao sair com alterações não salvas. |
+| Trajetória acadêmica e profissional | Registrar formação, experiência e depoimentos com validação e revisão antes de salvar; indicar períodos em andamento. |
 | Depoimentos | Registrar relatos, ler textos longos com expansão, pesquisar por ano e compartilhar a consulta. |
 | Destaques | Buscar por egresso ou curso, ordenar por data e abrir cada publicação; explorar o histórico por ano e cadastrar destaques pelo painel de coordenação. |
-| Coordenação de curso | Consultar cursos e seus egressos pelo painel do coordenador. |
-| Coordenação geral | Gerenciar cursos e coordenadores pelo painel geral. |
+| Coordenação de curso | Pesquisar cursos, egressos e publicações; conferir a prévia de um destaque antes de publicar e desvincular uma formação preservando o perfil. |
+| Coordenação geral | Pesquisar contas e cursos por responsável, revisar o cadastro de curso e confirmar exclusões com identificação do registro. |
+
+Fotos de perfil e imagens de destaque enviadas por arquivo aceitam **JPEG, PNG
+ou WebP, até 2 MB por imagem**. A API valida o tamanho após decodificar o base64
+e a assinatura do formato. Também aceita URLs HTTP(S), limitadas a 2.048
+caracteres, e caminhos locais como `/demo/avatar.svg`; a disponibilidade de
+imagens externas depende do servidor de origem.
+
+Os formulários preservam o conteúdo quando a gravação falha. Os avisos de
+alterações não salvas ajudam na navegação; rascunhos permanecem apenas na tela
+aberta e não são recuperados após fechar ou recarregar a aplicação.
 
 ## Principais telas
 
@@ -63,7 +73,7 @@ As orientações para atualizar a galeria estão em
 | Perfil do egresso | Cadastro e edição |
 | --- | --- |
 | ![Espaço reservado para captura do perfil do egresso](docs/images/telas/perfil.svg) | ![Espaço reservado para captura do formulário de cadastro e edição](docs/images/telas/cadastro.svg) |
-| Formação, experiência profissional e informações do perfil. | Formulário integrado às operações de gravação da API. |
+| Formação, experiência profissional e informações do perfil. | Identificação, apresentação e revisão antes de gravar na API. |
 
 | Depoimentos | Painel da coordenação geral |
 | --- | --- |
@@ -78,7 +88,8 @@ Instale **Git** e **Docker com Compose v2.20 ou superior**. No Windows/macOS,
 use Docker Desktop; no Linux, Docker Engine com o plugin Compose. O Docker deve
 estar em execução e configurado para containers Linux.
 
-As portas **5173** e **8080** precisam estar livres. A primeira execução precisa
+Por padrão, as portas **5173** e **8080** precisam estar livres; elas podem ser
+alteradas na configuração do Compose. A primeira execução precisa
 de internet para baixar imagens e dependências; Java, Node e PostgreSQL são
 preparados nos containers.
 
@@ -116,6 +127,45 @@ serviços e preserva os dados. Para executar em segundo plano:
 
 ```bash
 docker compose up --build -d --wait --wait-timeout 240
+```
+
+### Executar junto a outros projetos
+
+Se outro projeto já usa as portas padrão, crie um arquivo `.env` na raiz com
+portas livres. Esse arquivo é ignorado pelo Git:
+
+```dotenv
+PORTAL_FRONTEND_PORT=5180
+PORTAL_BACKEND_PORT=8081
+PORTAL_DB_PORT=5433
+```
+
+Depois execute `bash iniciar.sh` ou `iniciar.cmd`. Os inicializadores mostram e
+abrem a porta publicada; neste exemplo, o Portal fica em
+**http://localhost:5180** e a API em **http://localhost:8081**. Também é possível
+usar `docker compose up --build -d --wait --wait-timeout 240`.
+
+| Variável | Padrão | Uso |
+| --- | --- | --- |
+| `PORTAL_FRONTEND_PORT` | `5173` | Porta da interface no modo Docker. |
+| `PORTAL_BACKEND_PORT` | `8080` | Porta da API no modo Docker. |
+| `PORTAL_DB_PORT` | `5432` | Porta do banco somente com `compose.dev.yaml`. |
+
+O Compose completo **não publica a porta do PostgreSQL**: outro banco pode
+continuar usando 5432 na máquina. Não é necessário iniciar o serviço `db`
+separadamente para esse modo. As portas internas e os dados persistidos
+permanecem os mesmos.
+
+Essas variáveis não alteram as portas do inicializador `--local`, que executa
+Java/Vite em 8080/5173. Se publicar o banco em 5433 para desenvolvimento local,
+configure `SPRING_DATASOURCE_URL='jdbc:postgresql://localhost:5433/portal_demo'`
+em `.env.local`. Esse arquivo é separado do `.env` usado pelo Compose.
+
+Para verificar a demonstração em uma porta alternativa:
+
+```bash
+curl -i http://localhost:5180/api/demo/health
+python3 scripts/smoke_demo.py --base-url http://localhost:5180
 ```
 
 ### 3. Explorar as contas de exemplo
@@ -204,8 +254,9 @@ docker compose -f compose.yaml -f compose.dev.yaml up -d --wait db
 bash iniciar.sh --local
 ```
 
-O arquivo `compose.dev.yaml` publica o PostgreSQL em `127.0.0.1:5432`; essa porta
-também precisa estar livre. O inicializador instala as dependências do frontend,
+O arquivo `compose.dev.yaml` publica o PostgreSQL em `127.0.0.1:5432` por padrão;
+`PORTAL_DB_PORT` altera essa publicação. A porta escolhida precisa estar livre
+e corresponder à URL JDBC de `.env.local`. O inicializador instala as dependências do frontend,
 aguarda a API e inicia o Vite. Ctrl+C encerra Java/Vite; o banco Docker continua
 em execução até ser encerrado pelo Compose.
 
@@ -261,7 +312,7 @@ no desenvolvimento ou build, conforme a seção de variáveis.
 | --- | --- |
 | `npm run dev` | Servidor local com atualização automática. |
 | `npm run lint` | Análise estática com ESLint. |
-| `npm test` | Testes dos filtros, paginação, cache de detalhes, painéis, perfis, publicações e prévias/relatos da página inicial. |
+| `npm test` | Testes dos filtros, paginação, cache, painéis, conteúdo público, validações de gestão e política de imagens. |
 | `npm run build` | Build de produção em `dist/`. |
 | `npm run preview` | Preview dos arquivos compilados; exige a API em execução. |
 
@@ -364,6 +415,15 @@ guardam os relatos associados ao egresso.
 └── iniciar.cmd             # Inicializador Windows
 ```
 
+Consultas válidas sem registros em `/api/consultas/listar/*` e na listagem geral
+de destaques respondem `200` com `[]`. Parâmetros inválidos mantêm `400`; consultas
+de depoimentos com limite aceitam de 1 a 100 registros. Falhas do serviço são
+apresentadas separadamente de resultados vazios.
+
+Cursos com formações vinculadas precisam ser desvinculados antes da exclusão.
+A remoção de uma conta verifica seus cursos antes de apagar dados e executa as
+exclusões na mesma transação.
+
 ## Qualidade e testes
 
 Execute a partir da raiz, com Java 17+, Node/npm e Python 3 disponíveis:
@@ -400,8 +460,10 @@ além de cadastrar, editar e excluir um registro temporário com vínculos.
 O [workflow de validação](.github/workflows/demo.yml) prepara esses passos com
 PostgreSQL real em pushes, pull requests e execução manual no GitHub.
 
-Não há percentual mínimo de cobertura configurado nem suíte automatizada
-de testes de interface no frontend.
+O frontend possui 64 casos de regressão em seis arquivos, executados pelo
+runner nativo do Node. Não há percentual mínimo de cobertura configurado nem
+suíte automatizada em navegador; aparência, toque e acessibilidade devem ser
+revisados também no uso real.
 
 ## Diagnóstico
 
@@ -416,7 +478,7 @@ docker compose logs --tail=100 db
 | Sintoma | O que verificar |
 | --- | --- |
 | Docker indisponível | Abra Docker Desktop ou confirme que o daemon Linux está ativo e acessível. |
-| Porta ocupada | Encerre a execução anterior ou o processo usando 5173/8080; no modo local, verifique também 5432. |
+| Porta ocupada | No modo Docker, escolha portas livres com `PORTAL_FRONTEND_PORT` e `PORTAL_BACKEND_PORT` em `.env`. O banco só publica uma porta com `compose.dev.yaml`; nesse caso, use `PORTAL_DB_PORT` e ajuste a URL JDBC. |
 | Backend não inicia | Consulte logs do backend e do banco; confira URL, credenciais e saúde do PostgreSQL. |
 | Exemplos não aparecem | A carga requer o perfil `demo` e um banco inteiramente vazio. |
 | Dependências incompatíveis após trocar de sistema | Use `--local --reinstall`; evite reutilizar `node_modules` entre Windows e Linux. |

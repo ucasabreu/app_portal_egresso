@@ -116,7 +116,7 @@ Na proposta, explicar benefícios e os três caminhos existentes: visitante conh
 
 Agrupar identificação, apresentação e links em etapas curtas. Mostrar progresso, exemplos e um resumo verdadeiro antes do envio. Preservar campos após erro e levar o foco à primeira validação pendente.
 
-Adicionar prévia da foto, orientação de formatos/tamanho e limite de arquivo coordenado com o servidor. Hoje `readImageFile` aceita imagens e converte o arquivo completo para base64; não há controle de tamanho nessa função.
+Adicionar prévia da foto, orientação de formatos/tamanho e limite de arquivo coordenado com o servidor. Na etapa 4, `readImageFile` passou a aceitar JPEG, PNG e WebP de até 2 MB antes da leitura. A API aplica o mesmo limite aos bytes decodificados e verifica a assinatura do formato; imagens demo em caminhos locais continuam válidas.
 
 Na gestão, abrir formulários no contexto da seção, avisar sobre alterações não salvas e confirmar exclusões com nome e consequência. Um indicador de preenchimento pode contar campos definidos, com regras explícitas; não deve ser apresentado como avaliação profissional da pessoa.
 
@@ -128,7 +128,7 @@ Na publicação, selecionar egresso, escrever conteúdo, conferir imagem e visua
 
 Na gestão geral, mostrar responsável junto ao curso, quantidade de vínculos e pesquisa de contas. A API atual cadastra e exclui cursos, mas não oferece edição de curso ou destaque; alteração de responsável e edição de publicação precisam de endpoints próprios.
 
-Rever a ação “Excluir egresso”: atualmente ela apaga o perfil inteiro, não apenas o vínculo com o curso. Se a intenção for desvincular uma formação, usar o endpoint de exclusão de `CursoEgresso`, mostrando o impacto correto e validando autorização no servidor.
+A etapa 4 substituiu a ação de exclusão de perfil no painel por “Desvincular formação”, identificando o curso e o ID do vínculo. Se a intenção for desvincular uma formação, usar o endpoint de exclusão de `CursoEgresso`, mostrando o impacto correto e validando autorização no servidor.
 
 ## 5. Funcionalidades que agregam valor
 
@@ -160,7 +160,7 @@ Evoluir a estrutura existente: componentes visuais reutilizáveis em `components
 | Destaques e artigo | `/api/coordenadores/destaque/listar?nome=...`, `/api/coordenadores/buscar/destaque/{id}` |
 | Conquistas de uma pessoa | `/api/coordenadores/destaque/egresso/{idEgresso}` |
 
-O tratamento das mensagens conhecidas de coleção vazia de cursos, contas e destaques foi centralizado em `services/collections.js` na etapa 1. Na etapa 2, o diretório também passou a reconhecer as mensagens exatas de ausência de egressos em cada filtro. As outras consultas públicas ainda precisam de padronização. Não converter qualquer erro 400 em ausência de resultados. Evoluir o backend para retornar `200 []` em consultas válidas sem resultados e DTOs com contrato documentado.
+O tratamento das mensagens conhecidas de coleção vazia de cursos, contas e destaques foi centralizado em `services/collections.js` na etapa 1. Na etapa 2, o diretório também passou a reconhecer as mensagens exatas de ausência de egressos em cada filtro. A entrega inicial de contratos da etapa 6 padronizou as consultas válidas de `/api/consultas/listar/*` e a listagem geral de destaques para retornar `200 []` sem resultados. Parâmetros inválidos continuam respondendo 400; falhas do repositório não viram listas vazias. O frontend mantém compatibilidade com as mensagens exatas da API anterior. DTOs agregados e paginação no servidor continuam pendentes.
 
 Cancelar consultas obsoletas, evitar gravações duplicadas e reutilizar respostas sem misturar contas ou filtros. A documentação do [React sobre efeitos e consultas](https://react.dev/reference/react/useEffect) orienta limpeza de efeitos e discute condições de corrida e cache; a biblioteca de consultas deve ser escolhida apenas se a complexidade justificar.
 
@@ -184,7 +184,7 @@ Adotar WCAG 2.2 AA como objetivo de implementação, não como certificação j�
 
 Após a etapa 3, o build inclui a imagem principal de aproximadamente 1,18 MB e o logotipo de 326 KB. As imagens institucionais de 669 KB e 279 KB deixaram de ser importadas pelo frontend; seus arquivos continuam no repositório. Gerar versões menores e formatos apropriados, definir dimensões e usar carregamento tardio para imagens fora da primeira tela. A imagem principal deve carregar cedo; essa distinção é orientada pela [documentação de imagens do web.dev](https://web.dev/articles/browser-level-image-lazy-loading). Comparar resultados reais antes/depois, sem publicar pontuação de desempenho não medida.
 
-Validação automática: `npm test`, `npm run lint` e `npm run build`. Há 55 casos distribuídos em cinco arquivos: filtros/apresentação, painéis, publicações/perfis, diretório e entrada/depoimentos. A simulação de DOM confere renderização e ações com dados controlados; não substitui testes em navegador.
+Validação automática: `npm test`, `npm run lint` e `npm run build`. Há 64 casos distribuídos em seis arquivos: filtros/apresentação, painéis, publicações/perfis, diretório, entrada/depoimentos e validações de gestão/imagens. A simulação de DOM confere renderização e ações com dados controlados; não substitui testes em navegador.
 
 Roteiro manual obrigatório para a próxima entrega:
 
@@ -204,7 +204,9 @@ Roteiro manual obrigatório para a próxima entrega:
 | 1 — Conteúdo público | Implementado no frontend; verificações automatizadas aprovadas; revisão visual e integração com API local pendentes |
 | 2 — Descoberta | Implementado no frontend; verificações automatizadas aprovadas; revisão visual e integração com API local pendentes |
 | 3 — Entrada e leitura | Implementado no frontend; verificações automatizadas aprovadas; revisão visual e integração com API local pendentes |
-| 4 a 6 | Planejadas |
+| 4 — Gestão | Implementada; verificações automatizadas aprovadas; revisão visual com API local pendente |
+| 5 — Qualidade | Iniciada: política de imagens, dimensões, foco e regressões; navegador, otimização de arquivos e capturas pendentes |
+| 6 — Backend complementar | Contratos de coleção vazia, imagens e exclusões ajustados; autenticação, permissões, edição, rascunhos e consultas agregadas pendentes |
 
 ### Etapa 1 — Destaques e perfis públicos
 
@@ -269,3 +271,36 @@ Agrupar as alterações em três entregas, incluindo os testes e ajustes compart
 3. `docs(portal): atualizar funcionalidades e evolução da experiência` — README com apresentação do software e acompanhamento neste documento.
 
 Como há arquivos compartilhados entre as duas etapas (`package.json`, coleções e cartão de egresso), revisar a seleção por trechos antes de confirmar cada commit. Validar os testes disponíveis em cada entrega e revisar o diff preparado. A etapa seguinte é a 4 — gestão, prévia de publicação e formulários.
+
+
+### Etapa 4 — Gestão e revisão de dados
+
+- Coordenação com busca em cursos, vínculos de egresso e destaques. Uma tabela de formações mostra curso, pessoa, e-mail e período, mantendo IDs de vínculo separados do ID do perfil. A paginação reinicia quando a pesquisa muda.
+- “Desvincular formação” usa `DELETE /api/egressos/deletar/curso_egresso/{idVinculo}` e identifica pessoa/curso na confirmação. Preserva perfil, experiências, publicações e outras formações.
+- Publicação em conteúdo/revisão, com prévia de artigo e cartão, texto simples, validações de título/conquista e recuperação do conteúdo após falha. Não há persistência de rascunho no servidor ou navegador.
+- Gestão geral com pesquisa de contas, filtro de responsável, nome da conta junto ao curso, revisão antes do cadastro e confirmação ao limpar o formulário.
+- Cadastro/edição de perfil em identificação, apresentação/contatos e revisão. Currículo local da demonstração permanece aceito; salvar com sucesso segue para a trajetória.
+- Formação, experiência e depoimento têm revisão antes do envio e avisos ao trocar/cancelar um formulário preenchido. O término pode ficar vazio para período em andamento; o payload envia `null`. Anos seguem as regras existentes do backend, incluindo início de experiência a partir de 1991.
+- Foco vai ao primeiro campo inválido após a validação; corrigir um campo não transfere o foco para outro. Exclusões e avisos usam IDs de diálogo únicos.
+- Navegação interna usa `createBrowserRouter` e `useBlocker`, preservando as rotas existentes. O [bloqueio de navegação do React Router](https://reactrouter.com/api/hooks/useBlocker) permite continuar editando ou descartar; o evento [beforeunload](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event) fica ativo somente com dados pendentes ou gravação. O aviso nativo depende do navegador e não garante recuperação de dados, especialmente em dispositivos móveis.
+
+**Verificação executada:** lint, build e testes do frontend aprovados; nove casos novos, total de 64. Simulação de DOM com respostas controladas verificou as 15 rotas e os fluxos anteriores, além de busca, prévia, payload de publicação, erro/repetição sem perder conteúdo, descarte/cancelamento, bloqueio de navegação e evento de saída, cadastro de curso, currículo demo, formação em andamento e desvinculação pelo ID correto. Não houve navegador real, captura ou integração com Docker/PostgreSQL nesta execução.
+
+### Etapa 5 — Qualidade em andamento
+
+JPEG, PNG e WebP enviados por arquivo têm limite de 2 MB no cliente e servidor. SVG enviado como arquivo não é aceito; o avatar SVG local dos dados demo continua válido. O backend verifica MIME declarado, assinatura inicial e limite dos bytes decodificados; isso não substitui processamento completo de imagem. Referências externas HTTP(S) são aceitas sem consulta de rede pela API.
+
+Imagens visíveis receberam dimensões, mantendo a proporção por CSS; fotos usam decodificação assíncrona e carregamento tardio quando apropriado. A imagem principal continua com carregamento antecipado e prioridade alta. Os arquivos principais permanecem com aproximadamente 1,18 MB e 326 KB; versões menores, comparação de desempenho e revisão visual ainda devem ser feitas. O uso de router com bloqueio elevou o arquivo JavaScript principal de aproximadamente 253 KB para 310 KB, sem alerta de tamanho do Vite; não há pontuação de desempenho medida.
+
+**Próxima revisão:** verificar larguras de 360, 768, 1.024 e 1.440 px com API demo; teclado, contraste, zoom, foco nativo dos diálogos, aviso ao voltar/recarregar, carrossel com toque e arquivos válidos/inválidos. Confirmar que os dados permanecem após erro, que salvar não abre aviso de descarte e que desvincular uma formação preserva o perfil. Registrar capturas somente após aprovar essas telas.
+
+### Etapa 6 — Primeiros ajustes de contratos
+
+- `/api/consultas/listar/*` e a listagem geral de destaques retornam `200 []` para ausência de resultados; consultas inválidas continuam 400, mesmo em banco vazio. Limite de depoimentos aceita 1 a 100 e não provoca erro nulo quando omitido.
+- DTOs de perfil e destaque validam imagens opcionais e referências locais/HTTP(S). A conquista tem limite de 255 caracteres, alinhado ao campo persistido e ao formulário.
+- Curso com formação vinculada retorna erro de negócio antes de excluir. Remoção de conta verifica todos os seus cursos antes de apagar o primeiro; a operação é transacional.
+- Testes cobrem coleções vazias em 15 consultas, entradas inválidas, propagação de falha do repositório, limite/formato de imagens, rejeição HTTP de imagens inválidas e desvinculação preservando os registros do egresso.
+
+**Verificação executada:** `bash ./mvnw -o test` com H2 isolado, 168 testes aprovados. Não houve alteração de esquema ou nova dependência. Consultas agregadas/paginação no servidor, resposta 404 para destaque inexistente, edição de curso/destaque, autenticação real, autorização e rascunhos persistidos continuam como contratos próprios. Os bloqueios de formulário e confirmações não estabelecem permissões de acesso.
+
+**Versionamento sugerido:** separar a gestão em `feat(gestao): adicionar busca, revisão e prévia de publicação`, os contratos em `fix(api): validar imagens e preservar vínculos nas exclusões`, os ajustes de imagens em `perf(frontend): definir dimensões e prioridade das imagens` e a documentação em `docs(portal): atualizar apresentação e andamento das entregas`. Incluir testes com a alteração correspondente e manter as pendências visuais declaradas antes do push.
