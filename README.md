@@ -40,11 +40,11 @@ preparação de um ambiente reproduzível para apresentar o software.
 | Área | O que é possível fazer |
 | --- | --- |
 | Consulta de egressos | Pesquisar por nome, curso, cargo e anos de ingresso/conclusão. |
-| Perfil do egresso | Consultar descrição, foto, formação, cargos, links e currículo. |
+| Perfil do egresso | Consultar apresentação, foto, formação, experiências e conquistas; acessar currículo, redes e copiar o link do perfil. |
 | Cadastro e edição | Criar um perfil e atualizar seus dados pela interface integrada à API. |
 | Trajetória acadêmica e profissional | Associar cursos e cargos ao egresso, informando os períodos. |
 | Depoimentos | Registrar relatos e consultar depoimentos com filtro por ano. |
-| Destaques | Consultar notícias e a linha do tempo dos egressos; cadastrar destaques pelo painel de coordenação. |
+| Destaques | Buscar por egresso ou curso, ordenar por data e abrir cada publicação; explorar o histórico por ano e cadastrar destaques pelo painel de coordenação. |
 | Coordenação de curso | Consultar cursos e seus egressos pelo painel do coordenador. |
 | Coordenação geral | Gerenciar cursos e coordenadores pelo painel geral. |
 
@@ -260,6 +260,7 @@ no desenvolvimento ou build, conforme a seção de variáveis.
 | --- | --- |
 | `npm run dev` | Servidor local com atualização automática. |
 | `npm run lint` | Análise estática com ESLint. |
+| `npm test` | Testes dos filtros, carregamento dos painéis, perfis e publicações. |
 | `npm run build` | Build de produção em `dist/`. |
 | `npm run preview` | Preview dos arquivos compilados; exige a API em execução. |
 
@@ -319,6 +320,9 @@ guardam os relatos associados ao egresso.
 | `POST` | `/api/egressos/salvar/egresso` | Cadastrar um egresso. |
 | `PUT` | `/api/egressos/atualizar/egresso/{id}` | Atualizar um perfil existente. |
 | `DELETE` | `/api/egressos/deletar/egresso/{id}` | Excluir um egresso e seus vínculos relacionados. |
+| `GET` | `/api/coordenadores/destaque/listar?nome=...` | Buscar destaques por egresso ou curso. |
+| `GET` | `/api/coordenadores/buscar/destaque/{id}` | Abrir uma publicação individual. |
+| `GET` | `/api/coordenadores/destaque/egresso/{idEgresso}` | Consultar conquistas de um egresso. |
 | `GET` | `/api/demo/health` | Verificar prontidão e conexão com o banco no perfil `demo`. |
 
 ## Organização do código
@@ -329,11 +333,14 @@ guardam os relatos associados ao egresso.
 │   ├── src/
 │   │   ├── pages/           # Telas e fluxos de navegação
 │   │   ├── components/      # Componentes reutilizáveis
-│   │   ├── services/        # Configuração do endereço da API
+│   │   ├── services/        # Configuração e consultas da API
+│   │   ├── hooks/           # Consultas, carregamento e operações de gestão
+│   │   ├── utils/           # Filtros, datas e tratamento de mensagens
 │   │   ├── styles/          # Estilos compartilhados
 │   │   ├── assets/          # Imagens e ícones da interface
 │   │   └── App.jsx          # Rotas da aplicação
-│   └── public/demo/         # Avatar e currículo fictícios
+│   ├── public/demo/         # Avatar e currículo fictícios
+│   └── tests/               # Testes do frontend com o runner nativo do Node
 ├── backend/
 │   └── src/
 │       ├── main/java/com/example/portalegresso/backend/
@@ -369,6 +376,7 @@ bash ./mvnw test
 cd ../frontend
 npm ci --include=optional
 npm run lint
+npm test
 npm run build
 
 # Testes dos inicializadores
@@ -424,9 +432,11 @@ atual verifica credenciais e direciona a interface ao painel correspondente;
 autenticação com sessão/token e autorização dos endpoints ainda precisam ser
 implementadas para uso em produção.
 
-O carrossel inicial consulta os destaques pela API. Vagas, eventos e mentoria
-aparecem no contexto da
-proposta do portal, mas não constituem módulos implementados nesta versão.
+O carrossel inicial apresenta os destaques consultados pela API e cartões de
+apresentação da comunidade. Os cartões continuam disponíveis quando o banco
+está vazio ou a API não responde; a interface informa falhas de carregamento
+e permite tentar novamente. Vagas, eventos e mentoria não constituem módulos
+implementados nesta versão.
 
 ## Captura e organização das imagens
 
