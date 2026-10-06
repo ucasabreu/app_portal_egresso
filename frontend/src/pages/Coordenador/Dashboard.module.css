@@ -1,0 +1,18 @@
+.sections { display: grid; gap: 1.5rem; }
+.panel { min-width: 0; border: 1px solid var(--color-border); border-radius: 1rem; background: white; padding: clamp(1rem, 3vw, 1.75rem); scroll-margin-top: 1.5rem; }
+.panel h2 { font-size: 1.25rem; letter-spacing: -.02em; margin-bottom: 1.25rem; }
+.panel h3 { font-size: 1rem; margin-bottom: 1rem; }
+.table { min-width: 0; border: 1px solid var(--color-border); border-radius: .75rem; overflow: hidden; }
+.subsection { padding: 1.25rem; margin-top: 1rem; background: var(--color-surface-muted); border-radius: .75rem; min-width: 0; }
+.actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.actions button { font-size: .75rem; padding: .5rem .75rem; }
+.link { min-height: 2.75rem; display: inline-flex; align-items: center; color: var(--color-accent-hover); font-weight: 650; }
+.form { display: grid; gap: 1.25rem; }
+.columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+.records { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1rem; }
+.record { border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.25rem; display: grid; gap: .75rem; min-width: 0; }
+.record p { font-size: .875rem; color: var(--color-text-muted); white-space: pre-line; overflow-wrap: anywhere; }
+.record h3 { margin: 0; }
+.notice { margin-bottom: 1.5rem; }
+.empty { padding: 1.5rem; background: var(--color-surface-muted); border-radius: .75rem; color: var(--color-text-muted); font-size: .875rem; }
+@media (max-width: 38rem) { .columns { grid-template-columns: 1fr; } }
