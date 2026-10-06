@@ -2,6 +2,12 @@ const emptyMessages = {
   "/api/consultas/listar/cursos": "Não há cursos cadastrados.",
   "/api/consultas/listar/coordenadores": "Não há coordenadores cadastrados.",
   "/api/coordenadores/destaque/listar": "Não há destaques cadastrados.",
+  "/api/consultas/listar/egressos": "Não há egressos cadastrados.",
+  "/api/consultas/listar/egressos/nome": ["Não há egressos cadastrados.", "Não há egressos com o nome informado."],
+  "/api/consultas/listar/egressos/curso": ["Não há egressos cadastrados.", "Não há egressos com o curso informado."],
+  "/api/consultas/listar/egressos/cargo": ["Não há egressos cadastrados.", "Não há cargos cadastrados.", "Não há egressos com o cargo informado."],
+  "/api/consultas/listar/egressos/ano_inicio": ["Não há egressos cadastrados.", "Não há egressos para o ano informado."],
+  "/api/consultas/listar/egressos/ano_fim": ["Não há egressos cadastrados.", "Não há egressos para o ano informado."],
 };
 
 export async function getCollection(get, path) {
@@ -11,7 +17,7 @@ export async function getCollection(get, path) {
     return data;
   } catch (error) {
     const message = emptyMessages[path.split("?")[0]];
-    if (error?.response?.status === 400 && message && error.response.data === message) return [];
+    if (error?.response?.status === 400 && message && [message].flat().includes(error.response.data)) return [];
     throw error;
   }
 }

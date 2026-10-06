@@ -11,11 +11,12 @@ export function egressoQueries(values) {
 }
 export function intersectEgressos(collections) {
   if (!collections.length) return [];
-  const remaining = collections.slice(1).map(items => new Set(items.map(item => item.id_egresso)));
+  const remaining = collections.slice(1).map(items => new Set(items.filter(item => item?.id_egresso != null).map(item => String(item.id_egresso))));
   const seen = new Set();
   return collections[0].filter(item => {
-    const id = item.id_egresso;
-    if (id == null || seen.has(id) || !remaining.every(ids => ids.has(id))) return false;
+    if (item?.id_egresso == null) return false;
+    const id = String(item.id_egresso);
+    if (seen.has(id) || !remaining.every(ids => ids.has(id))) return false;
     seen.add(id);
     return true;
   });
