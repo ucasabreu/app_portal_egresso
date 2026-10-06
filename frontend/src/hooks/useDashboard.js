@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { API_URL } from "../config/config.js";
 import { errorMessage } from "../utils/presentation";
-import { loadDashboard } from "../services/dashboard.js";
+import { loadDashboardSummary } from "../services/dashboard.js";
 
 const initialState = { coordenador: null, coordenadores: [], cursos: [], destaques: [], sections: {}, loading: true, error: "" };
 
@@ -15,7 +15,7 @@ export default function useDashboard(id, general = false) {
     const load = async () => {
       setState(initialState);
       try {
-        const data = await loadDashboard(get, id, general);
+        const data = await loadDashboardSummary(get, id, general);
         if (!controller.signal.aborted) setState({ ...data, loading: false, error: "" });
       } catch (error) {
         if (!controller.signal.aborted) setState(value => ({ ...value, loading: false, error: errorMessage(error) }));

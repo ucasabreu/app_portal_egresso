@@ -1,3 +1,4 @@
+import { useAuth, accountPath } from "../../auth/AuthContext.js";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { FaBars, FaTimes, FaArrowRight } from "react-icons/fa";
@@ -11,6 +12,7 @@ const links = [
 ];
 
 export default function Header() {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const closeMenu = () => setOpen(false);
   return (
@@ -30,7 +32,7 @@ export default function Header() {
             <NavLink key={to} to={to} onClick={closeMenu}
               className={({ isActive }) => [styles.navLink, isActive ? styles.active : ""].join(" ")}>{label}</NavLink>
           ))}
-          <Link to="/login" className={styles.access} onClick={closeMenu}>Coordenação</Link>
+          <Link to={accountPath(user)} className={styles.access} onClick={closeMenu}>{user ? "Minha área" : "Entrar"}</Link>
           <Link to="/edit-egresso" className={styles.join} onClick={closeMenu}>Participar <FaArrowRight aria-hidden="true" /></Link>
         </nav>
       </Container>

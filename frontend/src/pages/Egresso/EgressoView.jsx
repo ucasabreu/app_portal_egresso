@@ -1,3 +1,4 @@
+import { useAuth, canEditProfile } from "../../auth/AuthContext.js";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { directoryReturn } from "../../utils/egressoDirectory.js";
 import useProfile from "../../hooks/useProfile";
@@ -10,6 +11,7 @@ import ErrorState from "../../components/feedback/ErrorState";
 import styles from "./PublicProfile.module.css";
 
 export default function EgressoView() {
+  const { user } = useAuth();
   const { id } = useParams();
   const location = useLocation();
   const returnPath = directoryReturn(location.state?.directory);
@@ -22,7 +24,7 @@ export default function EgressoView() {
   );
   return (
     <Container as="section" className={styles.page}>
-      <div className={styles.top}><Link to={returnPath} className={styles.link}>← Voltar aos egressos</Link><Link to={"/edit-egresso/" + id} className={styles.link}>Editar perfil →</Link></div>
+      <div className={styles.top}><Link to={returnPath} className={styles.link}>← Voltar aos egressos</Link>{canEditProfile(user, id) && <Link to={"/edit-egresso/" + id} className={styles.link}>Editar perfil →</Link>}</div>
       <ProfileHero egresso={profile.egresso} cursos={profile.cursos} />
       <nav className={styles.sections} aria-label="Nesta trajetória">
         <a href="#profile-education">Formação</a><a href="#profile-experience">Experiências</a><a href="#profile-highlights">Conquistas</a><a href="#profile-testimonials">Depoimentos</a>

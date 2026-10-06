@@ -43,3 +43,18 @@ export async function loadDashboard(get, id, general = false) {
     destaques: records.filter(item => sameId(item.coordenador?.id_coordenador, coordenador.id_coordenador)),
   };
 }
+
+export async function loadDashboardSummary(get, id, general = false) {
+  let data;
+  try { data = await get("/api/gestao/painel"); }
+  catch (error) {
+    if (error.response?.status >= 500) return loadDashboard(get, id, general);
+    throw error;
+  }
+  if (!data || !sameId(data.coordenador?.id_coordenador, id)
+    || data.coordenador.tipo !== (general ? "geral" : "coordenador")
+    || !Array.isArray(data.cursos) || !Array.isArray(data.coordenadores) || !Array.isArray(data.destaques)) {
+    throw new Error("Não foi possível carregar o painel desta conta.");
+  }
+  return data;
+}

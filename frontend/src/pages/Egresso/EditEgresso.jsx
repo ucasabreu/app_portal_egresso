@@ -1,3 +1,4 @@
+import { useAuth } from "../../auth/AuthContext.js";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -23,6 +24,9 @@ const empty = { foto: "", nome: "", email: "", linkedin: "", instagram: "", curr
 const profileValues = data => Object.fromEntries(Object.keys(empty).map(key => [key, typeof data[key] === "string" ? data[key] : ""]));
 const steps = ["Identificação", "Apresentação e contatos", "Revisão"];
 export default function EditEgresso() {
+  const auth = useAuth();
+  const [senha, setSenha] = useState("");
+  const [confirmationPassword, setConfirmationPassword] = useState("");
   const navigate = useNavigate();
   const { id } = useParams();
   const [egresso, setEgresso] = useState(empty);
@@ -41,7 +45,7 @@ export default function EditEgresso() {
   const form = useRef(null);
   const focusError = useRef(false);
   const heading = useRef(null);
-  const blocker = useUnsavedChanges(!loading && JSON.stringify(egresso) !== JSON.stringify(original), saving);
+  const blocker = useUnsavedChanges(!loading && (JSON.stringify(egresso) !== JSON.stringify(original) || !!senha), saving);
   useEffect(() => {
     const controller = new AbortController();
     setStep(1); setError(""); setErrors({}); setLoadError("");
@@ -73,16 +77,25 @@ export default function EditEgresso() {
     event.preventDefault();
     if (pending.current || photoLoading || photoError) return;
     const all = profileErrors(egresso);
-    const next = step === 1 ? Object.fromEntries(Object.entries(all).filter(([key]) => ["nome", "email"].includes(key))) : all;
+    if (!id || senha) {
+      if (senha.length < 8 || senha.length > 128) all.senha = "Use uma senha de 8 a 128 caracteres.";
+      if (senha !== confirmationPassword) all.confirmationPassword = "As senhas precisam ser iguais.";
+    }
+    const next = step === 1 ? Object.fromEntries(Object.entries(all).filter(([key]) => ["nome", "email", "senha", "confirmationPassword"].includes(key))) : all;
     setErrors(next);
-    if (Object.keys(next).length) { focusError.current = true; setStep(next.nome || next.email ? 1 : 2); return; }
+    if (Object.keys(next).length) { focusError.current = true; setStep(next.nome || next.email || next.senha || next.confirmationPassword ? 1 : 2); return; }
     if (step < 3) { setStep(value => value + 1); return; }
     pending.current = true; setSaving(true); setError("");
     try {
       const payload = profileValues(egresso);
-      const response = id ? await axios.put(API_URL + "/api/egressos/atualizar/egresso/" + id, payload) : await axios.post(API_URL + "/api/egressos/salvar/egresso", payload);
-      if (response.data?.id_egresso == null) throw new Error("O serviço não retornou a identificação do perfil salvo.");
-      setOriginal(egresso); blocker.release(); navigate("/egresso/" + response.data.id_egresso);
+      let savedId;
+      if (id) {
+        const response = await axios.put(API_URL + "/api/egressos/atualizar/egresso/" + id, payload);
+        savedId = response.data?.id_egresso;
+        if (senha && auth.user?.role === "geral") await axios.post(API_URL + "/api/gestao/egressos/" + id + "/senha", { senha });
+      } else savedId = (await auth.register({ ...payload, senha })).id;
+      if (savedId == null) throw new Error("O serviço não retornou a identificação do perfil salvo.");
+      setSenha(""); setConfirmationPassword(""); setOriginal(egresso); blocker.release(); navigate("/egresso/" + savedId);
     } catch (error) { setError(errorMessage(error)); }
     finally { pending.current = false; setSaving(false); }
   };
@@ -101,6 +114,10 @@ export default function EditEgresso() {
             {(egresso.foto || photoError) && <Button variant="secondary" disabled={saving || photoLoading} onClick={() => { setEgresso(value => ({ ...value, foto: "" })); setPhotoError(""); }}>Usar sem foto</Button>}
             <Field label="Nome completo" name="nome" autoComplete="name" value={egresso.nome} onChange={change} error={errors.nome} required disabled={saving} />
             <Field label="E-mail" name="email" type="email" autoComplete="email" value={egresso.email} onChange={change} error={errors.email} required disabled={saving} />
+            {(!id || auth.user?.role === "geral") && <>
+              <Field label={id ? "Nova senha de acesso" : "Senha de acesso"} name="senha" type="password" autoComplete="new-password" value={senha} onChange={event => setSenha(event.target.value)} error={errors.senha} hint={id ? "Opcional. Define uma nova senha para este egresso." : "Use de 8 a 128 caracteres para acessar sua área."} maxLength={128} disabled={saving} required={!id} />
+              <Field label="Confirmar senha" name="confirmationPassword" type="password" autoComplete="new-password" value={confirmationPassword} onChange={event => setConfirmationPassword(event.target.value)} error={errors.confirmationPassword} maxLength={128} disabled={saving} required={!id || !!senha} />
+            </>}
           </>}
           {step === 2 && <>
             <Field as={TextArea} label="Sobre você" name="descricao" value={egresso.descricao} onChange={change} placeholder="Conte um pouco sobre sua formação, atuação e interesses." rows={5} disabled={saving} />

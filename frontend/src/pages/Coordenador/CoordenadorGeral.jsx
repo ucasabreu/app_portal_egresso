@@ -7,6 +7,7 @@ import useMutation from "../../hooks/useMutation";
 import useUnsavedChanges from "../../hooks/useUnsavedChanges.js";
 import { sameId } from "../../services/dashboard.js";
 import { courseErrors, matchesSearch, focusFirstError } from "../../utils/management.js";
+import CoordinatorForm from "../../components/ui/CoordinatorForm";
 import AdminShell from "../../components/ui/AdminShell";
 import Field from "../../components/ui/Field";
 import Select from "../../components/ui/Select";
@@ -24,6 +25,7 @@ export default function CoordenadorGeral() {
   const { id } = useParams();
   const dashboard = useDashboard(id, true);
   const { busy, notice, run } = useMutation();
+  const [editingId, setEditingId] = useState(null);
   const [course, setCourse] = useState(empty);
   const [confirmation, setConfirmation] = useState(null);
   const [errors, setErrors] = useState({});
@@ -36,17 +38,18 @@ export default function CoordenadorGeral() {
   const focusError = useRef(false);
   useEffect(() => { if (focusError.current && !review && Object.keys(errors).length) { focusError.current = false; focusFirstError(form.current, errors); } }, [review, errors]);
   const blocker = useUnsavedChanges(Object.values(course).some(Boolean), busy);
-  const coordinator = course => course.coordenador?.login || dashboard.coordenadores.find(person => sameId(person.id_coordenador, course.coordenador?.id_coordenador))?.login || "Responsável não informado";
+  const coordinator = course => course.coordenador?.login || responsibleAccounts.find(person => sameId(person.id_coordenador, course.coordenador?.id_coordenador))?.login || "Responsável não informado";
+  const responsibleAccounts = [dashboard.coordenador, ...dashboard.coordenadores].filter(Boolean);
   const courses = dashboard.cursos.filter(course => (!responsibleId || sameId(course.coordenador?.id_coordenador, responsibleId)) && matchesSearch(courseQuery, course.nome, course.nivel, coordinator(course)));
   const coordinators = dashboard.coordenadores.filter(person => matchesSearch(coordinatorQuery, person.login, person.tipo));
   const update = event => { setCourse(value => ({ ...value, [event.target.name]: event.target.value })); setErrors(value => ({ ...value, [event.target.name]: "" })); setReview(false); };
   const save = async event => {
     event.preventDefault();
-    const next = courseErrors(course, dashboard.coordenadores);
+    const next = courseErrors(course, responsibleAccounts);
     setErrors(next);
     if (Object.keys(next).length) { focusError.current = true; setReview(false); return; }
     if (!review) { setReview(true); return; }
-    if (await run(() => axios.post(API_URL + "/api/coordenadores/salvar/curso", course), "Curso cadastrado com sucesso.", dashboard.reload)) { setCourse(empty); setReview(false); }
+    if (await run(() => editingId ? axios.put(API_URL + "/api/coordenadores/atualizar/curso/" + editingId, course) : axios.post(API_URL + "/api/coordenadores/salvar/curso", course), editingId ? "Curso atualizado com sucesso." : "Curso cadastrado com sucesso.", dashboard.reload)) { setCourse(empty); setEditingId(null); setReview(false); }
   };
   const remove = async () => {
     if (await run(() => axios.delete(API_URL + confirmation.path), confirmation.success, dashboard.reload)) setConfirmation(null);
@@ -55,7 +58,7 @@ export default function CoordenadorGeral() {
     { name: "Curso", selector: row => row.nome, sortable: true, wrap: true },
     { name: "Nível", selector: row => row.nivel, sortable: true },
     { name: "Responsável", selector: row => coordinator(row), sortable: true, wrap: true },
-    { name: "Ações", cell: row => <Button variant="ghost" disabled={busy} onClick={() => setConfirmation({ path: "/api/coordenadores/deletar/curso/" + row.id_curso, description: `O curso “${row.nome}”, sob responsabilidade de ${coordinator(row)}, será excluído. Cursos com formações vinculadas precisam ser desvinculados antes da exclusão.`, success: "Curso excluído com sucesso." })}>Excluir curso</Button> },
+    { name: "Ações", cell: row => <div className={styles.actions}><Button variant="secondary" disabled={busy || Object.values(course).some(Boolean)} onClick={() => { setEditingId(row.id_curso); setCourse({ nome: row.nome, nivel: row.nivel, id_coordenador: String(row.coordenador?.id_coordenador || "") }); setErrors({}); setReview(false); document.getElementById("new-course")?.scrollIntoView({ block: "start" }); }}>Editar curso</Button><Button variant="ghost" disabled={busy} onClick={() => setConfirmation({ path: "/api/coordenadores/deletar/curso/" + row.id_curso, description: `O curso “${row.nome}”, sob responsabilidade de ${coordinator(row)}, será excluído. Cursos com formações vinculadas precisam ser desvinculados antes da exclusão.`, success: "Curso excluído com sucesso." })}>Excluir curso</Button></div> },
   ];
   const coordinatorColumns = [
     { name: "Login", selector: row => row.login, sortable: true },
@@ -65,7 +68,7 @@ export default function CoordenadorGeral() {
   ];
   return (
     <AdminShell title="Uma visão de toda a comunidade." description="Gerencie as contas de coordenação e organize os cursos que conectam a formação dos egressos."
-      login={dashboard.coordenador?.login} sections={[["coordinators", "Coordenadores"], ["courses", "Todos os cursos"], ["new-course", "Cadastrar curso"]]}
+      login={dashboard.coordenador?.login} sections={[["coordinators", "Coordenadores"], ["courses", "Todos os cursos"], ["new-course", "Cadastrar ou editar curso"], ["new-coordinator", "Cadastrar conta"]]}
       stats={!dashboard.loading && !dashboard.error ? [["Outras contas de coordenação", dashboard.sections.coordenadores ? "Indisponível" : dashboard.coordenadores.length], ["Cursos cadastrados", dashboard.sections.cursos ? "Indisponível" : dashboard.cursos.length]] : undefined}>
       {notice && <Notice variant={notice.variant} className={styles.notice}><p>{notice.text}</p></Notice>}
       {dashboard.loading ? <LoadingState label="Carregando gestão do portal…" /> : dashboard.error ? <ErrorState description={dashboard.error} onRetry={dashboard.reload} /> : <div className={styles.sections}>
@@ -79,18 +82,19 @@ export default function CoordenadorGeral() {
           <p className={styles.count} role="status">{courses.length} de {dashboard.cursos.length} cursos</p><div className={styles.table}><PortalTable key={courseQuery + ":" + responsibleId} columns={courseColumns} data={courses} keyField="id_curso" paginationResetDefaultPage={!!courseQuery || !!responsibleId} /></div>
         </>}</section>
       </div>}
-      {!dashboard.loading && !dashboard.error && <section id="new-course" className={`${styles.panel} ${styles.composer}`}><h2>Cadastrar novo curso</h2>
+      {!dashboard.loading && !dashboard.error && <section id="new-course" className={`${styles.panel} ${styles.composer}`}><h2>{editingId ? "Editar curso" : "Cadastrar novo curso"}</h2>
         <form ref={form} className={styles.form} onSubmit={save} noValidate aria-busy={busy}>
-          {review ? <><Notice title="Confira o vínculo antes de cadastrar"><p>O curso ficará associado à conta indicada abaixo.</p></Notice><dl className={styles.review}><div><dt>Curso</dt><dd>{course.nome}</dd></div><div><dt>Nível</dt><dd>{course.nivel}</dd></div><div><dt>Responsável</dt><dd>{dashboard.coordenadores.find(person => sameId(person.id_coordenador, course.id_coordenador))?.login}</dd></div></dl></> : <>
+          {review ? <><Notice title={editingId ? "Confira as alterações do curso" : "Confira o vínculo antes de cadastrar"}><p>O curso ficará associado à conta indicada abaixo.</p></Notice><dl className={styles.review}><div><dt>Curso</dt><dd>{course.nome}</dd></div><div><dt>Nível</dt><dd>{course.nivel}</dd></div><div><dt>Responsável</dt><dd>{responsibleAccounts.find(person => sameId(person.id_coordenador, course.id_coordenador))?.login}</dd></div></dl></> : <>
             <div className={styles.columns}><Field label="Nome do curso" name="nome" value={course.nome} onChange={update} error={errors.nome} hint="Use letras e espaços." required disabled={busy} /><Field label="Nível de formação" name="nivel" value={course.nivel} onChange={update} error={errors.nivel} placeholder="Ex.: Graduação" required disabled={busy} /></div>
             {dashboard.sections.coordenadores && <ErrorState description="Carregue as contas de coordenação para escolher o responsável pelo curso." onRetry={dashboard.reload} />}
-            <Field as={Select} label="Coordenador responsável" name="id_coordenador" value={course.id_coordenador} onChange={update} error={errors.id_coordenador} required disabled={busy || !!dashboard.sections.coordenadores}><option value="">Selecione uma conta de coordenação</option>{dashboard.coordenadores.map(item => <option value={item.id_coordenador} key={item.id_coordenador}>{item.login}</option>)}</Field>
+            <Field as={Select} label="Coordenador responsável" name="id_coordenador" value={course.id_coordenador} onChange={update} error={errors.id_coordenador} required disabled={busy || !!dashboard.sections.coordenadores}><option value="">Selecione uma conta de coordenação</option>{responsibleAccounts.map(item => <option value={item.id_coordenador} key={item.id_coordenador}>{item.login}</option>)}</Field>
           </>}
-          <div className={styles.actions}><Button type="submit" loading={busy} loadingLabel="Cadastrando…" disabled={!!dashboard.sections.coordenadores || !dashboard.coordenadores.length}>{review ? "Cadastrar curso" : "Revisar curso"}</Button>{review && <Button variant="secondary" disabled={busy} onClick={() => setReview(false)}>Continuar editando</Button>}<Button variant="secondary" disabled={busy} onClick={() => setClear(true)}>Limpar campos</Button></div>
+          <div className={styles.actions}><Button type="submit" loading={busy} loadingLabel={editingId ? "Salvando…" : "Cadastrando…"} disabled={!!dashboard.sections.coordenadores || !responsibleAccounts.length}>{review ? editingId ? "Salvar alterações" : "Cadastrar curso" : "Revisar curso"}</Button>{review && <Button variant="secondary" disabled={busy} onClick={() => setReview(false)}>Continuar editando</Button>}<Button variant="secondary" disabled={busy} onClick={() => setClear(true)}>Limpar campos</Button></div>
         </form>
       </section>}
+      {!dashboard.loading && !dashboard.error && <CoordinatorForm onSaved={dashboard.reload} />}
       <ConfirmDialog open={!!confirmation} error={notice?.variant === "error" ? notice.text : undefined} pending={busy} description={confirmation?.description} onCancel={() => setConfirmation(null)} onConfirm={remove} />
-      <ConfirmDialog open={clear} title="Limpar os dados do curso?" description="Os dados preenchidos ainda não foram cadastrados." confirmLabel="Limpar campos" onCancel={() => setClear(false)} onConfirm={() => { setCourse(empty); setErrors({}); setReview(false); setClear(false); }} />
+      <ConfirmDialog open={clear} title="Limpar os dados do curso?" description="Os dados preenchidos ainda não foram cadastrados." confirmLabel="Limpar campos" onCancel={() => setClear(false)} onConfirm={() => { setCourse(empty); setEditingId(null); setErrors({}); setReview(false); setClear(false); }} />
       <UnsavedChangesDialog blocker={blocker} pending={busy} />
     </AdminShell>
   );

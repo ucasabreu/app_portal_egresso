@@ -4,6 +4,7 @@ import axios from "axios";
 import { API_URL } from "../../config/config.js";
 import { formatDate } from "../../utils/presentation";
 import { graduateRows, matchesSearch } from "../../utils/management.js";
+import useCollection from "../../hooks/useCollection";
 import useDashboard from "../../hooks/useDashboard";
 import useMutation from "../../hooks/useMutation";
 import AdminShell from "../../components/ui/AdminShell";
@@ -21,6 +22,7 @@ import styles from "./Dashboard.module.css";
 export default function Coordenador() {
   const { id } = useParams();
   const dashboard = useDashboard(id);
+  const drafts = useCollection("/api/gestao/rascunhos");
   const { busy, notice, run } = useMutation();
   const [selected, setSelected] = useState(null);
   const [confirmation, setConfirmation] = useState(null);
@@ -32,9 +34,20 @@ export default function Coordenador() {
   const courses = dashboard.cursos.filter(course => matchesSearch(courseQuery, course.nome, course.nivel));
   const highlights = dashboard.destaques.filter(item => matchesSearch(highlightQuery, item.titulo, item.egresso?.nome, item.feitoDestaque));
   const failedCourses = dashboard.cursos.filter(course => course.egressosError && (!courseId || String(course.id_curso) === courseId));
-  const publish = payload => run(() => axios.post(API_URL + "/api/coordenadores/" + id + "/egresso/" + selected.id + "/destaque", payload), "Destaque publicado com sucesso.", dashboard.reload);
+  const saved = () => { dashboard.reload(); drafts.retry(); };
+  const publish = (payload, draft) => run(() => selected.publication
+    ? axios.put(API_URL + "/api/coordenadores/atualizar/destaque/" + selected.publication.id, payload)
+    : draft ? axios.post(API_URL + "/api/gestao/rascunhos/" + draft.id + "/publicar", { versao: draft.versao })
+      : axios.post(API_URL + "/api/coordenadores/" + id + "/egresso/" + selected.id + "/destaque", payload),
+    selected.publication ? "Destaque atualizado com sucesso." : "Destaque publicado com sucesso.", saved);
+  const saveDraft = async (values, draft) => {
+    let result;
+    const payload = { ...values, id_egresso: selected.id, versao: draft?.versao };
+    if (await run(async () => { result = (await (draft ? axios.put(API_URL + "/api/gestao/rascunhos/" + draft.id, payload) : axios.post(API_URL + "/api/gestao/rascunhos", payload))).data; }, "Rascunho salvo no banco.", drafts.retry)) return result;
+    return false;
+  };
   const remove = async () => {
-    if (await run(() => axios.delete(API_URL + confirmation.path), confirmation.success, dashboard.reload)) setConfirmation(null);
+    if (await run(() => axios.delete(API_URL + confirmation.path), confirmation.success, saved)) setConfirmation(null);
   };
   const columns = [
     { name: "Egresso", selector: row => row.nome, sortable: true, wrap: true, cell: row => <Link className={styles.link} to={"/egresso_view/" + row.id}>{row.nome}</Link> },
@@ -50,7 +63,7 @@ export default function Coordenador() {
   const graduatesIncomplete = dashboard.sections.cursos || dashboard.cursos.some(course => course.egressosError);
   return (
     <AdminShell title="Acompanhe sua comunidade." description="Organize seus cursos, conheça os egressos e publique as conquistas que merecem destaque."
-      login={dashboard.coordenador?.login} sections={[["courses", "Meus cursos"], ["graduates", "Egressos"], ["highlights", "Meus destaques"]]}
+      login={dashboard.coordenador?.login} sections={[["courses", "Meus cursos"], ["graduates", "Egressos"], ["highlights", "Meus destaques"], ["drafts", "Rascunhos"]]}
       stats={!dashboard.loading && !dashboard.error ? [["Cursos vinculados", dashboard.sections.cursos ? "Indisponível" : dashboard.cursos.length], ["Egressos nos cursos", graduatesIncomplete ? "Indisponível" : uniqueGraduates.size], ["Destaques publicados", dashboard.sections.destaques ? "Indisponível" : dashboard.destaques.length]] : undefined}>
       {notice && <Notice className={styles.notice} variant={notice.variant}><p>{notice.text}</p></Notice>}
       {dashboard.loading ? <LoadingState label="Carregando painel…" /> : dashboard.error ? <ErrorState description={dashboard.error} onRetry={dashboard.reload} /> : <div className={styles.sections}>
@@ -73,11 +86,14 @@ export default function Coordenador() {
           {dashboard.sections.destaques ? <ErrorState description={dashboard.sections.destaques} onRetry={dashboard.reload} /> : dashboard.destaques.length ? <>
             <Field label="Buscar nos meus destaques" name="buscaDestaques" value={highlightQuery} onChange={event => setHighlightQuery(event.target.value)} placeholder="Título, egresso ou conquista" />
             <p className={styles.count} role="status">{highlights.length} de {dashboard.destaques.length} destaques</p>
-            {highlights.length ? <div className={styles.records}>{highlights.map(item => <article key={item.id} className={styles.record}><p>{formatDate(item.dataPublicacao)} · {item.egresso?.nome}</p><h3>{item.titulo}</h3><p><strong>Conquista:</strong> {item.feitoDestaque}</p><details><summary>Ler notícia</summary><p>{item.noticia}</p></details><div className={styles.actions}><Link className={styles.link} to={"/destaques/" + item.id}>Ver publicação →</Link><Button variant="ghost" disabled={busy || !!selected} onClick={() => setConfirmation({ path: "/api/coordenadores/deletar/destaque/" + item.id, description: `O destaque “${item.titulo}” será removido da galeria e do perfil do egresso.`, success: "Destaque excluído com sucesso." })}>Excluir destaque</Button></div></article>)}</div> : <p className={styles.empty}>Nenhum destaque corresponde à pesquisa. Ajuste os termos para ampliar a busca.</p>}
+            {highlights.length ? <div className={styles.records}>{highlights.map(item => <article key={item.id} className={styles.record}><p>{formatDate(item.dataPublicacao)} · {item.egresso?.nome}</p><h3>{item.titulo}</h3><p><strong>Conquista:</strong> {item.feitoDestaque}</p><details><summary>Ler notícia</summary><p>{item.noticia}</p></details><div className={styles.actions}><Link className={styles.link} to={"/destaques/" + item.id}>Ver publicação →</Link><Button variant="secondary" disabled={busy || !!selected} onClick={() => setSelected({ id: item.egresso.id_egresso, nome: item.egresso.nome, publication: item })}>Editar destaque</Button><Button variant="ghost" disabled={busy || !!selected} onClick={() => setConfirmation({ path: "/api/coordenadores/deletar/destaque/" + item.id, description: `O destaque “${item.titulo}” será removido da galeria e do perfil do egresso.`, success: "Destaque excluído com sucesso." })}>Excluir destaque</Button></div></article>)}</div> : <p className={styles.empty}>Nenhum destaque corresponde à pesquisa. Ajuste os termos para ampliar a busca.</p>}
           </> : <p className={styles.empty}>Selecione um egresso na consulta acima para publicar seu primeiro destaque.</p>}
         </section>
+        <section id="drafts" className={styles.panel}><h2>Rascunhos de destaque</h2>
+          {drafts.loading ? <LoadingState label="Carregando rascunhos…" /> : drafts.error ? <ErrorState description={drafts.error} onRetry={drafts.retry} /> : drafts.data.length ? <div className={styles.records}>{drafts.data.map(item => <article className={styles.record} key={item.id}><h3>{item.titulo || "Destaque sem título"}</h3><p>{item.egresso?.nome || "Egresso ainda não selecionado"} · Ainda não publicado</p><div className={styles.actions}><Button variant="secondary" disabled={busy || !!selected || !item.egresso} onClick={() => setSelected({ id: item.egresso.id_egresso, nome: item.egresso.nome, draft: item })}>Retomar rascunho</Button><Button variant="ghost" disabled={busy || !!selected} onClick={() => setConfirmation({ path: "/api/gestao/rascunhos/" + item.id, description: `O rascunho “${item.titulo || "Sem título"}” será excluído.`, success: "Rascunho excluído." })}>Excluir rascunho</Button></div></article>)}</div> : <p className={styles.empty}>Salve um destaque como rascunho para retomá-lo depois, inclusive em outra máquina.</p>}
+        </section>
       </div>}
-      {selected && <div className={styles.composer}><HighlightComposer egresso={selected} busy={busy} onPublish={publish} onClose={() => setSelected(null)} /></div>}
+      {selected && <div className={styles.composer}><HighlightComposer key={(selected.publication ? "edit-" + selected.publication.id : selected.draft ? "draft-" + selected.draft.id : "new-" + selected.id)} egresso={selected} busy={busy} initialValues={selected.publication || selected.draft || undefined} initialDraft={selected.draft} editing={!!selected.publication} onSaveDraft={saveDraft} onPublish={publish} onClose={() => { setSelected(null); drafts.retry(); }} /></div>}
       <ConfirmDialog open={!!confirmation} title={confirmation?.title} confirmLabel={confirmation?.label} error={notice?.variant === "error" ? notice.text : undefined} description={confirmation?.description} pending={busy} onCancel={() => setConfirmation(null)} onConfirm={remove} />
     </AdminShell>
   );

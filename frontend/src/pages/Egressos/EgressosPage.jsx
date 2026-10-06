@@ -1,15 +1,14 @@
 import { useEffect, useId, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { FaTimes } from "react-icons/fa";
-import { useEgressoDirectory, useDirectoryDetails } from "../../hooks/useEgressoDirectory.js";
-import { emptyFilters, filterLabels, readDirectory, directorySearch, directoryPage } from "../../utils/egressoDirectory.js";
+import usePagedCollection from "../../hooks/usePagedCollection.js";
+import { emptyFilters, filterLabels, readDirectory, directorySearch } from "../../utils/egressoDirectory.js";
 import PageShell from "../../components/ui/PageShell";
 import Field from "../../components/ui/Field";
 import Select from "../../components/ui/Select";
 import CopyLink from "../../components/ui/CopyLink";
 import EgressoCard from "../../components/ui/EgressoCard";
 import Button from "../../components/Button/Button";
-import Notice from "../../components/feedback/Notice";
 import LoadingState from "../../components/feedback/LoadingState";
 import ErrorState from "../../components/feedback/ErrorState";
 import EmptyState from "../../components/feedback/EmptyState";
@@ -23,9 +22,9 @@ export default function EgressosPage() {
   const [draft, setDraft] = useState(view.filters);
   const [expanded, setExpanded] = useState(() => !window.matchMedia?.("(max-width: 48rem)").matches);
   const formId = useId();
-  const directory = useEgressoDirectory(view.filters);
-  const page = useMemo(() => directoryPage(directory.data, view), [directory.data, view]);
-  const details = useDirectoryDetails(directory.loading || directory.error ? [] : page.items.map(person => person.id_egresso));
+  const directory = usePagedCollection("/api/publico/egressos?" + directorySearch(view));
+  const page = directory.data;
+  const details = Object.fromEntries(page.items.map(person => [person.id_egresso, { cursos: person.cursos, cargos: person.cargos, errors: {} }]));
   const canonical = directorySearch({ ...view, page: directory.loading || directory.error ? view.page : page.page });
   const returnPath = "/egressos/listar" + (canonical ? "?" + canonical : "");
   const active = Object.entries(view.filters).filter(([, value]) => value);
@@ -37,7 +36,7 @@ export default function EgressosPage() {
 
   const changeView = changes => setParams(directorySearch({ ...view, ...changes }));
   const reset = () => { setDraft(emptyFilters); changeView({ filters: emptyFilters, page: 1 }); };
-  const refresh = () => { details.clear(); directory.reload(); };
+  const refresh = directory.retry;
   const update = event => setDraft(values => ({ ...values, [event.target.name]: event.target.value }));
   const firstNumber = Math.max(1, Math.min(page.page - 2, page.pages - 4));
   const pageNumbers = Array.from({ length: Math.min(5, page.pages) }, (_, index) => firstNumber + index);
@@ -71,9 +70,7 @@ export default function EgressosPage() {
         </div>
       </div>
       {directory.loading ? <LoadingState label="Carregando a comunidade…" /> : directory.error ? <ErrorState description={directory.error} onRetry={refresh} /> : !page.total ? <EmptyState title={active.length ? "Nenhuma trajetória corresponde à pesquisa" : "A comunidade ainda não tem egressos cadastrados"} description={active.length ? "Remova um filtro ou ajuste os termos para ampliar a busca." : "Os perfis aparecerão aqui quando forem cadastrados no portal."} action={active.length ? <Button variant="secondary" onClick={reset}>Mostrar todos os egressos</Button> : undefined} /> : <>
-        {details.loading && <p className={styles.status} role="status">Buscando formação e experiência dos perfis desta página…</p>}
-        {details.hasErrors && <Notice variant="warning" className={styles.notice} title="Alguns detalhes não puderam ser carregados"><p>Os perfis continuam disponíveis. Tente novamente para consultar as formações e experiências indisponíveis.</p><Button variant="secondary" onClick={details.retry}>Tentar carregar detalhes novamente</Button></Notice>}
-        <div className={styles.grid}>{page.items.map(egresso => <EgressoCard key={egresso.id_egresso} egresso={egresso} details={details.entries[egresso.id_egresso]} loading={details.loading} directory={returnPath} />)}</div>
+        <div className={styles.grid}>{page.items.map(egresso => <EgressoCard key={egresso.id_egresso} egresso={egresso} details={details[egresso.id_egresso]} directory={returnPath} />)}</div>
         {page.pages > 1 && <nav className={styles.pagination} aria-label="Páginas de egressos">
           <Button variant="secondary" disabled={page.page === 1} onClick={() => changeView({ page: page.page - 1 })}>Anterior</Button>
           {pageNumbers.map(number => <Button key={number} variant="secondary" aria-label={`Página ${number}`} aria-current={page.page === number ? "page" : undefined} onClick={() => changeView({ page: number })}>{number}</Button>)}

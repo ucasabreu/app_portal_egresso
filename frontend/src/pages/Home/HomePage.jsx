@@ -13,12 +13,11 @@ import DestaqueCard from "../../components/ui/DestaqueCard";
 import EgressoCard from "../../components/ui/EgressoCard";
 import DepoimentoCard from "../../components/ui/DepoimentoCard";
 import Button from "../../components/Button/Button";
-import Notice from "../../components/feedback/Notice";
 import LoadingState from "../../components/feedback/LoadingState";
 import ErrorState from "../../components/feedback/ErrorState";
 import EmptyState from "../../components/feedback/EmptyState";
 import useCollection from "../../hooks/useCollection";
-import { useDirectoryDetails } from "../../hooks/useEgressoDirectory.js";
+import usePagedCollection from "../../hooks/usePagedCollection.js";
 import { homeContent } from "../../utils/homeContent.js";
 import { depoimentosPath } from "../../utils/depoimentos.js";
 import styles from "./Home.module.css";
@@ -30,12 +29,11 @@ const shortcuts = [
 ];
 
 export default function HomePage() {
-  const stories = useCollection("/api/coordenadores/destaque/listar");
-  const community = useCollection("/api/consultas/listar/egressos");
+  const stories = usePagedCollection("/api/publico/destaques?tamanho=6");
+  const community = usePagedCollection("/api/publico/egressos?tamanho=6");
   const testimonials = useCollection(depoimentosPath("", 3));
-  const content = useMemo(() => homeContent({ destaques: stories.data, egressos: community.data, depoimentos: testimonials.data }), [stories.data, community.data, testimonials.data]);
-  const details = useDirectoryDetails(content.people.map(person => person.id_egresso));
-
+  const content = useMemo(() => homeContent({ destaques: stories.data.items, egressos: community.data.items, depoimentos: testimonials.data }), [stories.data, community.data, testimonials.data]);
+  const details = Object.fromEntries(content.people.map(person => [person.id_egresso, { cursos: person.cursos, cargos: person.cargos, errors: {} }]));
   const [carousel, setCarousel] = useState(null);
   const [paused, setPaused] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -102,9 +100,7 @@ export default function HomePage() {
           {community.loading ? <LoadingState label="Buscando pessoas da comunidade…" /> : community.error ? <ErrorState title="Não foi possível consultar a comunidade" description={community.error} onRetry={community.retry} /> : !content.people.length ? (
             <EmptyState title="A comunidade começa com uma história" description="Os perfis aparecerão aqui quando forem cadastrados no portal." action={<Link to="/edit-egresso" className={styles.textLink}>Cadastrar meu perfil <FaArrowRight aria-hidden="true" /></Link>} />
           ) : <>
-            {details.loading && <p className={styles.status} role="status">Buscando formação e experiência dos perfis…</p>}
-            {details.hasErrors && <Notice variant="warning" className={styles.notice} title="Alguns detalhes estão indisponíveis"><p>Você pode abrir os perfis ou tentar carregar as formações e experiências novamente.</p><Button variant="secondary" onClick={details.retry}>Tentar carregar detalhes</Button></Notice>}
-            <div className={styles.peopleGrid}>{content.people.map(person => <EgressoCard key={person.id_egresso} egresso={person} details={details.entries[person.id_egresso]} loading={details.loading} directory="/egressos/listar" headingLevel={3} />)}</div>
+            <div className={styles.peopleGrid}>{content.people.map(person => <EgressoCard key={person.id_egresso} egresso={person} details={details[person.id_egresso]} directory="/egressos/listar" headingLevel={3} />)}</div>
           </>}
         </section>
         <section id="home-testimonials" className={styles.section} aria-labelledby="testimonials-title">

@@ -5,6 +5,8 @@ import Header from "./components/Header";
 import Global from "./styles/Global";
 import PageShell from "./components/ui/PageShell";
 import LoadingState from "./components/feedback/LoadingState";
+import AuthProvider from "./auth/AuthProvider";
+import ProtectedRoute from "./auth/ProtectedRoute";
 const Egresso = lazy(() => import("./pages/Egresso/Egresso"));
 const EditEgresso = lazy(() => import("./pages/Egresso/EditEgresso"));
 const EgressoView = lazy(() => import("./pages/Egresso/EgressoView"));
@@ -37,9 +39,9 @@ const router = createBrowserRouter(createRoutesFromElements(
   <Route element={<RootLayout />}>
     <Route element={<PublicLayout />}>
       <Route path="/" element={<HomePage />} />
-      <Route path="/egresso/:id" element={<Egresso />} />
       <Route path="/edit-egresso" element={<EditEgresso />} />
-      <Route path="/edit-egresso/:id" element={<EditEgresso />} />
+      <Route path="/egresso/:id" element={<ProtectedRoute profile />}><Route index element={<Egresso />} /></Route>
+      <Route path="/edit-egresso/:id" element={<ProtectedRoute profile />}><Route index element={<EditEgresso />} /></Route>
       <Route path="/egresso_view/:id" element={<EgressoView />} />
       <Route path="/egressos/listar" element={<EgressosPage />} />
       <Route path="/egressos/depoimentos" element={<Depoimento />} />
@@ -51,11 +53,11 @@ const router = createBrowserRouter(createRoutesFromElements(
         description="O endereço acessado não está disponível. Volte ao portal para continuar."><Link to="/">Voltar ao início →</Link></PageShell>} />
     </Route>
     <Route path="/login" element={<LoginCoordenador />} />
-    <Route path="/coordenador/:id" element={<Coordenador />} />
-    <Route path="/coordenador_geral/:id" element={<CoordenadorGeral />} />
+    <Route path="/coordenador/:id" element={<ProtectedRoute role="coordenador" />}><Route index element={<Coordenador />} /></Route>
+    <Route path="/coordenador_geral/:id" element={<ProtectedRoute role="geral" />}><Route index element={<CoordenadorGeral />} /></Route>
   </Route>
 ));
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return <AuthProvider><RouterProvider router={router} /></AuthProvider>;
 }
