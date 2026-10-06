@@ -5,6 +5,7 @@ export default function Photo({ src, alt = "", fallback = "/demo/avatar.svg", ..
       src={src || fallback}
       alt={alt}
       loading={props.loading || "lazy"}
+      decoding={props.decoding || "async"}
       onError={event => {
         const image = event.currentTarget;
         if (image.getAttribute("src") !== fallback) image.src = fallback;

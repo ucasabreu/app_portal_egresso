@@ -97,7 +97,7 @@ const LoginCoordenador = () => {
         <div className={styles.layout}>
           <section className={styles.story} aria-labelledby="portal-story-title">
             <Link to="/" className={styles.brand} aria-label="Portal de Egressos — início">
-              <span className={styles.logo}><img src={LogoImg} alt="UFMA" /></span>
+              <span className={styles.logo}><img src={LogoImg} alt="UFMA" width={1080} height={1080} decoding="async" /></span>
               <span>Portal de Egressos<small>Comunidade acadêmica</small></span>
             </Link>
             <div className={styles.storyContent}>

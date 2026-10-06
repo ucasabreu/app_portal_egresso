@@ -19,7 +19,7 @@ export default function Banner() {
           <p className={styles.note}>Formação · Comunidade · Trajetória</p>
         </div>
         <div className={styles.visual}>
-          <img src={Graduation} alt="Formandos reunidos na celebração da graduação" loading="eager" />
+          <img src={Graduation} alt="Formandos reunidos na celebração da graduação" loading="eager" width={5472} height={3648} fetchPriority="high" decoding="async" />
           <div className={styles.caption}><span>Além do diploma</span><p>Novos caminhos.<br />O mesmo vínculo.</p></div>
         </div>
       </Container>

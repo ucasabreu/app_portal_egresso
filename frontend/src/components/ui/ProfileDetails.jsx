@@ -11,7 +11,7 @@ export default function ProfileDetails({ egresso, cargos, cursos, depoimentos, d
   return (
     <div className={publicView ? styles.publicLayout : styles.layout}>
       {!publicView && <aside className={styles.identity} aria-label="Identificação e contato">
-        <Photo src={egresso.foto} alt={egresso.nome} className={styles.photo} />
+        <Photo src={egresso.foto} alt={egresso.nome} className={styles.photo} width={128} height={128} />
         <p className={styles.badge}>Comunidade de egressos</p><h2>{egresso.nome}</h2>
         {egresso.email && <a className={styles.contact} href={"mailto:" + egresso.email}><FaEnvelope aria-hidden="true" />{egresso.email}</a>}
         <div className={styles.links}>{links.filter(([url]) => url).map(([url, icon, label]) => {

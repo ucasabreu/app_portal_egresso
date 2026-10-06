@@ -33,14 +33,14 @@ export default function DestaquePublicacao() {
       </header>
       <div className={styles.articleLayout}>
         <div className={styles.articleBody}>
-          <Photo src={data.imagem || egresso?.foto} alt="" loading="eager" className={styles.articleImage} />
+          <Photo src={data.imagem || egresso?.foto} alt="" loading="eager" className={styles.articleImage} width={960} height={540} />
           <section className={styles.story} aria-labelledby="story-title"><h2 id="story-title">Sobre esta conquista</h2>
             <p>{data.noticia || "O texto desta publicação ainda não foi informado."}</p>
           </section>
           <Link to={gallery} className={styles.link}><FaArrowLeft aria-hidden="true" />Continuar explorando os destaques</Link>
         </div>
         <aside className={styles.author} aria-label="Egresso desta publicação">
-          <Photo src={egresso?.foto} alt="" className={styles.authorPhoto} />
+          <Photo src={egresso?.foto} alt="" className={styles.authorPhoto} width={48} height={48} />
           <p className={styles.eyebrow}>Por trás desta história</p><h2>{egresso?.nome || "Comunidade de egressos"}</h2>
           <p>Conheça a formação, as experiências e outros momentos desta trajetória.</p>
           {egresso?.id_egresso != null && <div className={styles.authorLinks}>

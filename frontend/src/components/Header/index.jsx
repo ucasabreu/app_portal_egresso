@@ -17,7 +17,7 @@ export default function Header() {
     <header className={styles.header}>
       <Container className={styles.inner}>
         <Link to="/" className={styles.brand} onClick={closeMenu}>
-          <img src={Logo} alt="UFMA" />
+          <img src={Logo} alt="UFMA" width={1080} height={1080} decoding="async" />
           <span>Portal de Egressos<small>Conexões além da graduação</small></span>
         </Link>
         <button className={styles.toggle} type="button" aria-expanded={open} aria-controls="portal-navigation"

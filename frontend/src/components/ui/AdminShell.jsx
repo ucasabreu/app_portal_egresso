@@ -7,7 +7,7 @@ export default function AdminShell({ title, description, login, sections, stats,
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
-        <Link className={styles.brand} to="/"><img src={Logo} alt="UFMA" /><span>Portal de Egressos<small>Área da coordenação</small></span></Link>
+        <Link className={styles.brand} to="/"><img src={Logo} alt="UFMA" width={1080} height={1080} decoding="async" /><span>Portal de Egressos<small>Área da coordenação</small></span></Link>
         <div className={styles.context}><FaLayerGroup aria-hidden="true" /><span>Painel de gestão</span></div>
         <nav aria-label="Seções do painel">{sections.map(([id, label]) => <a key={id} href={"#" + id}>{label}<span aria-hidden="true">↗</span></a>)}</nav>
         <div className={styles.bottom}><p>Conecte trajetórias.<br />Valorize conquistas.</p><Link to="/"><FaArrowLeft aria-hidden="true" /> Voltar ao portal</Link><Link to="/login"><FaSignOutAlt aria-hidden="true" /> Trocar conta</Link></div>

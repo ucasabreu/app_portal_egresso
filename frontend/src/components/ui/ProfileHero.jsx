@@ -9,7 +9,7 @@ export default function ProfileHero({ egresso, cursos }) {
   return (
     <header className={styles.hero}>
       <div className={styles.identity}>
-        <Photo src={egresso.foto} alt="" loading="eager" className={styles.photo} />
+        <Photo src={egresso.foto} alt="" loading="eager" className={styles.photo} width={160} height={160} />
         <div className={styles.intro}>
           <p className={styles.eyebrow}>Pessoas que fazem parte da nossa história</p>
           <h1>{egresso.nome}</h1>

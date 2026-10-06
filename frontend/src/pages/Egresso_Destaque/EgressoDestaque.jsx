@@ -20,7 +20,7 @@ export default function EgressoDestaque() {
       actions={<><Link to="/destaques" className={styles.link}>← Voltar aos destaques</Link><Link to={"/egresso_view/" + id} className={styles.link}>Conhecer perfil →</Link></>}>
       {loading ? <LoadingState /> : error ? <ErrorState description={error} onRetry={retry} /> : data.length === 0 ? <EmptyState title="Ainda não há destaques nesta trajetória" description="Os destaques publicados pela coordenação aparecerão aqui." /> : (
         <>
-          <div className={styles.historyIntro}><Photo src={egresso?.foto} alt="" /><div><Link className={styles.link} to={"/egresso_view/" + id}>{egresso?.nome || "Conhecer esta trajetória"}</Link><p>{ordered.length} {ordered.length === 1 ? "conquista publicada" : "conquistas publicadas"}. Explore os momentos de cada ano.</p></div></div>
+          <div className={styles.historyIntro}><Photo src={egresso?.foto} alt="" width={56} height={56} /><div><Link className={styles.link} to={"/egresso_view/" + id}>{egresso?.nome || "Conhecer esta trajetória"}</Link><p>{ordered.length} {ordered.length === 1 ? "conquista publicada" : "conquistas publicadas"}. Explore os momentos de cada ano.</p></div></div>
           {groups.map(group => <section className={styles.yearGroup} key={group.year} aria-label={"Conquistas: " + group.year}>
             <h2>{group.year}</h2><div className={styles.grid}>{group.destaques.map(item => <DestaqueCard key={item.id} destaque={item} headingLevel={3} expandable />)}</div>
           </section>)}
