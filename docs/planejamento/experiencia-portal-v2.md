@@ -6,7 +6,7 @@ Análise de 6 de outubro de 2026, na branch `feat/frontend-redesign`.
 
 Transformar o portal em uma apresentação clara da comunidade: descobrir pessoas, conhecer suas trajetórias e ler conquistas publicadas pela coordenação. A gestão deve facilitar essas publicações e explicar os vínculos entre contas, cursos e egressos.
 
-Este documento orienta a evolução por etapas. O painel corrigido foi validado pelo usuário; as etapas 1 (conteúdo público), 2 (descoberta) e 3 (entrada e leitura) foram implementadas no frontend e passaram nas verificações automatizadas, com revisão visual e integração local pendentes. As etapas 4 a 6 continuam propostas. O README continua destinado à apresentação e execução do software.
+Este documento orienta a evolução por etapas. O painel corrigido foi validado pelo usuário; as etapas 1 (conteúdo público), 2 (descoberta) e 3 (entrada e leitura) foram implementadas no frontend e passaram nas verificações automatizadas, com revisão visual e integração local pendentes. A etapa 4 e os contratos da etapa 6 estão implementados. O usuário informou a atualização da etapa 5; capturas de tela foram adiadas para depois do próximo redesign. A validação dos novos contêineres e a revisão visual em navegador real ainda dependem do ambiente local. O README continua destinado à apresentação e execução do software.
 
 ## 1. Diagnóstico inicial
 
@@ -25,7 +25,7 @@ Não houve inspeção visual em navegador real nesta etapa nem acesso à API em 
 | Edição e gestão do egresso | Formulários extensos; revisão usa aviso, sem resumo dedicado | Etapas claras, resumo real e validação junto aos campos |
 | Coordenação | Navegação por âncoras; tabelas por curso; consultas antes dependiam umas das outras | Dados resilientes, busca contextual e publicação com prévia |
 | Coordenação geral | Gestão por tabelas; vínculos pouco evidentes | Responsáveis identificados, filtros e consequências de exclusão claras |
-| Login | Aparência consistente; fluxo atual apenas redireciona após consultar credenciais | Preservar a identidade visual; evoluir autenticação com suporte do backend |
+| Login | No diagnóstico inicial, apenas redirecionava após consultar credenciais | Sessão e permissões implementadas na etapa 6, preservando a identidade visual |
 | Proposta e página inexistente | Conteúdo institucional e recuperação já existem | Explicar jornadas reais e manter retorno simples ao portal |
 
 ### Falha do painel e correção aplicada
@@ -88,7 +88,7 @@ Compor uma notícia principal e uma grade de cartões com imagem, título, nome 
 
 A página individual apresenta título, conquista em evidência, imagem, notícia completa, data e identificação do egresso. Incluir link ao perfil, histórico e botão para copiar o endereço, com retorno de sucesso ou falha. Preservar parágrafos de texto simples; qualquer futura renderização de HTML exige tratamento específico.
 
-Deduplicar resultados por ID: a busca atual relaciona cursos ao egresso e pode repetir uma publicação com múltiplas formações. Categoria, rascunho e publicação programada dependem de campos novos; não criar filtros decorativos para dados ausentes.
+Deduplicar resultados por ID: a busca atual relaciona cursos ao egresso e pode repetir uma publicação com múltiplas formações. Categorias e publicação programada dependem de novos contratos; não criar filtros decorativos para dados ausentes. Rascunhos privados foram incorporados na etapa 6.
 
 ### Diretório e apresentação de egressos
 
@@ -126,7 +126,7 @@ Organizar visão geral, cursos, egressos e destaques como áreas com estado pres
 
 Na publicação, selecionar egresso, escrever conteúdo, conferir imagem e visualizar o cartão/artigo antes de salvar. A validação deve explicar o limite de 100 caracteres e a regra atual do título, que não aceita pontuação. Melhorar essa regra exige alteração coordenada do backend.
 
-Na gestão geral, mostrar responsável junto ao curso, quantidade de vínculos e pesquisa de contas. A API atual cadastra e exclui cursos, mas não oferece edição de curso ou destaque; alteração de responsável e edição de publicação precisam de endpoints próprios.
+Na gestão geral, mostrar responsável junto ao curso, quantidade de vínculos e pesquisa de contas. No diagnóstico inicial, a API só cadastrava e excluía cursos. A etapa 6 acrescentou os endpoints de edição de curso/responsável e destaque, com permissões verificadas no servidor.
 
 A etapa 4 substituiu a ação de exclusão de perfil no painel por “Desvincular formação”, identificando o curso e o ID do vínculo. Se a intenção for desvincular uma formação, usar o endpoint de exclusão de `CursoEgresso`, mostrando o impacto correto e validando autorização no servidor.
 
@@ -141,11 +141,12 @@ A etapa 4 substituiu a ação de exclusão de perfil no painel por “Desvincula
 | Média | Copiar link e compartilhar trajetória | Frontend com tratamento de indisponibilidade das APIs do navegador |
 | Média | Favoritos locais de perfis | Opcional; explicar que ficam neste navegador; nenhuma sincronização prometida |
 | Média | Indicador de preenchimento do perfil | Cálculo com campos existentes e critérios visíveis |
-| Posterior | Editar destaque, rascunho e categorias | Novos contratos e campos, migração e testes de persistência |
-| Posterior | Autenticação, propriedade do perfil e permissões | Backend; sessão/token, armazenamento seguro de senha e autorização por recurso |
+| Implementada na etapa 6 | Editar destaque e rascunho | Contratos, tabela privada, controle de versão e testes de persistência |
+| Posterior | Categorias e publicação programada | Novos contratos e regras de produto |
+| Implementada na etapa 6 | Autenticação, propriedade do perfil e permissões | Sessão no servidor, hashes de senha e autorização por recurso |
 | Posterior | Paginação no servidor e relatórios por curso | Consultas agregadas; métricas definidas com dados disponíveis |
 
-Autenticação é uma dependência concreta para gestão com usuários reais: o login atual consulta credenciais em GET e redireciona; não foi encontrado um mecanismo de sessão/token ou proteção das rotas da API. Essa evolução deve manter a demonstração fácil de executar e estabelecer permissões efetivas para edição e exclusão.
+No diagnóstico inicial, o login consultava credenciais em GET e somente redirecionava. A etapa 6 substituiu esse fluxo por login POST, sessão, logout e autorização por recurso, mantendo as contas demo e preservando os dados existentes.
 
 ## 6. Organização técnica e contratos
 
@@ -160,7 +161,7 @@ Evoluir a estrutura existente: componentes visuais reutilizáveis em `components
 | Destaques e artigo | `/api/coordenadores/destaque/listar?nome=...`, `/api/coordenadores/buscar/destaque/{id}` |
 | Conquistas de uma pessoa | `/api/coordenadores/destaque/egresso/{idEgresso}` |
 
-O tratamento das mensagens conhecidas de coleção vazia de cursos, contas e destaques foi centralizado em `services/collections.js` na etapa 1. Na etapa 2, o diretório também passou a reconhecer as mensagens exatas de ausência de egressos em cada filtro. A entrega inicial de contratos da etapa 6 padronizou as consultas válidas de `/api/consultas/listar/*` e a listagem geral de destaques para retornar `200 []` sem resultados. Parâmetros inválidos continuam respondendo 400; falhas do repositório não viram listas vazias. O frontend mantém compatibilidade com as mensagens exatas da API anterior. DTOs agregados e paginação no servidor continuam pendentes.
+O tratamento das mensagens conhecidas de coleção vazia de cursos, contas e destaques foi centralizado em `services/collections.js` na etapa 1. Na etapa 2, o diretório também passou a reconhecer as mensagens exatas de ausência de egressos em cada filtro. A entrega inicial de contratos da etapa 6 padronizou as consultas válidas de `/api/consultas/listar/*` e a listagem geral de destaques para retornar `200 []` sem resultados. Parâmetros inválidos continuam respondendo 400; falhas do repositório não viram listas vazias. O frontend mantém compatibilidade com as mensagens exatas da API anterior. A etapa 6 agora oferece consultas públicas paginadas, cartões com formações/cargos em lote e painel agregado protegido por sessão.
 
 Cancelar consultas obsoletas, evitar gravações duplicadas e reutilizar respostas sem misturar contas ou filtros. A documentação do [React sobre efeitos e consultas](https://react.dev/reference/react/useEffect) orienta limpeza de efeitos e discute condições de corrida e cache; a biblioteca de consultas deve ser escolhida apenas se a complexidade justificar.
 
@@ -184,7 +185,7 @@ Adotar WCAG 2.2 AA como objetivo de implementação, não como certificação j�
 
 Após a etapa 3, o build inclui a imagem principal de aproximadamente 1,18 MB e o logotipo de 326 KB. As imagens institucionais de 669 KB e 279 KB deixaram de ser importadas pelo frontend; seus arquivos continuam no repositório. Gerar versões menores e formatos apropriados, definir dimensões e usar carregamento tardio para imagens fora da primeira tela. A imagem principal deve carregar cedo; essa distinção é orientada pela [documentação de imagens do web.dev](https://web.dev/articles/browser-level-image-lazy-loading). Comparar resultados reais antes/depois, sem publicar pontuação de desempenho não medida.
 
-Validação automática: `npm test`, `npm run lint` e `npm run build`. Há 64 casos distribuídos em seis arquivos: filtros/apresentação, painéis, publicações/perfis, diretório, entrada/depoimentos e validações de gestão/imagens. A simulação de DOM confere renderização e ações com dados controlados; não substitui testes em navegador.
+Validação automática: `npm test`, `npm run lint` e `npm run build`. Há 78 casos distribuídos em oito arquivos: filtros/apresentação, painéis, publicações/perfis, diretório, entrada/depoimentos e validações de gestão/imagens. A simulação de DOM confere renderização e ações com dados controlados; não substitui testes em navegador.
 
 Roteiro manual obrigatório para a próxima entrega:
 
@@ -205,8 +206,8 @@ Roteiro manual obrigatório para a próxima entrega:
 | 2 — Descoberta | Implementado no frontend; verificações automatizadas aprovadas; revisão visual e integração com API local pendentes |
 | 3 — Entrada e leitura | Implementado no frontend; verificações automatizadas aprovadas; revisão visual e integração com API local pendentes |
 | 4 — Gestão | Implementada; verificações automatizadas aprovadas; revisão visual com API local pendente |
-| 5 — Qualidade | Iniciada: política de imagens, dimensões, foco e regressões; navegador, otimização de arquivos e capturas pendentes |
-| 6 — Backend complementar | Contratos de coleção vazia, imagens e exclusões ajustados; autenticação, permissões, edição, rascunhos e consultas agregadas pendentes |
+| 5 — Qualidade | Atualização informada pelo usuário; política de imagens, dimensões, foco e regressões verificadas no código. Capturas adiadas para depois do próximo redesign; não foram medidos desempenho nem aparência em navegador nesta sessão. |
+| 6 — Backend complementar | Implementação concluída: sessão, permissões, edição, rascunhos privados com versão, 404 e consultas agregadas/paginadas. Testes automatizados aprovados; execução dos novos contêineres e revisão visual local ainda não verificadas nesta sessão. |
 
 ### Etapa 1 — Destaques e perfis públicos
 
@@ -277,7 +278,7 @@ Como há arquivos compartilhados entre as duas etapas (`package.json`, coleçõe
 
 - Coordenação com busca em cursos, vínculos de egresso e destaques. Uma tabela de formações mostra curso, pessoa, e-mail e período, mantendo IDs de vínculo separados do ID do perfil. A paginação reinicia quando a pesquisa muda.
 - “Desvincular formação” usa `DELETE /api/egressos/deletar/curso_egresso/{idVinculo}` e identifica pessoa/curso na confirmação. Preserva perfil, experiências, publicações e outras formações.
-- Publicação em conteúdo/revisão, com prévia de artigo e cartão, texto simples, validações de título/conquista e recuperação do conteúdo após falha. Não há persistência de rascunho no servidor ou navegador.
+- Publicação em conteúdo/revisão, com prévia de artigo e cartão, texto simples, validações de título/conquista e recuperação do conteúdo após falha. Na entrega da etapa 4, não havia persistência de rascunho; ela foi acrescentada para destaques na etapa 6.
 - Gestão geral com pesquisa de contas, filtro de responsável, nome da conta junto ao curso, revisão antes do cadastro e confirmação ao limpar o formulário.
 - Cadastro/edição de perfil em identificação, apresentação/contatos e revisão. Currículo local da demonstração permanece aceito; salvar com sucesso segue para a trajetória.
 - Formação, experiência e depoimento têm revisão antes do envio e avisos ao trocar/cancelar um formulário preenchido. O término pode ficar vazio para período em andamento; o payload envia `null`. Anos seguem as regras existentes do backend, incluindo início de experiência a partir de 1991.
@@ -301,6 +302,25 @@ Imagens visíveis receberam dimensões, mantendo a proporção por CSS; fotos us
 - Curso com formação vinculada retorna erro de negócio antes de excluir. Remoção de conta verifica todos os seus cursos antes de apagar o primeiro; a operação é transacional.
 - Testes cobrem coleções vazias em 15 consultas, entradas inválidas, propagação de falha do repositório, limite/formato de imagens, rejeição HTTP de imagens inválidas e desvinculação preservando os registros do egresso.
 
-**Verificação executada:** `bash ./mvnw -o test` com H2 isolado, 168 testes aprovados. Não houve alteração de esquema ou nova dependência. Consultas agregadas/paginação no servidor, resposta 404 para destaque inexistente, edição de curso/destaque, autenticação real, autorização e rascunhos persistidos continuam como contratos próprios. Os bloqueios de formulário e confirmações não estabelecem permissões de acesso.
+**Verificação executada:** `bash ./mvnw -o test` com H2 isolado, 168 testes aprovados. Não houve alteração de esquema ou nova dependência. Consultas agregadas/paginação no servidor, resposta 404, edição, autenticação, autorização e rascunhos foram concluídos posteriormente, na etapa 6 registrada abaixo. Os bloqueios de formulário e confirmações não estabelecem permissões de acesso.
 
 **Versionamento sugerido:** separar a gestão em `feat(gestao): adicionar busca, revisão e prévia de publicação`, os contratos em `fix(api): validar imagens e preservar vínculos nas exclusões`, os ajustes de imagens em `perf(frontend): definir dimensões e prioridade das imagens` e a documentação em `docs(portal): atualizar apresentação e andamento das entregas`. Incluir testes com a alteração correspondente e manter as pendências visuais declaradas antes do push.
+
+
+### Etapa 6 — Autenticação, contratos e persistência
+
+**Implementação:**
+
+- Login `POST`, logout, consulta de sessão e cadastro público somente de egressos. Sessão no servidor com cookie HttpOnly/SameSite, renovação no login, CSRF nas alterações e limitação de tentativas.
+- PBKDF2-HMAC-SHA256 com salt individual; migração idempotente de senhas antigas de coordenadores. As quatro contas fictícias de egressos recebem acesso demo; perfis reais existentes precisam de senha definida pela coordenação geral.
+- Autorização efetiva por papel e recurso: próprio perfil/trajetória, cursos do coordenador, autoria de destaque e rascunhos privados. A coordenação geral cria contas e não pode excluir a própria conta.
+- Edição de cursos e responsável preservando formações; edição de destaques preservando autoria, egresso e data. Novas ações conectadas aos formulários existentes.
+- Rascunhos de destaque em tabela separada, com recuperação após nova sessão e controle otimista de versão. Publicação e remoção do rascunho são transacionais. Os demais formulários continuam sem persistência de rascunho.
+- Diretório e galeria paginados no servidor, filtros combinados sem duplicação, formações/cargos em lote e painel agregado pela conta autenticada. Destaque inexistente recebe 404; versão desatualizada recebe 409.
+- Scripts demo com cookies/CSRF; teste HTTP ampliado para edição, permissões, conflitos e publicação. Configuração de sessão disponível em Docker e execução local; apresentação e contratos centralizados no README, sem planejamento no arquivo.
+
+**Verificação:** 185 testes Java aprovados com H2/Spring/MockMvc; 78 casos frontend e 27 testes Python; lint, build e `docker compose config --quiet` aprovados. Simulação de DOM: bloqueio de rotas, login inválido/válido, retomada e publicação de rascunho, edição de curso/responsável, edição de destaque com recuperação após erro, propriedade do perfil, consultas sem chamadas por cartão, logout e sessão expirada. O Swiper foi verificado com avanço de cinco segundos, retorno ao início, pausas, setas e paginação, usando respostas controladas.
+
+**Limites de verificação:** o acesso ao socket do Docker está bloqueado nesta sessão. A integração executada usa H2, e a simulação de DOM não verifica aparência, toque ou navegador real. O teste HTTP ampliado está preparado para PostgreSQL real, mas não foi executado contra os contêineres aqui.
+
+**Ativação local:** `docker compose up -d --build --wait`, seguido de `python3 scripts/smoke_demo.py`. O comando preserva o volume; não é necessário apagar o banco. Em instalações demo existentes, confirmar as contas, edição e retomada de rascunhos pelo navegador após atualizar. Capturas e nova direção visual ficam para o redesign seguinte.

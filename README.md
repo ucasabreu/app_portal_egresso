@@ -17,7 +17,7 @@ para coordenadores.
 - [Principais telas](#principais-telas)
 - [Executar a demonstração](#executar-a-demonstração) e [inicializadores](#inicializadores-por-sistema)
 - [Desenvolvimento local](#desenvolvimento-com-java-e-node-locais) e [frontend](#desenvolvimento-apenas-do-frontend)
-- [Variáveis e perfis](#variáveis-e-perfis)
+- [Variáveis e perfis](#variáveis-e-perfis) e [acesso e permissões](#acesso-e-permissões)
 - [Especificações técnicas](#especificações-técnicas), [arquitetura](#arquitetura-e-modelo-de-dados) e [código](#organização-do-código)
 - [Qualidade e testes](#qualidade-e-testes) e [diagnóstico](#diagnóstico)
 - [Escopo da demonstração](#escopo-da-demonstração)
@@ -42,12 +42,12 @@ preparação de um ambiente reproduzível para apresentar o software.
 | Página inicial | Descobrir conquistas publicadas, conhecer até seis pessoas da comunidade e ler até três depoimentos recentes. |
 | Consulta de egressos | Explorar cartões com formação e experiência, pesquisar por nome/curso/cargo/anos, remover filtros, ordenar e paginar; compartilhar a consulta e retomá-la ao voltar de um perfil. |
 | Perfil do egresso | Consultar apresentação, foto, formação, experiências e conquistas; acessar currículo, redes e copiar o link do perfil. |
-| Cadastro e edição | Preencher identificação, apresentação e contatos em três etapas, conferir os dados e salvar; receber avisos ao sair com alterações não salvas. |
+| Cadastro e edição | Criar uma conta de egresso com senha e preencher identificação, apresentação e contatos em três etapas, conferir os dados e salvar; receber avisos ao sair com alterações não salvas. |
 | Trajetória acadêmica e profissional | Registrar formação, experiência e depoimentos com validação e revisão antes de salvar; indicar períodos em andamento. |
 | Depoimentos | Registrar relatos, ler textos longos com expansão, pesquisar por ano e compartilhar a consulta. |
-| Destaques | Buscar por egresso ou curso, ordenar por data e abrir cada publicação; explorar o histórico por ano e cadastrar destaques pelo painel de coordenação. |
-| Coordenação de curso | Pesquisar cursos, egressos e publicações; conferir a prévia de um destaque antes de publicar e desvincular uma formação preservando o perfil. |
-| Coordenação geral | Pesquisar contas e cursos por responsável, revisar o cadastro de curso e confirmar exclusões com identificação do registro. |
+| Destaques | Buscar por egresso ou curso, ordenar por data e abrir cada publicação; explorar o histórico por ano e cadastrar, editar ou retomar rascunhos de destaques pelo painel de coordenação. |
+| Coordenação de curso | Pesquisar cursos, egressos e publicações; salvar rascunhos privados, conferir a prévia de um destaque antes de publicar e desvincular uma formação preservando o perfil. |
+| Coordenação geral | Pesquisar contas e cursos por responsável, criar contas de coordenação, editar cursos e seus responsáveis, definir acesso para perfis existentes e confirmar exclusões com identificação do registro. |
 
 Fotos de perfil e imagens de destaque enviadas por arquivo aceitam **JPEG, PNG
 ou WebP, até 2 MB por imagem**. A API valida o tamanho após decodificar o base64
@@ -55,9 +55,11 @@ e a assinatura do formato. Também aceita URLs HTTP(S), limitadas a 2.048
 caracteres, e caminhos locais como `/demo/avatar.svg`; a disponibilidade de
 imagens externas depende do servidor de origem.
 
-Os formulários preservam o conteúdo quando a gravação falha. Os avisos de
-alterações não salvas ajudam na navegação; rascunhos permanecem apenas na tela
-aberta e não são recuperados após fechar ou recarregar a aplicação.
+Os formulários preservam o conteúdo quando a gravação falha e avisam sobre
+alterações não salvas. No editor de destaques, **Salvar rascunho** grava no banco
+para recuperar pela mesma conta após recarregar ou acessar outra máquina.
+Campos ainda não salvos e formulários de perfil, formação e curso permanecem
+somente na aba aberta; não há salvamento automático.
 
 ## Principais telas
 
@@ -176,6 +178,10 @@ Acesse **http://localhost:5173/login**:
 | --- | --- | --- |
 | `admin.demo` | `demo123` | Painel do coordenador geral |
 | `coord.demo` | `demo123` | Painel do coordenador de curso |
+| `ana@example.com` | `demo123` | Perfil e trajetória de Ana |
+| `bruno@example.com` | `demo123` | Perfil e trajetória de Bruno |
+| `carla@example.com` | `demo123` | Perfil e trajetória de Carla |
+| `diego@example.com` | `demo123` | Perfil e trajetória de Diego |
 
 O perfil `demo` inclui **2 coordenadores, 3 cursos e 4 egressos**, com seus
 vínculos acadêmicos, cargos, depoimentos e 4 destaques. Os nomes, e-mails, credenciais,
@@ -184,15 +190,43 @@ avatar e currículo são fictícios e públicos.
 **Para explorar a demonstração:**
 
 1. Abra a lista de egressos e experimente os filtros por curso e cargo.
-2. Consulte um perfil e acesse **Editar perfil** para atualizar seus dados.
-3. Use **Cadastre-se** para criar outro egresso e adicionar curso, cargo e depoimento.
-4. Entre com `coord.demo` e consulte os egressos associados aos cursos.
+2. Entre com um e-mail demo e acesse **Minha área** ou **Editar perfil** no próprio perfil.
+3. Use **Cadastre-se** para criar outro egresso com senha de 8 a 128 caracteres e adicionar curso, cargo e depoimento.
+4. Entre com `coord.demo`, consulte seus egressos e experimente salvar, retomar e publicar um rascunho.
 5. Explore os destaques na página inicial e a linha do tempo de um egresso.
 6. Entre com `admin.demo` e explore o gerenciamento de cursos e coordenadores.
 
 As alterações persistem no volume do PostgreSQL. A carga inicial ocorre somente
 quando todas as tabelas do portal estão vazias, dentro de uma transação,
 preservando as edições nos próximos inícios.
+
+### Histórias para apresentação
+
+O catálogo em `scripts/demo/destaques.json` oferece **seis destaques adicionais**
+com capas próprias sobre APIs, interfaces, dados, arquitetura, compartilhamento
+de conhecimento e pesquisa. Todos são identificados como exemplos fictícios.
+
+Com a demonstração em execução, publique-os a partir da raiz:
+
+```bash
+# Atualiza a API, a interface e as capas, preservando o banco
+docker compose up -d --build --wait
+
+# Cadastra os destaques pela API, sem alterar os registros existentes
+python3 scripts/criar_destaques_demo.py
+```
+
+O comando autentica `admin.demo`, mantém cookies e tokens CSRF, consulta os
+perfis demo pelos e-mails e usa seus IDs atuais. Ele exige
+o perfil `demo`, verifica todas as capas antes de gravar e evita repetir
+publicações com o mesmo título, egresso e coordenador. Reexecutá-lo preserva
+as edições nos destaques já cadastrados.
+
+A porta é lida de `PORTAL_FRONTEND_PORT` no ambiente ou em `.env`, com padrão
+`5173`. Para conferir tudo antes de publicar, acrescente `--dry-run`; para
+outro endereço, use `--base-url http://localhost:5180`. Após a publicação,
+atualize a página inicial e visite `/destaques` ou o perfil de um egresso.
+No Windows nativo, use `python` conforme a instalação.
 
 ### Parar e restaurar
 
@@ -284,6 +318,9 @@ usuário/senha públicos `portal_demo`.
 | `ABRIR_NAVEGADOR` | `1` abre o navegador; `0` desativa no inicializador local. |
 | `TEMPO_INICIALIZACAO` | Tempo máximo de espera do backend local, em segundos. |
 | `VITE_API_URL` | Endereço alternativo da API na configuração do Vite/build. |
+| `PORTAL_COOKIE_SECURE` | `false` para HTTP local; `true` para enviar o cookie somente por HTTPS. |
+| `PORTAL_ALLOWED_ORIGINS` | Origens CORS separadas por vírgula; padrão `http://localhost:[*],http://127.0.0.1:[*]`. |
+| `PORTAL_SCHEMA_MODE` | `update` na demo; `validate` exige um esquema previamente preparado. |
 
 Para outro banco, configure as três variáveis `SPRING_DATASOURCE_*` e escolha
 explicitamente o perfil. O endpoint `/api/demo/health` e a carga fictícia existem
@@ -295,6 +332,51 @@ Por padrão, o frontend chama `/api`: o Vite encaminha as requisições para
 configure-a no ambiente do processo ou em `frontend/.env.local`. Ao usar
 `bash iniciar.sh --local`, as variáveis de `.env.local` da raiz também são
 exportadas para os processos iniciados. O Compose não utiliza esse arquivo.
+
+## Acesso e permissões
+
+A sessão fica no servidor e usa o cookie `PORTAL_EGRESSOS_SESSION`, com
+`HttpOnly`, `SameSite=Lax` e expiração após 30 minutos de inatividade. **Sair**
+invalida a sessão. Reiniciar a API exige entrar novamente. Não são armazenados
+tokens de autenticação no `localStorage`.
+
+| Conta | Permissões |
+| --- | --- |
+| Visitante | Consultar perfis, cursos, depoimentos e publicações; cadastrar uma conta de egresso. |
+| Egresso | Editar o próprio perfil e gerenciar suas formações, experiências e depoimentos. |
+| Coordenador | Consultar seu painel, desvincular formações dos seus cursos, publicar para seus egressos, editar seus destaques e gerenciar seus rascunhos. |
+| Coordenação geral | Administrar contas e cursos, atribuir responsáveis, editar perfis e publicações e definir senha para um egresso existente. |
+
+A API verifica identidade e propriedade do registro em cada operação protegida.
+Rascunhos pertencem exclusivamente ao autor, inclusive perante outras contas de
+coordenação geral. Publicar valida o conteúdo, cria o destaque e remove o
+rascunho na mesma transação; uma versão desatualizada recebe `409`.
+
+Senhas são armazenadas com salt individual e PBKDF2-HMAC-SHA256, com 600.000
+iterações, usando a biblioteca criptográfica do Java. A escolha de custo segue
+as [orientações da OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html).
+O login usa `POST`; os endpoints antigos de credenciais foram desativados (`410`).
+Dez tentativas por IP e identificador, dentro de 15 minutos, ativam um bloqueio
+local à instância da API (`429`).
+
+**Atualizar uma instalação existente:** execute `docker compose up -d --build --wait`.
+O modo `update` acrescenta senha de egresso e a tabela de rascunhos. A inicialização
+converte senhas antigas de coordenadores em hashes sem alterar o acesso e sem
+reescrever hashes existentes. Somente os quatro e-mails fictícios da tabela demo
+recebem `demo123` quando ainda não possuem senha. Outros perfis existentes precisam
+de senha definida pela coordenação geral em **Editar perfil**; o cadastro público
+não permite assumir um e-mail já registrado. O volume permanece preservado.
+
+Em clientes HTTP, primeiro obtenha `/api/auth/csrf`, conserve os cookies e envie
+`X-CSRF-TOKEN` em `POST`, `PUT` e `DELETE`. Após login, obtenha um novo token,
+pois o identificador da sessão e o token são renovados. O frontend e os scripts
+Python já realizam esse fluxo; falhas de gravação não são repetidas automaticamente.
+
+No Docker, configure as variáveis `PORTAL_*` de sessão em `.env` na raiz;
+no inicializador local, use `.env.local`. Ao hospedar por HTTPS, defina
+`PORTAL_COOKIE_SECURE=true` e restrinja `PORTAL_ALLOWED_ORIGINS` às origens da
+aplicação. O ambiente Compose mantém credenciais públicas e acesso local para
+apresentação; substitua a configuração de banco antes de usar dados reais.
 
 ## Desenvolvimento apenas do frontend
 
@@ -322,7 +404,7 @@ no desenvolvimento ou build, conforme a seção de variáveis.
 | --- | --- |
 | Frontend | React 19, JavaScript/JSX, Vite 6 e React Router 7: componentes, telas e navegação. |
 | Interface | CSS, styled-components 6, React Icons, Swiper e React Data Table Component. |
-| Integração | Axios e chamadas HTTP à API REST, com endereço configurável. |
+| Integração | Axios, sessão com cookies, tokens CSRF e chamadas à API REST com endereço configurável. |
 | Backend | Java 17, Spring Boot 3.4.3, Spring Web, Spring Data JPA, Bean Validation e Lombok. |
 | Dados | PostgreSQL 16 na demonstração; Hibernate/JPA para persistência e relacionamentos. |
 | Execução | Maven Wrapper, Node 22 no build Docker, Nginx e Docker Compose. |
@@ -357,25 +439,52 @@ erDiagram
     EGRESSO ||--o{ DEPOIMENTO : registra
     EGRESSO ||--o{ DESTAQUE_EGRESSO : protagoniza
     COORDENADOR ||--o{ DESTAQUE_EGRESSO : publica
+    COORDENADOR ||--o{ RASCUNHO_DESTAQUE : prepara
+    EGRESSO |o--o{ RASCUNHO_DESTAQUE : protagoniza
 ```
 
 `CursoEgresso` representa o vínculo entre um egresso e um curso, incluindo anos
 de início e conclusão. Cargos registram a trajetória profissional; depoimentos
 guardam os relatos associados ao egresso.
 
-**Exemplos de endpoints implementados:**
+**Principais contratos da API:**
 
-| Método | Caminho | Finalidade |
+| Método | Caminho | Finalidade e acesso |
 | --- | --- | --- |
-| `GET` | `/api/consultas/listar/egressos` | Consultar egressos. |
-| `GET` | `/api/egressos/buscar/egresso/{id}` | Carregar um perfil. |
-| `POST` | `/api/egressos/salvar/egresso` | Cadastrar um egresso. |
-| `PUT` | `/api/egressos/atualizar/egresso/{id}` | Atualizar um perfil existente. |
-| `DELETE` | `/api/egressos/deletar/egresso/{id}` | Excluir um egresso e seus vínculos relacionados. |
-| `GET` | `/api/coordenadores/destaque/listar?nome=...` | Buscar destaques por egresso ou curso. |
-| `GET` | `/api/coordenadores/buscar/destaque/{id}` | Abrir uma publicação individual. |
+| `GET` | `/api/auth/csrf` | Criar/consultar token de segurança; público. |
+| `POST` | `/api/auth/login` | Entrar com `{ "login": "coord.demo", "senha": "demo123" }`. |
+| `GET` / `POST` | `/api/auth/me` / `/api/auth/logout` | Consultar a sessão / sair. |
+| `POST` | `/api/auth/register` | Cadastrar egresso com dados de perfil e `senha`; inicia sua sessão. |
+| `GET` | `/api/publico/egressos` | Filtrar por `nome`, `curso`, `cargo`, `anoInicio`, `anoFim`; ordenar por `nome-asc` ou `nome-desc`. |
+| `GET` | `/api/publico/destaques` | Buscar por `nome` do egresso/curso; ordenar por `recentes` ou `antigos`. |
+| `GET` | `/api/egressos/buscar/egresso/{id}` | Carregar perfil público. |
+| `PUT` | `/api/egressos/atualizar/egresso/{id}` | Atualizar perfil; titular ou coordenação geral. |
+| `GET` | `/api/coordenadores/buscar/destaque/{id}` | Ler publicação; inexistente recebe `404`. |
 | `GET` | `/api/coordenadores/destaque/egresso/{idEgresso}` | Consultar conquistas de um egresso. |
-| `GET` | `/api/demo/health` | Verificar prontidão e conexão com o banco no perfil `demo`. |
+| `GET` | `/api/gestao/painel` | Cursos, vínculos, contas e destaques autorizados, em uma consulta. |
+| `POST` | `/api/coordenadores/salvar/coordenador` | Criar coordenador com `login`, `senha` e `tipo` (`coordenador` ou `geral`); coordenação geral. |
+| `PUT` | `/api/coordenadores/atualizar/curso/{id}` | Alterar `nome`, `nivel` e `id_coordenador`; coordenação geral. |
+| `PUT` | `/api/coordenadores/atualizar/destaque/{id}` | Alterar título, notícia, conquista e imagem; autor ou coordenação geral. |
+| `GET` / `POST` | `/api/gestao/rascunhos` | Listar / criar rascunhos privados. |
+| `GET` / `PUT` / `DELETE` | `/api/gestao/rascunhos/{id}` | Recuperar / atualizar com `versao` / excluir rascunho próprio. |
+| `POST` | `/api/gestao/rascunhos/{id}/publicar` | Publicar versão atual com `{ "versao": 1 }`. |
+| `POST` | `/api/gestao/egressos/{id}/senha` | Definir senha com `{ "senha": "..." }`; coordenação geral. |
+| `DELETE` | `/api/egressos/deletar/egresso/{id}` | Excluir perfil e vínculos; coordenação geral. |
+| `GET` | `/api/demo/health` | Prontidão e conexão com o banco; somente perfil `demo`. |
+
+As consultas `/api/publico/*` usam `pagina` a partir de 1 e `tamanho` entre 1 e
+100. A resposta contém `items`, `total`, `page`, `pages`, `size`, `first` e `last`.
+Uma pesquisa vazia retorna `items: []`, `total: 0` e intervalo `0–0`; páginas
+fora do total são ajustadas para a última disponível. Os cartões de egresso
+incluem formações e cargos carregados em lote, evitando uma chamada por cartão.
+
+Exemplo: `/api/publico/egressos?curso=Computa%C3%A7%C3%A3o&pagina=1&tamanho=6`.
+A edição de destaque preserva egresso, autoria e data original. A edição de curso
+preserva os vínculos e altera qual coordenador pode gerenciá-los.
+Erros de validação recebem `400`, sessão ausente `401`, acesso negado ou CSRF
+inválido `403`, rascunho/publicação inexistente `404` e conflito de versão `409`.
+Os contratos legados mantêm suas mensagens de negócio; falhas do servidor não
+são convertidas em resultados vazios.
 
 ## Organização do código
 
@@ -385,6 +494,7 @@ guardam os relatos associados ao egresso.
 │   ├── src/
 │   │   ├── pages/           # Telas e fluxos de navegação
 │   │   ├── components/      # Componentes reutilizáveis
+│   │   ├── auth/            # Sessão e proteção das rotas
 │   │   ├── services/        # Configuração e consultas da API
 │   │   ├── hooks/           # Consultas, carregamento e operações de gestão
 │   │   ├── utils/           # Filtros, datas e tratamento de mensagens
@@ -397,6 +507,7 @@ guardam os relatos associados ao egresso.
 │   └── src/
 │       ├── main/java/com/example/portalegresso/backend/
 │       │   ├── controller/ # Endpoints HTTP
+│       │   ├── auth/       # Sessões, permissões, CSRF e senhas
 │       │   ├── config/     # Configuração de CORS
 │       │   ├── dto/        # Objetos de transferência
 │       │   ├── exception/  # Tratamento de erros de validação
@@ -455,14 +566,17 @@ Com os containers em execução, valide o fluxo HTTP completo:
 python3 scripts/smoke_demo.py
 ```
 
-Esse script verifica as contas demo, consultas, rotas e recursos do frontend,
-além de cadastrar, editar e excluir um registro temporário com vínculos.
+Esse script verifica sessões e permissões, consultas paginadas, rotas e recursos
+do frontend. Cria registros temporários, edita curso e destaque, recupera rascunho
+após novo login, rejeita acesso de outro autor e conflito de versão e publica o
+rascunho. Ao terminar, remove os registros de validação.
 O [workflow de validação](.github/workflows/demo.yml) prepara esses passos com
 PostgreSQL real em pushes, pull requests e execução manual no GitHub.
 
-O frontend possui 64 casos de regressão em seis arquivos, executados pelo
-runner nativo do Node. Não há percentual mínimo de cobertura configurado nem
-suíte automatizada em navegador; aparência, toque e acessibilidade devem ser
+O backend possui 185 testes com JUnit, integração Spring/MockMvc e H2 isolado.
+O frontend possui 78 casos de regressão em oito arquivos, executados pelo
+runner nativo do Node. Os inicializadores e os scripts demo têm 27 testes Python.
+Não há percentual mínimo de cobertura configurado nem suíte automatizada em navegador; aparência, toque e acessibilidade devem ser
 revisados também no uso real.
 
 ## Diagnóstico
@@ -490,12 +604,16 @@ API, banco e encaminhamento pelo frontend.
 
 ## Escopo da demonstração
 
-O ambiente foi preparado para apresentação local com dados fictícios. O login
-atual verifica credenciais e direciona a interface ao painel correspondente;
-autenticação com sessão/token e autorização dos endpoints ainda precisam ser
-implementadas para uso em produção.
+O ambiente foi preparado para apresentação local com dados fictícios. Login,
+logout e permissões são aplicados pela API e refletem os três tipos de conta.
+Não há recuperação de senha por e-mail, autenticação externa ou gerenciamento de
+sessões distribuídas; a configuração de hospedagem e operação deve considerar
+essas características.
 
 O carrossel inicial apresenta somente conquistas publicadas, ordenadas por data.
+Com mais de uma publicação, avança a cada cinco segundos e retorna ao primeiro
+destaque. O avanço pausa ao passar o mouse ou navegar pelo teclado; também pode
+ser pausado pelo botão e respeita a preferência de movimento reduzido do sistema.
 Egressos e depoimentos aparecem em seções próprias. Quando uma consulta falha,
 as demais áreas continuam disponíveis e a seção afetada permite tentar novamente.
 Com o banco vazio, a página explica a ausência de conteúdo e mantém os caminhos
