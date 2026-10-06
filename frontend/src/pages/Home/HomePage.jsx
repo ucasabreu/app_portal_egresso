@@ -14,6 +14,7 @@ import Notice from "../../components/feedback/Notice";
 import TableCursos from "../../components/Table/TableCursos";
 import TableEgressos from "../../components/Table/TableEgressos";
 import useCollection from "../../hooks/useCollection";
+import { orderedDestaques } from "../../utils/destaques.js";
 import Graduation from "../../assets/graduation.jpg";
 import Network from "../../assets/network.jpg";
 import Opportunity from "../../assets/opportunity.jpg";
@@ -34,10 +35,10 @@ export default function HomePage() {
   const [tab, setTab] = useState("cursos");
   const { data, error, loading, retry } = useCollection("/api/coordenadores/destaque/listar");
   const slides = [
-    ...data.slice(0, 6).map(item => ({
+    ...orderedDestaques(data).slice(0, 6).map(item => ({
       id: item.id, title: item.titulo, description: item.feitoDestaque || item.noticia,
       image: item.imagem || item.egresso?.foto || Graduation,
-      link: item.egresso?.id_egresso ? "/egresso/" + item.egresso.id_egresso + "/destaques" : "/destaques",
+      link: "/destaques/" + item.id,
       label: "Conhecer esta história", name: item.egresso?.nome, highlight: true,
     })),
     ...introductions,

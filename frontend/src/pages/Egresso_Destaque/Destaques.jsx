@@ -1,40 +1,53 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { FaArrowRight } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import useCollection from "../../hooks/useCollection";
 import PageShell from "../../components/ui/PageShell";
 import Field from "../../components/ui/Field";
-import Photo from "../../components/ui/Photo";
+import DestaqueCard from "../../components/ui/DestaqueCard";
+import Select from "../../components/ui/Select";
 import Button from "../../components/Button/Button";
 import LoadingState from "../../components/feedback/LoadingState";
 import ErrorState from "../../components/feedback/ErrorState";
 import EmptyState from "../../components/feedback/EmptyState";
-import Graduation from "../../assets/graduation.jpg";
-import styles from "../../styles/Content.module.css";
+import { orderedDestaques } from "../../utils/destaques.js";
+import styles from "./Editorial.module.css";
 
 export default function Destaques() {
-  const [search, setSearch] = useState("");
-  const [applied, setApplied] = useState("");
+  const [params, setParams] = useSearchParams();
+  const applied = params.get("busca") || "";
+  const order = params.get("ordem") === "antigos" ? "antigos" : "recentes";
+  const [search, setSearch] = useState(applied);
+  useEffect(() => { setSearch(applied); }, [applied]);
   const { data, loading, error, retry } = useCollection("/api/coordenadores/destaque/listar" + (applied ? "?nome=" + encodeURIComponent(applied) : ""));
+  const ordered = orderedDestaques(data, order);
+  const changeSearch = event => {
+    event.preventDefault();
+    setParams(value => {
+      const next = new URLSearchParams(value);
+      if (search.trim()) next.set("busca", search.trim()); else next.delete("busca");
+      return next;
+    });
+  };
   return (
     <PageShell eyebrow="Reconhecimento e conquistas" title="Histórias que inspiram novos caminhos." description="Conheça os feitos e os destaques registrados pela coordenação para a comunidade de egressos.">
-      <form className={styles.toolbar} onSubmit={event => { event.preventDefault(); setApplied(search.trim()); }}>
-        <Field label="Nome do egresso" placeholder="Quem você quer conhecer?" value={search} onChange={event => setSearch(event.target.value)} />
+      <form className={styles.filters} onSubmit={changeSearch}>
+        <Field label="Nome do egresso ou curso" name="busca" type="search" placeholder="Ex.: Ana ou Ciência da Computação" value={search} onChange={event => setSearch(event.target.value)} />
         <Button type="submit">Buscar destaques</Button>
-        <Button variant="secondary" onClick={() => { setSearch(""); setApplied(""); }}>Mostrar todos</Button>
+        <Button variant="secondary" onClick={() => { setSearch(""); setParams(value => { const next = new URLSearchParams(value); next.delete("busca"); return next; }); }}>Limpar busca</Button>
+        <Field as={Select} label="Ordenar publicações" value={order} onChange={event => { const next = new URLSearchParams(params); next.set("ordem", event.target.value); setParams(next); }}>
+          <option value="recentes">Mais recentes</option><option value="antigos">Mais antigas</option>
+        </Field>
       </form>
-      {loading ? <LoadingState /> : error ? <ErrorState description={error} onRetry={retry} /> : data.length === 0 ? <EmptyState title="Nenhum destaque encontrado" description="Experimente outro nome. Novos destaques serão apresentados aqui quando publicados." /> : (
-        <div className={styles.grid}>
-          {data.map(item => (
-            <article className={styles.card} key={item.id}>
-              <Photo src={item.imagem || item.egresso?.foto} fallback={Graduation} alt="" className={styles.image} />
-              <div className={styles.body}><span className={styles.tag}>Egresso em destaque</span><h2>{item.titulo}</h2>
-                <p className={styles.meta}>{item.egresso?.nome || "Comunidade de egressos"}</p><p>{item.feitoDestaque || item.noticia}</p>
-                {item.egresso?.id_egresso && <Link className={styles.link} to={"/egresso/" + item.egresso.id_egresso + "/destaques"}>Ver linha do tempo <FaArrowRight aria-hidden="true" /></Link>}
-              </div>
-            </article>
-          ))}
-        </div>
+      {loading ? <LoadingState label="Buscando histórias da comunidade…" /> : error ? <ErrorState description={error} onRetry={retry} /> : (
+        <>
+          <p className={styles.count} role="status">{ordered.length} {ordered.length === 1 ? "publicação encontrada" : "publicações encontradas"}{applied && <> para <strong>“{applied}”</strong></>}</p>
+          {ordered.length === 0 ? <EmptyState title={applied ? "Nenhuma história encontrada nesta busca" : "As próximas conquistas aparecerão aqui"} description={applied ? "Experimente outro nome ou curso, ou limpe a busca para explorar as publicações." : "Quando a coordenação publicar um destaque, ele fará parte desta galeria."} /> : (
+            <div className={styles.gallery}>
+              <DestaqueCard destaque={ordered[0]} featured />
+              {ordered.length > 1 && <div className={styles.grid}>{ordered.slice(1).map(item => <DestaqueCard key={item.id} destaque={item} />)}</div>}
+            </div>
+          )}
+        </>
       )}
     </PageShell>
   );

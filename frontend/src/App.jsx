@@ -17,6 +17,7 @@ const HomePage = lazy(() => import("./pages/Home/HomePage"));
 const PropostaPortal = lazy(() => import("./pages/Proposta/PropostaPortal"));
 const EgressoDestaque = lazy(() => import("./pages/Egresso_Destaque/EgressoDestaque"));
 const Destaques = lazy(() => import("./pages/Egresso_Destaque/Destaques"));
+const DestaquePublicacao = lazy(() => import("./pages/Egresso_Destaque/DestaquePublicacao"));
 
 function RouteScroll() {
   const { pathname } = useLocation();
@@ -46,6 +47,7 @@ export default function App() {
             <Route path="/egressos/depoimentos" element={<Depoimento />} />
             <Route path="/proposta" element={<PropostaPortal />} />
             <Route path="/destaques" element={<Destaques />} />
+            <Route path="/destaques/:id" element={<DestaquePublicacao />} />
             <Route path="/egresso/:id/destaques" element={<EgressoDestaque />} />
             <Route path="*" element={<PageShell eyebrow="Página não encontrada" title="Vamos encontrar o caminho."
               description="O endereço acessado não está disponível. Volte ao portal para continuar."><Link to="/">Voltar ao início →</Link></PageShell>} />

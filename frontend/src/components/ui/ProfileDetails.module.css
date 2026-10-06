@@ -1,4 +1,10 @@
 .layout { display: grid; grid-template-columns: minmax(0, 19rem) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.publicLayout { min-width: 0; }
+.sectionHeading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem 1rem; margin-bottom: 1.5rem; }
+.sectionHeading h2 { margin-bottom: 0; }
+.historyLink { display: inline-flex; align-items: center; min-height: var(--control-height); color: var(--color-accent-hover); font-size: .875rem; font-weight: 700; }
+.historyLink:hover { text-decoration: underline; }
+.highlights { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 1rem; }
 .identity { border: 1px solid var(--color-border); background: white; border-radius: 1.25rem; overflow: hidden; padding: 2rem; display: flex; align-items: center; flex-direction: column; gap: 1rem; text-align: center; position: sticky; top: 1.5rem; }
 .photo { width: 8rem; height: 8rem; object-fit: cover; border-radius: 50%; border: 6px solid var(--color-surface-muted); }
 .identity h2 { font-size: 1.5rem; letter-spacing: -.03em; overflow-wrap: anywhere; }

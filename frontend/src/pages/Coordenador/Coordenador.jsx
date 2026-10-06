@@ -87,7 +87,7 @@ export default function Coordenador() {
           <section id="highlights" className={styles.panel}><h2>Meus destaques</h2>
             {dashboard.sections.destaques ? <ErrorState description={dashboard.sections.destaques} onRetry={dashboard.reload} /> : dashboard.destaques.length ? <div className={styles.records}>{dashboard.destaques.map(item => <article key={item.id} className={styles.record}>
               <p>{formatDate(item.dataPublicacao)}</p><h3>{item.titulo}</h3><p>{item.noticia}</p><p><strong>Conquista:</strong> {item.feitoDestaque}</p>
-              <div className={styles.actions}><Link className={styles.link} to={"/egresso/" + item.egresso?.id_egresso + "/destaques"}>Ver publicação →</Link><Button variant="ghost" disabled={busy} onClick={() => setConfirmation({ path: "/api/coordenadores/deletar/destaque/" + item.id, description: "O destaque “" + item.titulo + "” será removido do portal.", success: "Destaque excluído com sucesso." })}>Excluir</Button></div>
+              <div className={styles.actions}><Link className={styles.link} to={"/destaques/" + item.id}>Ver publicação →</Link><Button variant="ghost" disabled={busy} onClick={() => setConfirmation({ path: "/api/coordenadores/deletar/destaque/" + item.id, description: "O destaque “" + item.titulo + "” será removido do portal.", success: "Destaque excluído com sucesso." })}>Excluir</Button></div>
             </article>)}</div> : <p className={styles.empty}>Selecione um egresso na tabela acima para publicar seu primeiro destaque.</p>}
           </section>
         </div>
