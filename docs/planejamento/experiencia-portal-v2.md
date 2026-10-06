@@ -6,7 +6,7 @@ Análise de 6 de outubro de 2026, na branch `feat/frontend-redesign`.
 
 Transformar o portal em uma apresentação clara da comunidade: descobrir pessoas, conhecer suas trajetórias e ler conquistas publicadas pela coordenação. A gestão deve facilitar essas publicações e explicar os vínculos entre contas, cursos e egressos.
 
-Este documento orienta a evolução por etapas. O painel corrigido foi validado pelo usuário; a etapa 1 de conteúdo público foi implementada no frontend e passou nas verificações automatizadas, com revisão visual e integração local pendentes. As demais etapas continuam propostas. O README continua destinado à apresentação e execução do software.
+Este documento orienta a evolução por etapas. O painel corrigido foi validado pelo usuário; as etapas 1 (conteúdo público), 2 (descoberta) e 3 (entrada e leitura) foram implementadas no frontend e passaram nas verificações automatizadas, com revisão visual e integração local pendentes. As etapas 4 a 6 continuam propostas. O README continua destinado à apresentação e execução do software.
 
 ## 1. Diagnóstico inicial
 
@@ -92,7 +92,7 @@ Deduplicar resultados por ID: a busca atual relaciona cursos ao egresso e pode r
 
 ### Diretório e apresentação de egressos
 
-Cartão sugerido: avatar, nome, formação principal, período, experiência em andamento quando existente, apresentação curta e chamada para o perfil. Exibir “Formação não informada” quando apropriado; não deduzir profissão pela descrição livre.
+Cartão sugerido: avatar, nome, formação mais recente, período, experiência em andamento quando existente, apresentação curta e chamada para o perfil. Exibir “Formação não informada” quando apropriado; não deduzir profissão pela descrição livre.
 
 Manter busca por nome, curso, cargo e anos; tornar filtros ativos visíveis como etiquetas removíveis. Guardar filtros, ordenação e página na URL. Incluir total de resultados, limpar filtros e paginação local para a demonstração. Voltar de um perfil deve recuperar a consulta anterior.
 
@@ -160,7 +160,7 @@ Evoluir a estrutura existente: componentes visuais reutilizáveis em `components
 | Destaques e artigo | `/api/coordenadores/destaque/listar?nome=...`, `/api/coordenadores/buscar/destaque/{id}` |
 | Conquistas de uma pessoa | `/api/coordenadores/destaque/egresso/{idEgresso}` |
 
-O tratamento das mensagens conhecidas de coleção vazia de cursos, contas e destaques foi centralizado em `services/collections.js` na etapa 1. As demais consultas públicas ainda precisam de padronização. Não converter qualquer erro 400 em ausência de resultados. Evoluir o backend para retornar `200 []` em consultas válidas sem resultados e DTOs com contrato documentado.
+O tratamento das mensagens conhecidas de coleção vazia de cursos, contas e destaques foi centralizado em `services/collections.js` na etapa 1. Na etapa 2, o diretório também passou a reconhecer as mensagens exatas de ausência de egressos em cada filtro. As outras consultas públicas ainda precisam de padronização. Não converter qualquer erro 400 em ausência de resultados. Evoluir o backend para retornar `200 []` em consultas válidas sem resultados e DTOs com contrato documentado.
 
 Cancelar consultas obsoletas, evitar gravações duplicadas e reutilizar respostas sem misturar contas ou filtros. A documentação do [React sobre efeitos e consultas](https://react.dev/reference/react/useEffect) orienta limpeza de efeitos e discute condições de corrida e cache; a biblioteca de consultas deve ser escolhida apenas se a complexidade justificar.
 
@@ -182,9 +182,9 @@ Priorizar artigo e perfil após confirmar o painel: são melhorias visíveis que
 
 Adotar WCAG 2.2 AA como objetivo de implementação, não como certificação já obtida. Verificar contraste de texto, foco visível, acesso por teclado, rótulos, mensagens e refluxo, com a [referência oficial da W3C](https://www.w3.org/WAI/WCAG22/quickref/). Manter controles de aproximadamente 44 px como decisão de usabilidade do projeto.
 
-O build atual inclui imagens de aproximadamente 1,18 MB, 669 KB e 279 KB, além do logotipo de 326 KB. Gerar versões menores e formatos apropriados, definir dimensões e usar carregamento tardio para imagens fora da primeira tela. A imagem principal deve carregar cedo; essa distinção é orientada pela [documentação de imagens do web.dev](https://web.dev/articles/browser-level-image-lazy-loading). Comparar resultados reais antes/depois, sem publicar pontuação de desempenho não medida.
+Após a etapa 3, o build inclui a imagem principal de aproximadamente 1,18 MB e o logotipo de 326 KB. As imagens institucionais de 669 KB e 279 KB deixaram de ser importadas pelo frontend; seus arquivos continuam no repositório. Gerar versões menores e formatos apropriados, definir dimensões e usar carregamento tardio para imagens fora da primeira tela. A imagem principal deve carregar cedo; essa distinção é orientada pela [documentação de imagens do web.dev](https://web.dev/articles/browser-level-image-lazy-loading). Comparar resultados reais antes/depois, sem publicar pontuação de desempenho não medida.
 
-Validação automática: `npm test`, `npm run lint` e `npm run build`. Foram adicionados 12 casos de regressão do carregamento dos painéis, além dos quatro casos existentes de filtros/apresentação. A simulação de DOM confere renderização e ações com dados controlados; não substitui testes em navegador.
+Validação automática: `npm test`, `npm run lint` e `npm run build`. Há 55 casos distribuídos em cinco arquivos: filtros/apresentação, painéis, publicações/perfis, diretório e entrada/depoimentos. A simulação de DOM confere renderização e ações com dados controlados; não substitui testes em navegador.
 
 Roteiro manual obrigatório para a próxima entrega:
 
@@ -202,8 +202,9 @@ Roteiro manual obrigatório para a próxima entrega:
 | --- | --- |
 | 0 — Confiabilidade | Painel corrigido e confirmado pelo usuário |
 | 1 — Conteúdo público | Implementado no frontend; verificações automatizadas aprovadas; revisão visual e integração com API local pendentes |
-| 2 — Descoberta | Próxima implementação: diretório, cartões enriquecidos e paginação |
-| 3 a 6 | Planejadas |
+| 2 — Descoberta | Implementado no frontend; verificações automatizadas aprovadas; revisão visual e integração com API local pendentes |
+| 3 — Entrada e leitura | Implementado no frontend; verificações automatizadas aprovadas; revisão visual e integração com API local pendentes |
+| 4 a 6 | Planejadas |
 
 ### Etapa 1 — Destaques e perfis públicos
 
@@ -221,3 +222,50 @@ Roteiro manual obrigatório para a próxima entrega:
 **Limite do contrato atual:** a busca de destaque inexistente no backend lança uma exceção genérica e pode responder 500. O frontend mantém um estado de erro com recuperação; resposta 404 possui mensagem própria. Padronizar esse caso no backend faz parte da evolução dos contratos, sem tratar qualquer falha 500 como publicação inexistente.
 
 **Revisão local:** abrir `/destaques`, buscar um nome/curso, alternar a ordenação, ler uma conquista, voltar à galeria, abrir o perfil, conferir suas conquistas e compartilhar o endereço. Conferir também o histórico em celular e desktop. Não foram criados novos endpoints nem alterados os dados de demonstração nesta etapa.
+
+
+### Etapa 2 — Diretório e descoberta de egressos
+
+- Cartões com foto, apresentação, formação mais recente e experiência em andamento quando registrada; na ausência de experiência atual, apresentar a mais recente. Períodos usam os anos cadastrados, sem inferir profissão pela descrição livre.
+- Busca por nome, curso, cargo e anos, com filtros recolhíveis em telas pequenas, etiquetas removíveis e limpeza completa. A ordenação não descarta termos digitados antes de aplicar a pesquisa.
+- Filtros, ordem alfabética, página e quantidade ficam na URL. O botão de compartilhamento copia a consulta; o retorno do perfil recupera os mesmos parâmetros. URLs com página fora da faixa são ajustadas após o carregamento.
+- Paginação local com 6, 12 ou 24 pessoas, total e intervalo visível. Ordenar e trocar de página reutiliza a lista já recebida da API.
+- Formações e cargos são consultados apenas para as pessoas na página visível. As respostas válidas são reutilizadas enquanto o diretório permanece aberto; falhas podem ser repetidas sem recarregar as seções válidas. “Atualizar lista” renova a consulta e os detalhes.
+- As mensagens conhecidas de busca válida sem resultados (HTTP 400 do contrato atual) aparecem como lista vazia. Erros de validação, autenticação, servidor e formato continuam visíveis como falhas. Um detalhe indisponível não apaga o cartão nem a informação da outra seção.
+
+**Verificação executada:** `npm test`, `npm run lint` e `npm run build`, com 14 novos casos de regressão de URL, ordenação, paginação, seleção de trajetória, contratos de coleção vazia, cache e falhas parciais. A simulação de DOM verificou navegação entre páginas e perfil, contagem de consultas, filtros removíveis, rascunho preservado, compartilhamento, atualização, URLs inválidas e recolhimento dos filtros. Essa simulação usa respostas controladas e não substitui navegador real.
+
+**Limites:** a paginação é local; o backend ainda retorna a lista completa para cada filtro aplicado. Não há novo endpoint, dependência ou alteração do banco. O cache é temporário e pertence à tela aberta, sem persistência entre visitas.
+
+**Revisão local:** abrir `/egressos/listar`, combinar filtros, ordenar, alterar a quantidade e compartilhar a URL. Abrir um perfil e voltar; conferir os mesmos parâmetros. Para testar várias páginas com os quatro egressos da demonstração, cadastrar perfis descartáveis até ultrapassar seis. Conferir as larguras de 360, 768, 1.024 e 1.440 px, navegação por teclado e estados de API desligada/detalhes indisponíveis. Capturas e validação com o banco local permanecem pendentes.
+
+**Sequência:** a implementação da etapa 3 está registrada a seguir.
+
+
+### Etapa 3 — Página inicial, depoimentos e proposta
+
+- Página inicial organizada em apresentação, conquistas, comunidade, depoimentos, exploração e convite para cadastro. As tabelas de consulta foram substituídas por prévias de pessoas; a consulta completa continua no diretório.
+- Carrossel com até seis conquistas reais, ordenadas por data e sem cartões institucionais misturados. Setas, paginação, teclado e barra de arraste permanecem disponíveis para navegar pelas publicações; com apenas uma, os controles ficam bloqueados pelo Swiper. Na ausência de publicações, exibir orientação e acesso à comunidade.
+- Até seis egressos em ordem alfabética, com formação e experiência reaproveitando o cartão do diretório. Os detalhes são carregados somente dessas pessoas; uma falha parcial preserva os cartões e permite tentar novamente.
+- Prévia de até três depoimentos usando o endpoint de limite já existente. Cartão compartilhado entre início e página de relatos, com autor, foto, data, perfil e expansão de texto longo. O texto continua simples, preservando parágrafos, sem interpretar HTML.
+- Página de depoimentos com ano na URL, compartilhamento da consulta, contagem, ordenação por data e estados distintos para ausência de relatos, período sem resultados e falha real.
+- Consultas independentes das seções da página inicial. O hook compartilhado associa resultados à consulta atual e cancela a anterior: trocar rapidamente o ano não permite que uma resposta antiga substitua os relatos atuais.
+- Proposta com objetivo do portal, jornadas de visitante/egresso/coordenação, ações para as rotas existentes e orientações de uso em seções expansíveis. O conteúdo descreve as funcionalidades disponíveis.
+
+**Verificação executada:** `npm test`, `npm run lint` e `npm run build` aprovados; 12 novos casos de regressão, totalizando 55 casos em cinco arquivos. A simulação de DOM conferiu as 15 rotas existentes e as interações anteriores do diretório, perfis, galeria e painéis. Para esta etapa, verificou carrossel com publicações reais, limites das prévias, falhas independentes e recuperação, ausência com HTTP 400 conhecido, expansão/recolhimento, texto simples, ano na URL, cópia de link, parâmetros inválidos, formato inesperado e cancelamento de resposta atrasada. Não houve validação em navegador real ou banco local.
+
+**Limites:** as consultas de destaques e egressos ainda retornam listas completas, recortadas no frontend para a prévia. Apenas os depoimentos usam o limite no servidor. Não foram adicionadas dependências, endpoints ou alterações no banco.
+
+**Revisão local:** abrir `/`, conferir notícias reais e os controles do carrossel com duas ou mais publicações. Expandir um depoimento, abrir um perfil e explorar o diretório. Em `/egressos/depoimentos`, aplicar um ano com relatos e outro sem resultados, copiar o link e reabrir a consulta. Conferir `/proposta` e seus três caminhos. Revisar teclado, celular/desktop, carregamento de imagens e integração com a API local antes de aprovar a apresentação visual.
+
+### Versionamento após as etapas 2 e 3
+
+O fim desta etapa é um bom ponto para registrar commits, antes de iniciar a gestão da etapa 4. As verificações automáticas passaram; a revisão visual com API local deve constar como pendente até ser executada.
+
+Agrupar as alterações em três entregas, incluindo os testes e ajustes compartilhados junto à funcionalidade correspondente:
+
+1. `feat(egressos): enriquecer diretório e preservar consultas` — cartões, filtros, URL, paginação, retorno do perfil, detalhes e regressões da etapa 2.
+2. `feat(portal): reorganizar início, depoimentos e proposta` — composição da entrada, relatos expansíveis, busca por ano, consultas resilientes e regressões da etapa 3.
+3. `docs(portal): atualizar funcionalidades e evolução da experiência` — README com apresentação do software e acompanhamento neste documento.
+
+Como há arquivos compartilhados entre as duas etapas (`package.json`, coleções e cartão de egresso), revisar a seleção por trechos antes de confirmar cada commit. Validar os testes disponíveis em cada entrega e revisar o diff preparado. A etapa seguinte é a 4 — gestão, prévia de publicação e formulários.

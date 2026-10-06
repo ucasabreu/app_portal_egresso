@@ -27,7 +27,7 @@ para coordenadores.
 ## Sobre o projeto
 
 O portal aproxima a comunidade acadêmica das trajetórias de seus ex-alunos:
-visitantes podem explorar cursos e egressos, conhecer experiências profissionais
+visitantes podem explorar egressos e suas formações, conhecer experiências profissionais
 e ler relatos sobre a formação. Os painéis de coordenação reúnem informações
 sobre cursos, coordenadores e egressos associados.
 
@@ -39,11 +39,12 @@ preparação de um ambiente reproduzível para apresentar o software.
 
 | Área | O que é possível fazer |
 | --- | --- |
-| Consulta de egressos | Pesquisar por nome, curso, cargo e anos de ingresso/conclusão. |
+| Página inicial | Descobrir conquistas publicadas, conhecer até seis pessoas da comunidade e ler até três depoimentos recentes. |
+| Consulta de egressos | Explorar cartões com formação e experiência, pesquisar por nome/curso/cargo/anos, remover filtros, ordenar e paginar; compartilhar a consulta e retomá-la ao voltar de um perfil. |
 | Perfil do egresso | Consultar apresentação, foto, formação, experiências e conquistas; acessar currículo, redes e copiar o link do perfil. |
 | Cadastro e edição | Criar um perfil e atualizar seus dados pela interface integrada à API. |
 | Trajetória acadêmica e profissional | Associar cursos e cargos ao egresso, informando os períodos. |
-| Depoimentos | Registrar relatos e consultar depoimentos com filtro por ano. |
+| Depoimentos | Registrar relatos, ler textos longos com expansão, pesquisar por ano e compartilhar a consulta. |
 | Destaques | Buscar por egresso ou curso, ordenar por data e abrir cada publicação; explorar o histórico por ano e cadastrar destaques pelo painel de coordenação. |
 | Coordenação de curso | Consultar cursos e seus egressos pelo painel do coordenador. |
 | Coordenação geral | Gerenciar cursos e coordenadores pelo painel geral. |
@@ -57,7 +58,7 @@ As orientações para atualizar a galeria estão em
 | Página inicial | Consulta de egressos |
 | --- | --- |
 | ![Espaço reservado para captura da página inicial](docs/images/telas/inicio.svg) | ![Espaço reservado para captura da consulta de egressos](docs/images/telas/egressos.svg) |
-| Apresentação do portal, destaques e consulta de cursos. | Listagem com filtros e acesso aos perfis. |
+| Apresentação do portal, conquistas, egressos e depoimentos. | Listagem com filtros e acesso aos perfis. |
 
 | Perfil do egresso | Cadastro e edição |
 | --- | --- |
@@ -67,7 +68,7 @@ As orientações para atualizar a galeria estão em
 | Depoimentos | Painel da coordenação geral |
 | --- | --- |
 | ![Espaço reservado para captura da consulta de depoimentos](docs/images/telas/depoimentos.svg) | ![Espaço reservado para captura do painel da coordenação geral](docs/images/telas/coordenacao.svg) |
-| Relatos de egressos e pesquisa por ano. | Consulta e gerenciamento de cursos e coordenadores. |
+| Relatos expansíveis, autoria, data e pesquisa por ano. | Consulta e gerenciamento de cursos e coordenadores. |
 
 ## Executar a demonstração
 
@@ -260,7 +261,7 @@ no desenvolvimento ou build, conforme a seção de variáveis.
 | --- | --- |
 | `npm run dev` | Servidor local com atualização automática. |
 | `npm run lint` | Análise estática com ESLint. |
-| `npm test` | Testes dos filtros, carregamento dos painéis, perfis e publicações. |
+| `npm test` | Testes dos filtros, paginação, cache de detalhes, painéis, perfis, publicações e prévias/relatos da página inicial. |
 | `npm run build` | Build de produção em `dist/`. |
 | `npm run preview` | Preview dos arquivos compilados; exige a API em execução. |
 
@@ -432,10 +433,11 @@ atual verifica credenciais e direciona a interface ao painel correspondente;
 autenticação com sessão/token e autorização dos endpoints ainda precisam ser
 implementadas para uso em produção.
 
-O carrossel inicial apresenta os destaques consultados pela API e cartões de
-apresentação da comunidade. Os cartões continuam disponíveis quando o banco
-está vazio ou a API não responde; a interface informa falhas de carregamento
-e permite tentar novamente. Vagas, eventos e mentoria não constituem módulos
+O carrossel inicial apresenta somente conquistas publicadas, ordenadas por data.
+Egressos e depoimentos aparecem em seções próprias. Quando uma consulta falha,
+as demais áreas continuam disponíveis e a seção afetada permite tentar novamente.
+Com o banco vazio, a página explica a ausência de conteúdo e mantém os caminhos
+de exploração e cadastro. Vagas, eventos e mentoria não constituem módulos
 implementados nesta versão.
 
 ## Captura e organização das imagens
@@ -460,7 +462,7 @@ Salve as capturas em `docs/images/telas/` com os nomes abaixo:
 
 | Arquivo sugerido | Como chegar à tela | O que mostrar |
 | --- | --- | --- |
-| `inicio.png` | Página inicial `/`. | Banner e parte da consulta de cursos/egressos. |
+| `inicio.png` | Página inicial `/`. | Banner, conquistas reais e prévia da comunidade. |
 | `egressos.png` | `/egressos/listar`. | Lista preenchida e controles de filtro. |
 | `perfil.png` | Abra um egresso pela listagem. | Perfil com formação e experiência; a rota usa o ID real do registro. |
 | `cadastro.png` | **Editar perfil** em um perfil existente. | Formulário preenchido com dados demo; para cadastro vazio, use `/edit-egresso`. |
@@ -480,7 +482,7 @@ Depois de salvar cada PNG, altere apenas a referência correspondente no README:
 ![Espaço reservado para captura da página inicial](docs/images/telas/inicio.svg)
 
 <!-- Depois -->
-![Página inicial do Portal de Egressos com consulta de cursos](docs/images/telas/inicio.png)
+![Página inicial do Portal de Egressos com conquistas e comunidade](docs/images/telas/inicio.png)
 ```
 
 Repita para os demais arquivos. Atualize o texto introdutório da galeria quando
