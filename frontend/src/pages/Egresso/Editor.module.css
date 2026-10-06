@@ -14,3 +14,13 @@
 .notice { margin-bottom: 1.5rem; }
 @media (max-width: 48rem) { .layout { grid-template-columns: 1fr; } }
 @media (max-width: 36rem) { .fields, .inlineForm { grid-template-columns: 1fr; } }
+.steps { list-style: none; display: flex; flex-wrap: wrap; gap: .75rem; padding: 0; }
+.steps li { display: flex; align-items: center; gap: .5rem; color: var(--color-text-muted); font-size: .8125rem; }
+.steps li span { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--color-surface-muted); }
+.steps li[aria-current="step"] { color: var(--color-accent-hover); font-weight: 700; }
+.steps li[aria-current="step"] span { background: var(--color-accent); color: white; }
+.stepTitle { font-size: 1.25rem; color: var(--color-brand); }
+.review { display: grid; gap: 1rem; margin: 0; }
+.review div { padding-bottom: 1rem; border-bottom: 1px solid var(--color-border); }
+.review dt { color: var(--color-text-muted); font-size: .875rem; }
+.review dd { margin: .25rem 0 0; white-space: pre-line; overflow-wrap: anywhere; }

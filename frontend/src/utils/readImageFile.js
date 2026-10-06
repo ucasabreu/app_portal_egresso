@@ -1,7 +1,10 @@
+import { imageFileError } from "./imagePolicy.js";
+
 export default function readImageFile(file) {
   return new Promise((resolve, reject) => {
-    if (!file || !file.type.startsWith("image/")) {
-      reject(new Error("Selecione um arquivo de imagem."));
+    const error = imageFileError(file);
+    if (error) {
+      reject(new Error(error));
       return;
     }
     const reader = new FileReader();

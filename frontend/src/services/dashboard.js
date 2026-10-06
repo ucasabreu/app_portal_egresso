@@ -31,7 +31,7 @@ export async function loadDashboard(get, id, general = false) {
     try {
       const associations = await getCollection(get, "/api/coordenadores/coordenador/" + course.id_curso + "/egressos_curso");
       return { ...course, egressos: associations.filter(item => item.egresso).map(item => ({
-        id: item.egresso.id_egresso, nome: item.egresso.nome, email: item.egresso.email,
+        idVinculo: item.id_curso_egresso ?? null, id: item.egresso.id_egresso, nome: item.egresso.nome, email: item.egresso.email,
         anoInicio: item.ano_inicio, anoFim: item.ano_fim,
       })), egressosError: "" };
     } catch (error) {

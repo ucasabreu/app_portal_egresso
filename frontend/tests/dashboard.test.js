@@ -33,7 +33,7 @@ test("mantém apenas cursos e destaques da conta e traduz os vínculos de forma�
   const result = await loadDashboard(fixture(), 2);
   assert.deepEqual(result.cursos.map(item => item.id_curso), [10]);
   assert.deepEqual(result.destaques.map(item => item.id), [5]);
-  assert.deepEqual(result.cursos[0].egressos, [{ id: 1, nome: "Ana", email: "ana@example.com", anoInicio: 2018, anoFim: 2022 }]);
+  assert.deepEqual(result.cursos[0].egressos, [{ idVinculo: null, id: 1, nome: "Ana", email: "ana@example.com", anoInicio: 2018, anoFim: 2022 }]);
   assert.deepEqual(result.sections, {});
 });
 

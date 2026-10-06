@@ -1,8 +1,11 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { API_URL } from "../../config/config.js";
 import { errorMessage } from "../../utils/presentation";
+import useUnsavedChanges from "../../hooks/useUnsavedChanges.js";
+import UnsavedChangesDialog from "../../components/ui/UnsavedChangesDialog";
+import { trajectoryErrors, focusFirstError } from "../../utils/management.js";
 import useProfile from "../../hooks/useProfile";
 import useCollection from "../../hooks/useCollection";
 import PageShell from "../../components/ui/PageShell";
@@ -32,6 +35,24 @@ export default function Egresso() {
   const [notice, setNotice] = useState(null);
   const [confirmation, setConfirmation] = useState(null);
   const pending = useRef(false);
+  const form = useRef(null);
+  const [errors, setErrors] = useState({});
+  const [review, setReview] = useState(false);
+  const [nextActive, setNextActive] = useState(null);
+  const draft = active === "cargo" ? cargo : active === "curso" ? curso : active === "depoimento" ? { texto } : {};
+  const dirty = Object.values(draft).some(Boolean);
+  const blocker = useUnsavedChanges(dirty, busy);
+  const resetForm = next => { setCargo(emptyCargo); setCurso(emptyCurso); setTexto(""); setErrors({}); setReview(false); setActive(next); setNextActive(null); };
+  const openForm = next => dirty ? setNextActive(next) : resetForm(next);
+  const validate = () => {
+    const next = trajectoryErrors(active, draft, courses.data);
+    setErrors(next);
+    if (Object.keys(next).length) { setReview(false); return false; }
+    if (!review) { setReview(true); return false; }
+    return true;
+  };
+  useEffect(() => { if (!review && Object.keys(errors).length) focusFirstError(form.current, errors); }, [errors, review]);
+  useEffect(() => { form.current?.querySelector("h3")?.focus(); }, [active, review]);
   const run = async (operation, success) => {
     if (pending.current) return false;
     pending.current = true; setBusy(true); setNotice(null);
@@ -45,51 +66,59 @@ export default function Egresso() {
   };
   const saveCargo = async event => {
     event.preventDefault();
-    if (await run(() => axios.post(API_URL + "/api/egressos/salvar/egresso/" + id + "/salvar_cargo", cargo), "Experiência registrada com sucesso.")) { setCargo(emptyCargo); setActive(""); }
+    if (!validate()) return;
+    if (await run(() => axios.post(API_URL + "/api/egressos/salvar/egresso/" + id + "/salvar_cargo", { ...cargo, ano_fim: cargo.ano_fim || null }), "Experiência registrada com sucesso.")) { setCargo(emptyCargo); resetForm(""); }
   };
   const saveCurso = async event => {
     event.preventDefault();
-    if (await run(() => axios.post(API_URL + "/api/egressos/salvar/egresso/" + id + "/curso/" + curso.id_curso + "/curso_egresso", curso), "Curso registrado com sucesso.")) { setCurso(emptyCurso); setActive(""); }
+    if (!validate()) return;
+    if (await run(() => axios.post(API_URL + "/api/egressos/salvar/egresso/" + id + "/curso/" + curso.id_curso + "/curso_egresso", { ...curso, ano_fim: curso.ano_fim || null }), "Curso registrado com sucesso.")) { setCurso(emptyCurso); resetForm(""); }
   };
   const saveDepoimento = async event => {
     event.preventDefault();
-    if (await run(() => axios.post(API_URL + "/api/egressos/salvar/egresso/" + id + "/salvar_depoimento", { texto }), "Depoimento compartilhado com sucesso.")) { setTexto(""); setActive(""); }
+    if (!validate()) return;
+    if (await run(() => axios.post(API_URL + "/api/egressos/salvar/egresso/" + id + "/salvar_depoimento", { texto }), "Depoimento compartilhado com sucesso.")) { setTexto(""); resetForm(""); }
   };
   const remove = async () => {
     const endpoints = { cargo: "cargo", curso: "curso_egresso", depoimento: "depoimento" };
     if (await run(() => axios.delete(API_URL + "/api/egressos/deletar/" + endpoints[confirmation.type] + "/" + confirmation.id), "Registro excluído com sucesso.")) setConfirmation(null);
   };
-  const actions = <div className={styles.actions}><Button variant="secondary" disabled={busy} onClick={() => setActive("")}>Cancelar</Button><Button type="submit" loading={busy} loadingLabel="Salvando…">Salvar</Button></div>;
-  const yearField = (value, onChange, name, label, required) => <Field key={name} label={label} name={name} type="text" inputMode="numeric" pattern="[0-9]{4}" maxLength={4} value={value} onChange={onChange} placeholder="Ex.: 2024" required={required} disabled={busy} />;
-  const cargoChange = event => setCargo(value => ({ ...value, [event.target.name]: event.target.value }));
-  const cursoChange = event => setCurso(value => ({ ...value, [event.target.name]: event.target.value }));
+  const actions = <div className={styles.actions}><Button variant="secondary" disabled={busy} onClick={() => openForm("")}>Cancelar</Button><Button type="submit" loading={busy} loadingLabel="Salvando…">{review ? "Confirmar e salvar" : "Revisar registro"}</Button></div>;
+  const yearField = (value, onChange, name, label, required) => <Field key={name} label={label} name={name} type="text" inputMode="numeric" pattern="[0-9]{4}" maxLength={4} value={value} onChange={onChange} error={errors[name]} hint={!required ? "Deixe vazio se estiver em andamento." : undefined} placeholder="Ex.: 2024" required={required} disabled={busy} />;
+  const cargoChange = event => { setCargo(value => ({ ...value, [event.target.name]: event.target.value })); setErrors({}); };
+  const cursoChange = event => { setCurso(value => ({ ...value, [event.target.name]: event.target.value })); setErrors({}); };
+  const summary = entries => <div className={styles.full}><Notice title="Confira antes de salvar"><p>Este registro ficará visível na trajetória de {profile.egresso?.nome}.</p></Notice><dl className={styles.review}>{entries.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value || "Em andamento"}</dd></div>)}</dl><Button variant="secondary" disabled={busy} onClick={() => setReview(false)}>Continuar editando</Button></div>;
   const cargoAction = active === "cargo" ? (
-    <form className={styles.inlineForm} onSubmit={saveCargo}>
-      <h3>Registrar experiência</h3>
-      <Field label="Cargo ou atividade" name="descricao" value={cargo.descricao} onChange={cargoChange} required disabled={busy} />
-      <Field label="Local de atuação" name="local" value={cargo.local} onChange={cargoChange} required disabled={busy} />
+    <form ref={form} className={styles.inlineForm} onSubmit={saveCargo} noValidate>
+      <h3 tabIndex={-1}>Registrar experiência</h3>
+      {review ? summary([["Cargo", cargo.descricao], ["Local", cargo.local], ["Início", cargo.ano_inicio], ["Conclusão", cargo.ano_fim]]) : <>
+      <Field label="Cargo ou atividade" name="descricao" error={errors.descricao} value={cargo.descricao} onChange={cargoChange} required disabled={busy} />
+      <Field label="Local de atuação" name="local" error={errors.local} value={cargo.local} onChange={cargoChange} required disabled={busy} />
       {yearField(cargo.ano_inicio, cargoChange, "ano_inicio", "Ano de início", true)}
       {yearField(cargo.ano_fim, cargoChange, "ano_fim", "Ano de conclusão", false)}
+      </>}
       {actions}
     </form>
-  ) : <Button variant="secondary" className={styles.addAction} disabled={busy} onClick={() => setActive("cargo")}>Adicionar experiência</Button>;
+  ) : <Button variant="secondary" className={styles.addAction} disabled={busy} onClick={() => openForm("cargo")}>Adicionar experiência</Button>;
   const cursoAction = active === "curso" ? (
-    <form className={styles.inlineForm} onSubmit={saveCurso}>
-      <h3>Registrar formação</h3>
+    <form ref={form} className={styles.inlineForm} onSubmit={saveCurso} noValidate>
+      <h3 tabIndex={-1}>Registrar formação</h3>
+      {review ? summary([["Curso", courses.data.find(item => String(item.id_curso) === String(curso.id_curso))?.nome], ["Ingresso", curso.ano_inicio], ["Conclusão", curso.ano_fim]]) : <>
       {courses.error ? <div className={styles.full}><ErrorState description={courses.error} onRetry={courses.retry} /></div> : (
-        <Field as={Select} className={styles.full} label="Curso" name="id_curso" value={curso.id_curso} onChange={cursoChange} required disabled={busy || courses.loading}>
+        <Field as={Select} className={styles.full} label="Curso" name="id_curso" error={errors.id_curso} value={curso.id_curso} onChange={cursoChange} required disabled={busy || courses.loading}>
           <option value="">{courses.loading ? "Carregando cursos…" : "Selecione seu curso"}</option>
           {courses.data.map(item => <option key={item.id_curso} value={item.id_curso}>{item.nome}</option>)}
         </Field>
       )}
       {yearField(curso.ano_inicio, cursoChange, "ano_inicio", "Ano de ingresso", true)}
-      {yearField(curso.ano_fim, cursoChange, "ano_fim", "Ano de conclusão", true)}
-      <div className={styles.actions}><Button variant="secondary" disabled={busy} onClick={() => setActive("")}>Cancelar</Button><Button type="submit" loading={busy} disabled={courses.loading || !!courses.error} loadingLabel="Salvando…">Salvar formação</Button></div>
+      {yearField(curso.ano_fim, cursoChange, "ano_fim", "Ano de conclusão", false)}
+      </>}
+      <div className={styles.actions}><Button variant="secondary" disabled={busy} onClick={() => openForm("")}>Cancelar</Button><Button type="submit" loading={busy} disabled={courses.loading || !!courses.error} loadingLabel="Salvando…">{review ? "Salvar formação" : "Revisar formação"}</Button></div>
     </form>
-  ) : <Button variant="secondary" className={styles.addAction} disabled={busy} onClick={() => setActive("curso")}>Adicionar formação</Button>;
+  ) : <Button variant="secondary" className={styles.addAction} disabled={busy} onClick={() => openForm("curso")}>Adicionar formação</Button>;
   const depoimentoAction = active === "depoimento" ? (
-    <form className={styles.inlineForm} onSubmit={saveDepoimento}><h3>Compartilhar experiência</h3><Field as={TextArea} className={styles.full} label="Seu depoimento" value={texto} onChange={event => setTexto(event.target.value)} rows={5} required disabled={busy} />{actions}</form>
-  ) : <Button variant="secondary" className={styles.addAction} disabled={busy} onClick={() => setActive("depoimento")}>Adicionar depoimento</Button>;
+    <form ref={form} className={styles.inlineForm} onSubmit={saveDepoimento} noValidate><h3 tabIndex={-1}>Compartilhar experiência</h3>{review ? summary([["Depoimento", texto]]) : <Field as={TextArea} className={styles.full} label="Seu depoimento" name="texto" error={errors.texto} value={texto} onChange={event => setTexto(event.target.value)} rows={5} required disabled={busy} />}{actions}</form>
+  ) : <Button variant="secondary" className={styles.addAction} disabled={busy} onClick={() => openForm("depoimento")}>Adicionar depoimento</Button>;
   return (
     <PageShell eyebrow="Construindo sua trajetória" title="O próximo capítulo começa por você." description="Complete sua formação e suas experiências para apresentar seu percurso à comunidade."
       actions={<><Link className={content.link} to={"/edit-egresso/" + id}>Editar dados pessoais →</Link><Link className={content.link} to={"/egresso_view/" + id}>Visualizar perfil →</Link></>}>
@@ -98,10 +127,12 @@ export default function Egresso() {
         <>
           {profile.warnings.length > 0 && <Notice variant="warning" className={styles.notice}>{profile.warnings.map(message => <p key={message}>{message}</p>)}</Notice>}
           <ProfileDetails {...profile} cargoAction={cargoAction} cursoAction={cursoAction} depoimentoAction={depoimentoAction}
-            renderDelete={(type, itemId) => <Button variant="ghost" disabled={busy} onClick={() => setConfirmation({ type, id: itemId })}>Excluir</Button>} />
+            renderDelete={(type, itemId) => <Button variant="ghost" disabled={busy} onClick={() => setConfirmation({ type, id: itemId, name: type === "curso" ? profile.cursos.find(item => item.id_curso_egresso === itemId)?.curso?.nome : type === "cargo" ? profile.cargos.find(item => item.id_cargo === itemId)?.descricao : "Depoimento de " + profile.egresso.nome })}>Excluir</Button>} />
         </>
       )}
-      <ConfirmDialog open={!!confirmation} error={notice?.variant === "error" ? notice.text : undefined} pending={busy} description="Este registro será removido da trajetória. A exclusão não pode ser desfeita." onCancel={() => setConfirmation(null)} onConfirm={remove} />
+      <ConfirmDialog open={!!confirmation} error={notice?.variant === "error" ? notice.text : undefined} pending={busy} description={`“${confirmation?.name || "Registro"}” será removido da trajetória de ${profile.egresso?.nome || "este egresso"}. A exclusão não pode ser desfeita.`} onCancel={() => setConfirmation(null)} onConfirm={remove} />
+      <ConfirmDialog open={nextActive !== null} title="Descartar alterações do registro?" description="O registro ainda não foi salvo. Você perderá os dados deste formulário." confirmLabel="Descartar alterações" onCancel={() => setNextActive(null)} onConfirm={() => resetForm(nextActive)} />
+      <UnsavedChangesDialog blocker={blocker} pending={busy} />
     </PageShell>
   );
 }
