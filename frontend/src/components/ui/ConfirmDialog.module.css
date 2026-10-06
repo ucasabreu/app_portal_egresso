@@ -1,0 +1,6 @@
+.dialog { width: min(30rem, calc(100% - 2rem)); border: 1px solid var(--color-border); border-radius: 1.25rem; padding: 2rem; color: var(--color-text); box-shadow: var(--shadow-lg); }
+.dialog::backdrop { background: rgb(16 38 60 / 65%); }
+.dialog h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+.dialog p { color: var(--color-text-muted); }
+.dialog .error { margin-top: 1rem; color: var(--color-danger); }
+.actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .75rem; margin-top: 2rem; }

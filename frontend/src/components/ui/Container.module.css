@@ -1,0 +1,11 @@
+.container {
+  width: 100%;
+  max-width: var(--content-width);
+  min-width: 0;
+  margin-inline: auto;
+  padding-inline: clamp(var(--space-4), 4vw, var(--space-12));
+}
+
+.narrow {
+  max-width: var(--content-width-narrow);
+}

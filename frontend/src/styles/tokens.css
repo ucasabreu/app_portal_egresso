@@ -1,0 +1,58 @@
+:root {
+  color-scheme: light;
+  --color-brand: #17324d;
+  --color-brand-strong: #10263c;
+  --color-accent: #087f8c;
+  --color-accent-hover: #066873;
+  --color-background: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-surface-muted: #edf2f6;
+  --color-text: #172b3a;
+  --color-text-muted: #526777;
+  --color-border: #d8e2ea;
+  --color-border-strong: #718796;
+  --color-info: #175c80;
+  --color-info-surface: #edf6fc;
+  --color-success: #176344;
+  --color-success-surface: #edf8f1;
+  --color-warning: #80550b;
+  --color-warning-surface: #fff8e7;
+  --color-danger: #b42318;
+  --color-danger-surface: #fff1ef;
+  --font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --line-height-body: 1.6;
+  --line-height-heading: 1.15;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --shadow-sm: 0 2px 8px rgb(23 50 77 / 6%);
+  --shadow-lg: 0 24px 64px rgb(23 50 77 / 12%);
+  --content-width: 76rem;
+  --content-width-narrow: 46rem;
+  --control-height: 2.75rem;
+  --transition-fast: 160ms ease;
+
+  /* Compatibilidade com as páginas que serão migradas nas próximas etapas. */
+  --primary: var(--color-background);
+  --secondary: var(--color-text);
+  --gray: var(--color-border);
+  --gray-light: var(--color-border);
+  --blue: var(--color-accent);
+  --white: var(--color-surface);
+}

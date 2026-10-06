@@ -1,15 +1,8 @@
-import React from "react";
-import "../Input/Input.css";
+import styles from "../ui/Control.module.css";
 
-
-const Input = ({ ...props }) => {
-    return (
-      <input
-        className="container-login"
-        {...props}
-        
-      />
-    );
+const Input = ({ className = "", ...props }) => {
+  return (
+    <input {...props} className={[styles.control, className].join(" ")} />
+  );
 };
-
 export default Input;

@@ -1,0 +1,50 @@
+.state {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: var(--space-12);
+  height: var(--space-12);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  color: var(--color-accent);
+}
+
+.title {
+  color: var(--color-brand);
+  font-size: var(--text-lg);
+}
+
+.description {
+  max-width: 44ch;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.error {
+  color: var(--color-danger);
+}
+
+.spinner {
+  width: var(--space-6);
+  height: var(--space-6);
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
