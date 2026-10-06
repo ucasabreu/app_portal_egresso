@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Uma arquitetura preparada para crescer</title>
+  <desc id="desc">Ilustração editorial de software. Conteúdo fictício para demonstração do Portal de Egressos.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102e43"/><stop offset="1" stop-color="#22475a"/></linearGradient></defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <circle cx="1160" cy="40" r="245" fill="#afbbe5" opacity=".07"/>
+  <circle cx="120" cy="670" r="170" fill="#afbbe5" opacity=".06"/>
+  <path d="M80 83h42" stroke="#afbbe5" stroke-width="6" stroke-linecap="round"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="80" y="126" font-size="19" fill="#c9d9e1" letter-spacing="3">PORTAL DE EGRESSOS</text>
+    <text x="80" y="247" font-size="15" fill="#afbbe5" letter-spacing="3">SOFTWARE</text>
+    <text x="80" y="319" font-size="43" font-weight="650" fill="#f3f6f5">Boas escolhas</text>
+    <text x="80" y="376" font-size="43" font-weight="650" fill="#f3f6f5">sustentam o futuro</text>
+    <text x="80" y="441" font-size="20" fill="#bed0d8">Formação · Comunidade · Trajetória</text>
+    <rect x="80" y="543" width="237" height="37" rx="18" fill="#afbbe5" opacity=".15"/>
+    <text x="102" y="568" font-size="13" font-weight="650" fill="#afbbe5" letter-spacing="1">EXEMPLO FICTÍCIO</text>
+  </g>
+  <rect x="696" y="178" width="363" height="357" rx="27" fill="#102b3d" stroke="#526e7d" stroke-opacity=".5"/>
+  <path d="M878 315v46m-109 0h218m-218 0v37m109-37v37m109-37v37" stroke="#afbbe5" stroke-width="5" fill="none"/><rect x="819" y="225" width="118" height="90" rx="16" fill="#afbbe5"/><rect x="728" y="398" width="82" height="82" rx="14" fill="#82b8a7"/><rect x="837" y="398" width="82" height="82" rx="14" fill="#c9aa78"/><rect x="946" y="398" width="82" height="82" rx="14" fill="#87a7bf"/><path d="M850 270h56m-151 169h28m81 0h28m81 0h28" stroke="#15344a" stroke-width="7" stroke-linecap="round"/>
+</svg>

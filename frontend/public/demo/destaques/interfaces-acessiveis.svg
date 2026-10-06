@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Interfaces que aproximam a comunidade</title>
+  <desc id="desc">Ilustração editorial de interface. Conteúdo fictício para demonstração do Portal de Egressos.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102e43"/><stop offset="1" stop-color="#22475a"/></linearGradient></defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <circle cx="1160" cy="40" r="245" fill="#b7c9ef" opacity=".07"/>
+  <circle cx="120" cy="670" r="170" fill="#b7c9ef" opacity=".06"/>
+  <path d="M80 83h42" stroke="#b7c9ef" stroke-width="6" stroke-linecap="round"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="80" y="126" font-size="19" fill="#c9d9e1" letter-spacing="3">PORTAL DE EGRESSOS</text>
+    <text x="80" y="247" font-size="15" fill="#b7c9ef" letter-spacing="3">INTERFACE</text>
+    <text x="80" y="319" font-size="43" font-weight="650" fill="#f3f6f5">Uma experiência</text>
+    <text x="80" y="376" font-size="43" font-weight="650" fill="#f3f6f5">para cada tela</text>
+    <text x="80" y="441" font-size="20" fill="#bed0d8">Formação · Comunidade · Trajetória</text>
+    <rect x="80" y="543" width="237" height="37" rx="18" fill="#b7c9ef" opacity=".15"/>
+    <text x="102" y="568" font-size="13" font-weight="650" fill="#b7c9ef" letter-spacing="1">EXEMPLO FICTÍCIO</text>
+  </g>
+  <rect x="696" y="178" width="363" height="357" rx="27" fill="#102b3d" stroke="#526e7d" stroke-opacity=".5"/>
+  <rect x="732" y="234" width="238" height="242" rx="16" fill="#e8eff4"/><path d="M751 260h110" stroke="#355264" stroke-width="8" stroke-linecap="round"/><rect x="751" y="287" width="96" height="68" rx="8" fill="#b7c9ef"/><rect x="862" y="287" width="88" height="68" rx="8" fill="#accbbd"/><path d="M751 379h188m-188 24h158m-158 24h174" stroke="#90a5b2" stroke-width="7" stroke-linecap="round"/><rect x="939" y="350" width="85" height="167" rx="15" fill="#15344a" stroke="#b7c9ef" stroke-width="5"/><path d="M957 377h48m-48 20h39m-39 66h44" stroke="#b7c9ef" stroke-width="6" stroke-linecap="round"/>
+</svg>
