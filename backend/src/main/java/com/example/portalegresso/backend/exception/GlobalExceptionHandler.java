@@ -13,6 +13,20 @@ import com.example.portalegresso.backend.service.RegraNegocioRunTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<?> handleIntegrity(Exception error) {
+        return ResponseEntity.status(409).body(Map.of("message", "O registro já existe ou possui vínculos que impedem esta operação."));
+    }
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ResponseEntity<?> handleStatus(org.springframework.web.server.ResponseStatusException error) {
+        return ResponseEntity.status(error.getStatusCode()).body(Map.of("message", error.getReason() == null ? "Não foi possível concluir a operação." : error.getReason()));
+    }
+
+    @ExceptionHandler({org.springframework.orm.ObjectOptimisticLockingFailureException.class, jakarta.persistence.OptimisticLockException.class})
+    public ResponseEntity<?> handleConflict(Exception error) {
+        return ResponseEntity.status(409).body(Map.of("message", "Este registro mudou em outra sessão. Reabra o conteúdo antes de salvar."));
+    }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {

@@ -20,4 +20,18 @@ public interface DestaqueEgressoRepositorio extends JpaRepository<DestaqueEgress
        "OR LOWER(c.nome) LIKE LOWER(CONCAT('%', :nomeOuCurso, '%'))")
     List<DestaqueEgresso> buscarPorNomeOuCurso(@Param("nomeOuCurso") String nomeOuCurso);
     List<DestaqueEgresso> findByEgresso(Egresso egresso);;
+
+    @Query(value = """
+        select d from DestaqueEgresso d join fetch d.egresso e join fetch d.coordenador where
+        (:nome = '' or lower(e.nome) like lower(concat('%', :nome, '%')) or
+        exists (select ce.id_curso_egresso from CursoEgresso ce where ce.egresso = e and lower(ce.curso.nome) like lower(concat('%', :nome, '%'))))
+        """, countQuery = """
+        select count(d) from DestaqueEgresso d where
+        (:nome = '' or lower(d.egresso.nome) like lower(concat('%', :nome, '%')) or
+        exists (select ce.id_curso_egresso from CursoEgresso ce where ce.egresso = d.egresso and lower(ce.curso.nome) like lower(concat('%', :nome, '%'))))
+        """)
+    org.springframework.data.domain.Page<DestaqueEgresso> gallery(String nome, org.springframework.data.domain.Pageable pageable);
+    @Query("select d from DestaqueEgresso d join fetch d.egresso join fetch d.coordenador c where c.id_coordenador = :coordinator order by d.dataPublicacao desc, d.id desc")
+    List<DestaqueEgresso> managedHighlights(Integer coordinator);
+
 }

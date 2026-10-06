@@ -15,9 +15,12 @@ import lombok.NoArgsConstructor;
 public class EgressoDTO {
 
     @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s]+$", message = "O nome deve conter apenas letras e espaços")
+    @jakarta.validation.constraints.NotBlank(message = "O nome é obrigatório")
     private String nome;
 
     @Email(message = "Email inválido")
+    @jakarta.validation.constraints.NotBlank(message = "O e-mail é obrigatório")
+    @jakarta.validation.constraints.Size(max = 254)
     private String email;
 
     private String descricao;

@@ -117,7 +117,8 @@ public class EgressoService {
     }
 
     public Egresso atualizar(Egresso egresso) {
-        buscarEgressoPorId(egresso.getId_egresso());
+        Egresso existente = buscarEgressoPorId(egresso.getId_egresso());
+        egresso.setSenha(existente.getSenha());
         verificarEgresso(egresso);
         if (!egressoRepositorio.existsById(egresso.getId_egresso())) {
             throw new RegraNegocioRunTime("Egresso não encontrato.");
@@ -208,8 +209,10 @@ public class EgressoService {
             throw new RegraNegocioRunTime("O email do egresso é inválido.");
         }
 
+        egresso.setEmail(egresso.getEmail().trim().toLowerCase(java.util.Locale.ROOT));
+
         // Verifica se o e-mail ja foi usado
-        if (egressoRepositorio.findByEmail(egresso.getEmail())
+        if (egressoRepositorio.findByEmailIgnoreCase(egresso.getEmail())
                 .filter(existente -> !java.util.Objects.equals(existente.getId_egresso(), egresso.getId_egresso()))
                 .isPresent()) {
             throw new RegraNegocioRunTime("O email informado já está em uso por outro egresso.");

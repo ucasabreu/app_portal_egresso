@@ -28,12 +28,14 @@ import com.example.portalegresso.backend.service.EgressoService;
 import com.example.portalegresso.backend.service.RegraNegocioRunTime;
 
 import jakarta.validation.Valid;
+import com.example.portalegresso.backend.auth.PortalAccess;
+import static com.example.portalegresso.backend.auth.PortalAccess.Policy.*;
 
 import java.util.List;
 
 @RequestMapping("/api/egressos")
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+
 
 public class EgressoController {
 
@@ -55,7 +57,8 @@ public class EgressoController {
      * 
      */
 
-    @PostMapping("/salvar/egresso") //ok
+    @PostMapping("/salvar/egresso")
+    @PortalAccess(ADMIN) //ok
     public ResponseEntity<?> salvar(@RequestBody @Valid EgressoDTO dto){
         Egresso egresso = Egresso.builder()
                 .nome(dto.getNome())
@@ -77,6 +80,7 @@ public class EgressoController {
     }
 
     @PutMapping("/atualizar/egresso/{id}")
+    @PortalAccess(PROFILE)
     public ResponseEntity<?> atualizarEgresso(@PathVariable Integer id, @RequestBody @Valid EgressoDTO dto) {
         Egresso egresso = Egresso.builder().id_egresso(id)
                 .nome(dto.getNome()).email(dto.getEmail()).descricao(dto.getDescricao())
@@ -89,7 +93,8 @@ public class EgressoController {
         }
     }
 
-    @PostMapping("/salvar/egresso/{id}/salvar_depoimento")//ok
+    @PostMapping("/salvar/egresso/{id}/salvar_depoimento")
+    @PortalAccess(PROFILE)//ok
     public ResponseEntity<?> salvarDepoimento(@PathVariable("id") Integer idEgresso, @RequestBody @Valid DepoimentoDTO dto) {
         Depoimento depoimento = Depoimento.builder()
                 .egresso(Egresso.builder().id_egresso(idEgresso).build())
@@ -103,7 +108,8 @@ public class EgressoController {
         }
     }
 
-    @PostMapping("/salvar/egresso/{id}/salvar_cargo") //OK
+    @PostMapping("/salvar/egresso/{id}/salvar_cargo")
+    @PortalAccess(PROFILE) //OK
     public ResponseEntity<?> salvarCargo(@PathVariable("id") Integer idEgresso ,@RequestBody @Valid CargoDTO dto){
         Cargo cargo = Cargo.builder()
                     .egresso(Egresso.builder().id_egresso(idEgresso).build())
@@ -123,6 +129,7 @@ public class EgressoController {
     }
 
     @PostMapping("/salvar/egresso/{id_egresso}/curso/{id_curso}/curso_egresso")
+    @PortalAccess(PROFILE)
     public ResponseEntity<?> salvarCursoEgresso(@PathVariable("id_egresso") Integer idEgresso, @PathVariable("id_curso") Integer idCurso, @RequestBody @Valid CursoEgressoDTO dto) {
         CursoEgresso cursoEgresso = CursoEgresso.builder()
                 .egresso(Egresso.builder().id_egresso(idEgresso).build())
@@ -206,7 +213,8 @@ public class EgressoController {
      * -> DELETE /api/egressos/deletar/cargo
      */
 
-    @DeleteMapping("/deletar/egresso/{id}")//OK
+    @DeleteMapping("/deletar/egresso/{id}")
+    @PortalAccess(ADMIN)//OK
     public ResponseEntity<?> removerEgresso(@PathVariable("id") Integer idEgresso){
         try{
             Egresso egresso = Egresso.builder().id_egresso(idEgresso).build();
@@ -218,7 +226,8 @@ public class EgressoController {
         }
     }
 
-    @DeleteMapping("/deletar/depoimento/{id}")//ok
+    @DeleteMapping("/deletar/depoimento/{id}")
+    @PortalAccess(DEPOIMENTO)//ok
     public ResponseEntity<?> removerDepoimento(@PathVariable("id") Integer idDepoimento){
         try{
             Depoimento depoimento = Depoimento.builder().id_depoimento(idDepoimento).build();
@@ -229,7 +238,8 @@ public class EgressoController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-    @DeleteMapping("/deletar/cargo/{id}")//ok
+    @DeleteMapping("/deletar/cargo/{id}")
+    @PortalAccess(CARGO)//ok
     public ResponseEntity<?> removerCargo(@PathVariable("id") Integer idCargo){
         try{
             Cargo cargo = Cargo.builder().id_cargo(idCargo).build();
@@ -241,7 +251,8 @@ public class EgressoController {
         }
     }
 
-    @DeleteMapping("/deletar/curso_egresso/{id}")//ok
+    @DeleteMapping("/deletar/curso_egresso/{id}")
+    @PortalAccess(FORMATION)//ok
     public ResponseEntity<?> removerCursoEgresso(@PathVariable("id") Integer idCursoEgresso){
         try{
             CursoEgresso cursoEgresso = CursoEgresso.builder().id_curso_egresso(idCursoEgresso).build();

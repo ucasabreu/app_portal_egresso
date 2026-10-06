@@ -19,6 +19,8 @@ public class CoordenadorDTO {
     @Pattern(regexp = "^[a-zA-Z0-9._]+$", message = "O login deve conter apenas letras, números, pontos ou underline")
     private String login;
     
+    @NotBlank(message = "A senha é obrigatória")
+    @Size(min = 8, max = 128, message = "A senha deve ter de 8 a 128 caracteres")
     private String senha;
 
     @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s]+$", message = "O tipo deve conter apenas letras e espaços")

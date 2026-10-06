@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 public class CursoDTO {
 
     @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s]+$", message = "O nome  do cursro deve conter apenas letras e espaços")
-    @NotNull(message = "Nome é obrigatório")
+    @jakarta.validation.constraints.NotBlank(message = "Nome é obrigatório")
     private String nome;
 
     @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s]+$", message = "O nivel deve conter apenas letras e espaços")
-    @NotNull(message = "Nivel é obrigatório")
+    @jakarta.validation.constraints.NotBlank(message = "Nivel é obrigatório")
     private String nivel;
     
     private Integer id_coordenador;

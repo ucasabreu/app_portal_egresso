@@ -20,6 +20,9 @@ services:
     build: ./backend
     environment:
       SPRING_PROFILES_ACTIVE: demo
+      PORTAL_COOKIE_SECURE: ${PORTAL_COOKIE_SECURE:-false}
+      PORTAL_ALLOWED_ORIGINS: ${PORTAL_ALLOWED_ORIGINS:-http://localhost:[*],http://127.0.0.1:[*]}
+      PORTAL_SCHEMA_MODE: ${PORTAL_SCHEMA_MODE:-update}
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/portal_demo
       SPRING_DATASOURCE_USERNAME: portal_demo
       SPRING_DATASOURCE_PASSWORD: portal_demo

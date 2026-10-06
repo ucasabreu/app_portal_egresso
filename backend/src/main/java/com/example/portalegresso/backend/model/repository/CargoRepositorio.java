@@ -18,4 +18,8 @@ public interface CargoRepositorio extends JpaRepository<Cargo,Integer> {
     List<Egresso> findEgressosByCargoDescricao(@Param("cargo") String cargo);
     List<Cargo> findByEgresso(Egresso egresso);
 
+
+    @org.springframework.data.jpa.repository.Query("select j from Cargo j join fetch j.egresso where j.egresso.id_egresso in :ids")
+    java.util.List<com.example.portalegresso.backend.model.entidades.Cargo> forGraduates(java.util.List<Integer> ids);
+
 }

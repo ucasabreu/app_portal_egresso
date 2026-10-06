@@ -24,6 +24,9 @@ import jakarta.transaction.Transactional;
 public class CoordenadorService {
 
     @Autowired
+    com.example.portalegresso.backend.auth.PasswordHasher passwords;
+
+    @Autowired
     CoordenadorRepositorio coordenadorRepositorio;
 
     @Autowired
@@ -48,7 +51,7 @@ public class CoordenadorService {
 
         if (!coord.isPresent())
             throw new RegraNegocioRunTime("Erro de autenticação. Login não encontrado.");
-        if (!coord.get().getSenha().equals(senha))
+        if (!passwords.matches(senha, coord.get().getSenha()))
             throw new RegraNegocioRunTime("Erro de autenticação. Senha incorreta.");
 
         return true;
@@ -60,6 +63,8 @@ public class CoordenadorService {
     @Transactional
     public Coordenador salvar(Coordenador coordenador) {
         verificarCoordenador(coordenador);
+        if (!java.util.Set.of("geral", "coordenador").contains(coordenador.getTipo())) throw new RegraNegocioRunTime("Tipo de conta inválido.");
+        coordenador.setSenha(passwords.encode(coordenador.getSenha()));
         return coordenadorRepositorio.save(coordenador);
     }
 
@@ -220,7 +225,7 @@ public class CoordenadorService {
     // ✅ Buscar destaque por ID
     public DestaqueEgresso buscarDestaquePorId(Long id) {
         return destaqueEgressoRepositorio.findById(id)
-                .orElseThrow(() -> new RuntimeException("Destaque não encontrado para o ID:" + id));
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "Destaque não encontrado."));
     }
 
     public List<DestaqueEgresso> buscarDestaquesPorEgresso(Integer idEgresso) {
@@ -246,7 +251,7 @@ public class CoordenadorService {
             throw new RegraNegocioRunTime("Senha deve ser informada.");
         }
 
-        return coordenadorRepositorio.findByLoginAndSenha(login, senha)
+        return coordenadorRepositorio.findByLogin(login).filter(c -> passwords.matches(senha, c.getSenha()))
                 .orElseThrow(
                         () -> new RegraNegocioRunTime("Coordenador não encontrado com o login e senha fornecido."));
     }

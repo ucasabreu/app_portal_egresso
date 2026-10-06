@@ -10,13 +10,15 @@ import java.util.Arrays;
 
 @Configuration
 public class CorsConfig {
+    @org.springframework.beans.factory.annotation.Value("${PORTAL_ALLOWED_ORIGINS:http://localhost:[*],http://127.0.0.1:[*]}")
+    private String allowedOrigins;
 
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(Arrays.asList("*")); // Permite qualquer origem
+        config.setAllowedOriginPatterns(Arrays.asList(allowedOrigins.split(","))); // Apenas origens configuradas
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("*")); // Permite todos os cabeçalhos
+        config.setAllowedHeaders(Arrays.asList("Content-Type", "X-CSRF-TOKEN")); // Cabeçalhos usados pela aplicação
         config.setAllowCredentials(true); // Permite envio de credenciais, se necessário
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

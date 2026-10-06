@@ -27,4 +27,8 @@ public interface CursoRepositorio extends JpaRepository<Curso,Integer>{
     // Verificar se o nome já está na tabela (insensível a maiúsculas e minúsculas)
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN TRUE ELSE FALSE END FROM Curso c WHERE LOWER(c.nome) = LOWER(:nome)")
     boolean existsByNome(@Param("nome") String nome);
+
+    @Query("select c from Curso c join fetch c.coordenador where (:coordinator is null or c.coordenador.id_coordenador = :coordinator)")
+    List<Curso> managedCourses(Integer coordinator);
+
 }

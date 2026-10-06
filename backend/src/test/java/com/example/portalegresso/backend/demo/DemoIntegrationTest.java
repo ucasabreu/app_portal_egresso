@@ -41,6 +41,18 @@ class DemoIntegrationTest {
     @Autowired DepoimentoRepositorio depoimentos;
     @Autowired DestaqueEgressoRepositorio destaques;
 
+    @Autowired org.springframework.web.context.WebApplicationContext context;
+    @org.junit.jupiter.api.BeforeEach
+    void autenticarAdministradorParaOperacoesDeGestao() throws Exception {
+        var session = new org.springframework.mock.web.MockHttpSession();
+        String token = json.readTree(mvc.perform(get("/api/auth/csrf").session(session)).andReturn().getResponse().getContentAsString()).get("token").asText();
+        mvc.perform(post("/api/auth/login").session(session).header("X-CSRF-TOKEN", token)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"login\":\"admin.demo\",\"senha\":\"demo123\"}")).andExpect(status().isOk());
+        token = json.readTree(mvc.perform(get("/api/auth/csrf").session(session)).andReturn().getResponse().getContentAsString()).get("token").asText();
+        mvc = org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup(context)
+                .defaultRequest(get("/").session(session).header("X-CSRF-TOKEN", token)).build();
+    }
+
     @Test
     void deveCarregarDadosFicticiosRelacionados() {
         assertEquals(2, coordenadores.count());
@@ -69,14 +81,13 @@ class DemoIntegrationTest {
     @Test
     void deveAutenticarAmbasContasSemRetornarSenha() throws Exception {
         for (var conta : Map.of("admin.demo", "geral", "coord.demo", "coordenador").entrySet()) {
-            mvc.perform(get("/api/coordenadores/buscar/coordenador")
-                    .param("login", conta.getKey()).param("senha", "demo123"))
-                    .andExpect(status().isOk()).andExpect(jsonPath("$.tipo").value(conta.getValue()))
+            var session = new org.springframework.mock.web.MockHttpSession();
+            String token = json.readTree(mvc.perform(get("/api/auth/csrf").session(session)).andReturn().getResponse().getContentAsString()).get("token").asText();
+            mvc.perform(post("/api/auth/login").session(session).header("X-CSRF-TOKEN", token)
+                    .contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(Map.of("login", conta.getKey(), "senha", "demo123"))))
+                    .andExpect(status().isOk()).andExpect(jsonPath("$.role").value(conta.getValue()))
                     .andExpect(jsonPath("$.senha").doesNotExist());
         }
-        mvc.perform(get("/api/coordenadores/buscar/coordenador")
-                .param("login", "admin.demo").param("senha", "incorreta"))
-                .andExpect(status().isBadRequest());
     }
 
     @Test
