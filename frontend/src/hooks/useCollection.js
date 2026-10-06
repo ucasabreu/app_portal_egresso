@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { API_URL } from "../config/config.js";
 import { errorMessage } from "../utils/presentation.js";
+import { getCollection } from "../services/collections.js";
 
 export default function useCollection(path) {
   const [state, setState] = useState({ data: [], loading: true, error: "" });
@@ -10,9 +11,9 @@ export default function useCollection(path) {
   useEffect(() => {
     const controller = new AbortController();
     setState({ data: [], loading: true, error: "" });
-    axios.get(API_URL + path, { signal: controller.signal })
-      .then(({ data }) => {
-        if (!Array.isArray(data)) throw new Error("O serviço retornou dados em um formato inesperado.");
+    const get = async url => (await axios.get(API_URL + url, { signal: controller.signal })).data;
+    getCollection(get, path)
+      .then(data => {
         if (!controller.signal.aborted) setState({ data, loading: false, error: "" });
       })
       .catch(error => {
