@@ -19,10 +19,15 @@ try {
     $Started = $true
     & docker @ComposeArguments up --build -d --wait --wait-timeout 240
     if ($LASTEXITCODE -ne 0) { throw 'Falha ao iniciar. Consulte docker compose logs.' }
-    Write-Host 'Portal: http://localhost:5173'
+    $FrontendAddress = & docker @ComposeArguments port frontend 80
+    if ($LASTEXITCODE -ne 0 -or ($FrontendAddress -join '').Trim() -notmatch '^127\.0\.0\.1:(\d+)$') {
+        throw 'Não foi possível identificar a porta publicada do frontend. Consulte docker compose ps.'
+    }
+    $PortalUrl = "http://localhost:$($Matches[1])"
+    Write-Host "Portal: $PortalUrl"
     Write-Host 'Contas: admin.demo ou coord.demo / senha demo123'
     Write-Host 'Ctrl+C encerra os serviços e preserva os dados.'
-    if (-not $NoBrowser) { Start-Process 'http://localhost:5173' }
+    if (-not $NoBrowser) { Start-Process $PortalUrl }
     & docker @ComposeArguments logs --follow
 } catch {
     Write-Host $_.Exception.Message -ForegroundColor Red

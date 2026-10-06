@@ -24,7 +24,7 @@ services:
       SPRING_DATASOURCE_USERNAME: portal_demo
       SPRING_DATASOURCE_PASSWORD: portal_demo
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:${PORTAL_BACKEND_PORT:-8080}:8080"
     depends_on:
       db:
         condition: service_healthy
@@ -39,7 +39,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "127.0.0.1:5173:80"
+      - "127.0.0.1:${PORTAL_FRONTEND_PORT:-5173}:80"
     depends_on:
       backend:
         condition: service_healthy
