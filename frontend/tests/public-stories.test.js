@@ -32,6 +32,24 @@ test("agrupa o histórico por ano e mantém grupo explícito para datas ausentes
   ]);
 });
 
+test("novas publicações do mesmo dia aparecem antes das antigas e ocupam o carrossel", () => {
+  const sameDay = Array.from({ length: 10 }, (_, index) => ({
+    id: index + 1, dataPublicacao: "2026-10-06",
+  }));
+  const ordered = orderedDestaques(sameDay);
+  assert.deepEqual(ordered.slice(0, 6).map(item => item.id), [10, 9, 8, 7, 6, 5]);
+  assert.deepEqual(orderedDestaques(sameDay, "antigos"), sameDay);
+});
+
+test("empates de data com identificadores não numéricos preservam a ordem recebida", () => {
+  const records = [
+    { id: "publicacao-a", dataPublicacao: "2026-10-06" },
+    { id: "publicacao-b", dataPublicacao: "2026-10-06" },
+  ];
+  assert.deepEqual(orderedDestaques(records), records);
+  assert.deepEqual(orderedDestaques(records, "antigos"), records);
+});
+
 test("a coleção vazia do contrato legado é reconhecida inclusive com filtro", async () => {
   const get = async () => { throw failure(400, "Não há destaques cadastrados."); };
   assert.deepEqual(await getCollection(get, "/api/coordenadores/destaque/listar"), []);

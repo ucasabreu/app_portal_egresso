@@ -1,8 +1,8 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Scrollbar, Keyboard, A11y } from "swiper/modules";
-import { FaArrowRight, FaUserGraduate, FaQuoteLeft, FaAward } from "react-icons/fa";
+import { Navigation, Pagination, Scrollbar, Keyboard, A11y, Autoplay } from "swiper/modules";
+import { FaArrowRight, FaUserGraduate, FaQuoteLeft, FaAward, FaPause, FaPlay } from "react-icons/fa";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -36,6 +36,27 @@ export default function HomePage() {
   const content = useMemo(() => homeContent({ destaques: stories.data, egressos: community.data, depoimentos: testimonials.data }), [stories.data, community.data, testimonials.data]);
   const details = useDirectoryDetails(content.people.map(person => person.id_egresso));
 
+  const [carousel, setCarousel] = useState(null);
+  const [paused, setPaused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false);
+  const autoAdvance = content.stories.length > 1 && !paused && !hovered && !focused && !reducedMotion;
+
+  useEffect(() => {
+    const preference = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!preference) return;
+    const update = event => setReducedMotion(event.matches);
+    preference.addEventListener("change", update);
+    return () => preference.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (!carousel || carousel.destroyed) return;
+    if (autoAdvance && !carousel.autoplay.running) carousel.autoplay.start();
+    else if (!autoAdvance && carousel.autoplay.running) carousel.autoplay.stop();
+  }, [carousel, autoAdvance]);
+
   return (
     <>
       <Banner />
@@ -48,13 +69,29 @@ export default function HomePage() {
           {stories.loading ? <LoadingState label="Buscando os destaques da comunidade…" /> : stories.error ? <ErrorState title="Os destaques não puderam ser carregados" description={stories.error} onRetry={stories.retry} /> : !content.stories.length ? (
             <EmptyState title="As próximas conquistas terão espaço aqui" description="Ainda não há destaques publicados. Conheça as pessoas que já fazem parte do portal." action={<Link to="/egressos/listar" className={styles.textLink}>Explorar a comunidade <FaArrowRight aria-hidden="true" /></Link>} />
           ) : (
-            <Swiper key={content.stories.map(story => story.id).join("-")} className={styles.carousel}
-              modules={[Navigation, Pagination, Scrollbar, Keyboard, A11y]} slidesPerView={1} spaceBetween={24}
-              navigation pagination={{ clickable: true }} scrollbar={{ draggable: true }} keyboard={{ enabled: true, onlyInViewport: true }} autoHeight watchOverflow
-              role="region" aria-label="Histórias em destaque" aria-roledescription="carrossel"
-              a11y={{ prevSlideMessage: "História anterior", nextSlideMessage: "Próxima história", paginationBulletMessage: "Ir para a história {{index}}", slideLabelMessage: "{{index}} de {{slidesLength}}" }}>
-              {content.stories.map(story => <SwiperSlide key={story.id}><DestaqueCard destaque={story} featured headingLevel={3} /></SwiperSlide>)}
-            </Swiper>
+            <>
+              <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
+                onFocusCapture={() => setFocused(true)}
+                onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
+                <Swiper key={content.stories.map(story => story.id).join("-")} className={styles.carousel}
+                  modules={[Navigation, Pagination, Scrollbar, Keyboard, A11y, Autoplay]} slidesPerView={1} spaceBetween={24}
+                  onSwiper={setCarousel} rewind={content.stories.length > 1}
+                  autoplay={{ enabled: autoAdvance, delay: 5000, disableOnInteraction: false }}
+                  navigation pagination={{ clickable: true }} scrollbar={{ draggable: true }} keyboard={{ enabled: true, onlyInViewport: true }} autoHeight watchOverflow
+                  role="region" aria-label="Histórias em destaque" aria-roledescription="carrossel"
+                  a11y={{ prevSlideMessage: "História anterior", nextSlideMessage: "Próxima história", paginationBulletMessage: "Ir para a história {{index}}", slideLabelMessage: "{{index}} de {{slidesLength}}" }}>
+                  {content.stories.map(story => <SwiperSlide key={story.id}><DestaqueCard destaque={story} featured headingLevel={3} /></SwiperSlide>)}
+                </Swiper>
+              </div>
+              {content.stories.length > 1 && <div className={styles.playbackControl}>
+                {reducedMotion ? <p>Avanço automático desativado pela preferência de movimento reduzido.</p> : (
+                  <Button variant="secondary" onClick={() => setPaused(value => !value)}>
+                    {paused ? <FaPlay aria-hidden="true" /> : <FaPause aria-hidden="true" />}
+                    {paused ? "Retomar avanço automático" : "Pausar avanço automático"}
+                  </Button>
+                )}
+              </div>}
+            </>
           )}
         </section>
         <section id="home-community" className={styles.section} aria-labelledby="community-title">

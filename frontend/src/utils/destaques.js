@@ -9,7 +9,12 @@ export function orderedDestaques(items, order = "recentes") {
   };
   return [...unique.values()].sort((first, second) => {
     const a = timestamp(first), b = timestamp(second);
-    if (a === b) return 0;
+    if (a === b) {
+      if (a == null) return 0;
+      const firstId = Number(first.id), secondId = Number(second.id);
+      if (!Number.isSafeInteger(firstId) || !Number.isSafeInteger(secondId)) return 0;
+      return order === "antigos" ? firstId - secondId : secondId - firstId;
+    }
     if (a == null) return 1;
     if (b == null) return -1;
     return order === "antigos" ? a - b : b - a;
