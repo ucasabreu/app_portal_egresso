@@ -1,27 +1,28 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import SmallRght from "../../assets/small-right.svg";
-import "../Banner/styles.css";
-import Button from "../Button/Button";
+import { Link } from "react-router-dom";
+import { FaArrowRight } from "react-icons/fa";
+import Graduation from "../../assets/graduation.jpg";
+import Container from "../ui/Container";
+import styles from "./Banner.module.css";
 
-const Banner = () => {
-  const navigate = useNavigate();
+export default function Banner() {
   return (
-    <div className="container-banner">
-      <div className="text-banner">
-        <h2>
-          Conectando Histórias e Construindo Futuro
-        </h2>
-        <p>
-          O site Portal Egressos tem como objetivo manter o vínculo entre a instituição e seus ex-alunos, promovendo a troca de experiências, o acompanhamento das trajetórias profissionais e a oferta de oportunidades de qualificação e networking. Além disso, busca fortalecer a comunidade acadêmica, valorizar conquistas e facilitar a integração dos egressos ao mercado de trabalho e aos projetos institucionais.
-        </p>
-        <Button onClick={() => navigate("/proposta")}>O que é o Portal Egressos? 
-          <img src={SmallRght} alt="seta" />
-          
-        </Button>
-      </div>
-    </div>
+    <section className={styles.hero} aria-labelledby="home-title">
+      <Container className={styles.inner}>
+        <div className={styles.copy}>
+          <p className={styles.eyebrow}>Sua história continua aqui</p>
+          <h1 id="home-title">A formação conecta.<br /><span>As histórias inspiram.</span></h1>
+          <p className={styles.description}>Um espaço para reencontrar a comunidade, compartilhar conquistas e acompanhar as trajetórias de quem passou pela universidade.</p>
+          <div className={styles.actions}>
+            <Link to="/egressos/listar" className={styles.primary}>Conhecer os egressos <FaArrowRight aria-hidden="true" /></Link>
+            <Link to="/proposta" className={styles.secondary}>Descobrir o portal</Link>
+          </div>
+          <p className={styles.note}>Formação · Comunidade · Trajetória</p>
+        </div>
+        <div className={styles.visual}>
+          <img src={Graduation} alt="Formandos reunidos na celebração da graduação" loading="eager" />
+          <div className={styles.caption}><span>Além do diploma</span><p>Novos caminhos.<br />O mesmo vínculo.</p></div>
+        </div>
+      </Container>
+    </section>
   );
 }
-
-export default Banner;

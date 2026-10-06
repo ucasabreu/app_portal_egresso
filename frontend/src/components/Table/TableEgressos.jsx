@@ -1,158 +1,42 @@
-import React, { useState, useEffect } from "react";
-import DataTable from "react-data-table-component";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import "../Table/Table.css";
-import  { API_URL } from "../../config/config.js";
-import Button from "../Button/Button.jsx";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import useCollection from "../../hooks/useCollection";
+import Field from "../ui/Field";
+import Select from "../ui/Select";
+import Button from "../Button/Button";
+import LoadingState from "../feedback/LoadingState";
+import ErrorState from "../feedback/ErrorState";
+import PortalTable from "./PortalTable";
+import styles from "./Table.module.css";
 
-
-const TableEgressos = () => {
-  const [egressosData, setEgressosData] = useState([]);
-  const [errorMessage, setErrorMessage] = useState(""); // Estado para mensagens de erro
-  const [searchNome, setSearchNome] = useState("");
-  const [searchCurso, setSearchCurso] = useState("");
-  const [searchNivel, setSearchNivel] = useState("");
-  const [searchAno, setSearchAno] = useState("");
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
-  const fetchEgressos = async () => {
-    setLoading(true);
-    setErrorMessage("");
-
-    try {
-      const response = await axios.get(`${API_URL}/api/consultas/listar/cursoegresso`);
-
-      if (Array.isArray(response.data)) {
-        const formattedData = response.data.map((item) => ({
-          id_egresso: item.egresso.id_egresso,
-          nome: item.egresso.nome,
-          curso: item.curso.nome,
-          nivel: item.curso.nivel,
-          ano: item.ano_fim,
-        }));
-        setEgressosData(formattedData);
-      } else if (typeof response.data === "string") {
-        // Se for uma string, é provavelmente uma mensagem de erro da API
-        setErrorMessage(response.data);
-      } else {
-        // Resposta inesperada (nem array, nem string)
-        setErrorMessage("Erro inesperado: formato de resposta desconhecido.");
-      }
-    } catch (error) {
-      console.error("Erro ao buscar egressos:", error);
-
-      const errorMessage =
-        error.response?.data || 
-        `Erro ${error.response?.status}: ${error.response?.statusText}` ||
-        "Erro ao buscar dados dos egressos. Verifique sua conexão ou tente novamente mais tarde.";
-
-      setErrorMessage(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchEgressos();
-  }, []);
-
-  const handleReset = () => {
-    setSearchNome("");
-    setSearchCurso("");
-    setSearchNivel("");
-    setSearchAno("");
-  };
-
-  const handleRowClick = (row) => {
-    navigate(`/egresso_view/${row.id_egresso}`);
-  };
-
-  const filteredEgressos = egressosData.filter(
-    (egresso) =>
-      (searchNome === "" || egresso.nome === searchNome) &&
-      (searchCurso === "" || egresso.curso === searchCurso) &&
-      (searchNivel === "" || egresso.nivel === searchNivel) &&
-      (searchAno === "" || egresso.ano.toString() === searchAno)
-  );
-
-  const nomes = egressosData.map((egresso) => String(egresso.nome));
-  const cursos = [...new Set(egressosData.map((egresso) => String(egresso.curso)))];
-  const niveis = [...new Set(egressosData.map((egresso) => String(egresso.nivel)))];
-  const anos = [...new Set(egressosData.map((egresso) => String(egresso.ano)))];
-
+export default function TableEgressos() {
+  const { data, loading, error, retry } = useCollection("/api/consultas/listar/cursoegresso");
+  const [filters, setFilters] = useState({ nome: "", curso: "", nivel: "", ano: "" });
+  const rows = data.filter(item => item.egresso && item.curso).map(item => ({
+    key: item.id_curso_egresso || item.egresso.id_egresso + "-" + item.curso.id_curso,
+    id: item.egresso.id_egresso, nome: item.egresso.nome, curso: item.curso.nome, nivel: item.curso.nivel, ano: item.ano_fim,
+  }));
+  const filtered = rows.filter(row => Object.entries(filters).every(([key, value]) => !value || String(row[key] ?? "") === value));
   const columns = [
-    {
-      name: "Nome",
-      selector: (row) => row.nome,
-      sortable: true,
-      cell: (row) => (
-        <span onClick={() => handleRowClick(row)} className="egresso-name">
-          {row.nome}
-        </span>
-      ),
-    },
-    { name: "Curso", selector: (row) => row.curso, sortable: true },
-    { name: "Nível", selector: (row) => row.nivel, sortable: true },
-    { name: "Ano de Conclusão", selector: (row) => row.ano, sortable: true },
+    { name: "Egresso", selector: row => row.nome, sortable: true, wrap: true, cell: row => <Link className={styles.profileLink} to={"/egresso_view/" + row.id}>{row.nome}</Link> },
+    { name: "Curso", selector: row => row.curso, sortable: true, wrap: true },
+    { name: "Nível", selector: row => row.nivel, sortable: true },
+    { name: "Conclusão", selector: row => row.ano ?? "Em andamento", sortable: true },
   ];
-
+  if (loading) return <LoadingState label="Buscando formações dos egressos…" />;
+  if (error) return <ErrorState description={error} onRetry={retry} />;
   return (
-    <div className="container_table">
-      {loading && <div className="loading-message">Carregando dados...</div>}
-
-      {!loading && errorMessage && (
-        <div className="error-message">{errorMessage}</div>
-      )}
-
-      {!loading && !errorMessage && filteredEgressos.length === 0 && (
-        <div className="no-results-message">
-          Nenhum egresso encontrado com os filtros aplicados.
-        </div>
-      )}
-
-      {!loading && !errorMessage && (
-        <>
-          <div className="header_table">
-            <Button className="reset-button" onClick={handleReset}>Resetar Filtros</Button>
-          </div>
-
-          <div className="filters-container-horizontal">
-            <select className="search-input" value={searchNome} onChange={(e) => setSearchNome(e.target.value)}>
-              <option value="">Buscar por nome</option>
-              {nomes.map((nome, index) => (
-                <option key={`${nome}-${index}`} value={nome}>{nome}</option>
-              ))}
-            </select>
-
-            <select className="search-input" value={searchCurso} onChange={(e) => setSearchCurso(e.target.value)}>
-              <option value="">Buscar por curso</option>
-              {cursos.map((curso, index) => (
-                <option key={`${curso}-${index}`} value={curso}>{curso}</option>
-              ))}
-            </select>
-
-            <select className="search-input" value={searchNivel} onChange={(e) => setSearchNivel(e.target.value)}>
-              <option value="">Buscar por nível</option>
-              {niveis.map((nivel, index) => (
-                <option key={`${nivel}-${index}`} value={nivel}>{nivel}</option>
-              ))}
-            </select>
-
-            <select className="search-input" value={searchAno} onChange={(e) => setSearchAno(e.target.value)}>
-              <option value="">Buscar por ano</option>
-              {anos.map((ano, index) => (
-                <option key={`${ano}-${index}`} value={ano}>{ano}</option>
-              ))}
-            </select>
-          </div>
-
-          <DataTable columns={columns} data={filteredEgressos} pagination highlightOnHover striped />
-        </>
-      )}
+    <div className={styles.table}>
+      <div className={styles.filters}>
+        {Object.entries({ nome: "Nome", curso: "Curso", nivel: "Nível", ano: "Ano de conclusão" }).map(([key, label]) => (
+          <Field key={key} as={Select} label={label} value={filters[key]} onChange={event => setFilters(values => ({ ...values, [key]: event.target.value }))}>
+            <option value="">Todos</option>
+            {[...new Set(rows.map(row => row[key]).filter(value => value != null))].sort().map(value => <option key={value} value={value}>{value}</option>)}
+          </Field>
+        ))}
+        <Button variant="secondary" onClick={() => setFilters({ nome: "", curso: "", nivel: "", ano: "" })}>Limpar filtros</Button>
+      </div>
+      <PortalTable columns={columns} data={filtered} keyField="key" />
     </div>
   );
-};
-
-export default TableEgressos;
+}

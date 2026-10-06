@@ -1,264 +1,72 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useHistory
-import "./EgressosPage.css";
+import { FaArrowRight } from "react-icons/fa";
 import { API_URL } from "../../config/config.js";
+import { errorMessage } from "../../utils/presentation";
+import { egressoQueries, intersectEgressos } from "../../utils/egressoFilters";
+import PageShell from "../../components/ui/PageShell";
+import Field from "../../components/ui/Field";
+import Photo from "../../components/ui/Photo";
+import Button from "../../components/Button/Button";
+import LoadingState from "../../components/feedback/LoadingState";
+import ErrorState from "../../components/feedback/ErrorState";
+import EmptyState from "../../components/feedback/EmptyState";
+import styles from "../../styles/Content.module.css";
 
+const initialFilters = { nome: "", curso: "", cargo: "", anoInicio: "", anoFim: "" };
+export default function EgressosPage() {
+  const [filters, setFilters] = useState(initialFilters);
+  const [applied, setApplied] = useState(initialFilters);
+  const [revision, setRevision] = useState(0);
+  const [state, setState] = useState({ data: [], loading: true, error: "" });
+  useEffect(() => {
+    const controller = new AbortController();
+    setState({ data: [], loading: true, error: "" });
+    Promise.all(egressoQueries(applied).map(path => axios.get(API_URL + path, { signal: controller.signal })))
+      .then(responses => {
+        if (responses.some(response => !Array.isArray(response.data))) throw new Error("O serviço retornou dados em um formato inesperado.");
+        if (!controller.signal.aborted) setState({ data: intersectEgressos(responses.map(response => response.data)), loading: false, error: "" });
+      })
+      .catch(error => {
+        if (!controller.signal.aborted) setState({ data: [], loading: false, error: errorMessage(error) });
+      });
+    return () => controller.abort();
+  }, [applied, revision]);
+  const update = event => setFilters(values => ({ ...values, [event.target.name]: event.target.value }));
+  const reset = () => { setFilters(initialFilters); setApplied(initialFilters); setRevision(value => value + 1); };
 
-const EgressosPage = () => {
-    const [egressos, setEgressos] = useState([]);
-    const [searchName, setSearchName] = useState("");
-    const [searchCourse, setSearchCourse] = useState("");
-    const [searchCargo, setSearchCargo] = useState("");
-    const [searchAnoInicio, setSearchAnoInicio] = useState("");
-    const [searchAnoFim, setSearchAnoFim] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const history = useNavigate(); // Initialize useHistory
-
-    const fetchAllEgressos = async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`${API_URL}/api/consultas/listar/egressos`);
-            setEgressos(response.data);
-            setError(null);
-        } catch (error) {
-            handleApiError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchEgressosByName = async (name) => {
-        if (!name) {
-            fetchAllEgressos();
-            return;
-        }
-
-        setLoading(true);
-        try {
-            const response = await axios.get(`${API_URL}/api/consultas/listar/egressos/nome`, {
-                params: { nome: name },
-            });
-            setEgressos(response.data);
-            setError(null);
-        } catch (error) {
-            handleApiError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchEgressosByCourse = async (course) => {
-        if (!course) {
-            fetchAllEgressos();
-            return;
-        }
-
-        setLoading(true);
-        try {
-            const response = await axios.get(`${API_URL}/api/consultas/listar/egressos/curso`, {
-                params: { curso: course },
-            });
-            setEgressos(response.data);
-            setError(null);
-        } catch (error) {
-            handleApiError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchEgressosByCargo = async (cargo) => {
-        if (!cargo) {
-            fetchAllEgressos();
-            return;
-        }
-
-        setLoading(true);
-        try {
-            const response = await axios.get(`${API_URL}/api/consultas/listar/egressos/cargo`, {
-                params: { cargo: cargo },
-            });
-            setEgressos(response.data);
-            setError(null);
-        } catch (error) {
-            handleApiError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchEgressosByAnoInicio = async (anoInicio) => {
-        if (!anoInicio || isNaN(anoInicio)) {
-            fetchAllEgressos();
-            return;
-        }
-
-        setLoading(true);
-        try {
-            const response = await axios.get(`${API_URL}/api/consultas/listar/egressos/ano_inicio`, {
-                params: { ano: parseInt(anoInicio, 10) },
-            });
-            setEgressos(response.data);
-            setError(null);
-        } catch (error) {
-            handleApiError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchEgressosByAnoFim = async (anoFim) => {
-        if (!anoFim || isNaN(anoFim)) {
-            fetchAllEgressos();
-            return;
-        }
-
-        setLoading(true);
-        try {
-            const response = await axios.get(`${API_URL}/api/consultas/listar/egressos/ano_fim`, {
-                params: { ano: parseInt(anoFim, 10) },
-            });
-            setEgressos(response.data);
-            setError(null);
-        } catch (error) {
-            handleApiError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleApiError = (error) => {
-        console.error("Erro ao buscar egressos!", error);
-        if (error.response) {
-            setError(`Erro: ${error.response.data.message || error.response.data || "Erro ao carregar egressos."}`);
-        } else if (error.request) {
-            setError("Erro: Sem resposta do servidor.");
-        } else {
-            setError("Erro: Falha na requisição.");
-        }
-        setEgressos([]);
-    };
-
-    useEffect(() => {
-        fetchAllEgressos();
-    }, []);
-
-    useEffect(() => {
-        const delayDebounce = setTimeout(() => {
-            fetchEgressosByName(searchName);
-        }, 500);
-
-        return () => clearTimeout(delayDebounce);
-    }, [searchName]);
-
-    useEffect(() => {
-        const delayDebounce = setTimeout(() => {
-            fetchEgressosByCourse(searchCourse);
-        }, 500);
-
-        return () => clearTimeout(delayDebounce);
-    }, [searchCourse]);
-
-    useEffect(() => {
-        const delayDebounce = setTimeout(() => {
-            fetchEgressosByCargo(searchCargo);
-        }, 500);
-
-        return () => clearTimeout(delayDebounce);
-    }, [searchCargo]);
-
-    useEffect(() => {
-        const delayDebounce = setTimeout(() => {
-            fetchEgressosByAnoInicio(searchAnoInicio);
-        }, 500);
-
-        return () => clearTimeout(delayDebounce);
-    }, [searchAnoInicio]);
-
-    useEffect(() => {
-        const delayDebounce = setTimeout(() => {
-            fetchEgressosByAnoFim(searchAnoFim);
-        }, 500);
-
-        return () => clearTimeout(delayDebounce);
-    }, [searchAnoFim]);
-
-    return (
-        <div className="page-egressos">
-            <header className="header">
-                <h1>Egressos</h1>
-
-                <div className="search-container">
-                    <input
-                        type="text"
-                        placeholder="Pesquisar por nome..."
-                        value={searchName}
-                        onChange={(e) => setSearchName(e.target.value)}
-                        className="search-input"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Pesquisar por curso..."
-                        value={searchCourse}
-                        onChange={(e) => setSearchCourse(e.target.value)}
-                        className="search-input"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Pesquisar por cargo..."
-                        value={searchCargo}
-                        onChange={(e) => setSearchCargo(e.target.value)}
-                        className="search-input"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Pesquisar por ano de início..."
-                        value={searchAnoInicio}
-                        onChange={(e) => setSearchAnoInicio(e.target.value)}
-                        className="search-input"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Pesquisar por ano de fim..."
-                        value={searchAnoFim}
-                        onChange={(e) => setSearchAnoFim(e.target.value)}
-                        className="search-input"
-                    />
-                </div>
-            </header>
-
-            <div className="container-central">
-                {loading ? (
-                    <p className="loading">Carregando...</p>
-                ) : error ? (
-                    <p className="error">{error}</p>
-                ) : egressos.length > 0 ? (
-                    egressos.map((egresso) => (
-                        <div
-                            key={egresso.id}
-                            className="egresso-card"
-                            onClick={() => history(`/egresso_view/${egresso.id_egresso}`)}
-                        >
-                            {egresso.foto ? (
-                                <img src={egresso.foto} alt={egresso.nome} className="egresso-foto" />
-                            ) : (
-                                <img src="/imagens/default-user.png" alt="Usuário padrão" className="egresso-foto" />
-                            )}
-                            <p className="egresso-nome">{egresso.nome}</p>
-                            <p className="egresso-curso">{egresso.curso}</p>
-                            <p className="egresso-cargo">{egresso.cargo}</p>
-                        </div>
-                    ))
-                ) : (
-                    <p className="no-results">Nenhum egresso encontrado.</p>
-                )}
+  return (
+    <PageShell title="Pessoas que fazem parte da nossa história." description="Encontre egressos por nome, formação ou experiência profissional. Abra um perfil para conhecer a trajetória completa.">
+      <form className={styles.toolbar} onSubmit={event => { event.preventDefault(); setApplied({ ...filters }); }}>
+        <Field label="Nome" name="nome" value={filters.nome} onChange={update} placeholder="Nome do egresso" />
+        <Field label="Curso" name="curso" value={filters.curso} onChange={update} placeholder="Área de formação" />
+        <Field label="Cargo" name="cargo" value={filters.cargo} onChange={update} placeholder="Experiência profissional" />
+        <Field label="Ano de ingresso" name="anoInicio" type="text" inputMode="numeric" pattern="[0-9]{4}" maxLength={4} value={filters.anoInicio} onChange={update} placeholder="Ex.: 2018" />
+        <Field label="Ano de conclusão" name="anoFim" type="text" inputMode="numeric" pattern="[0-9]{4}" maxLength={4} value={filters.anoFim} onChange={update} placeholder="Ex.: 2022" />
+        <Button type="submit">Aplicar filtros</Button>
+        <Button variant="secondary" onClick={reset}>Limpar filtros</Button>
+      </form>
+      {state.loading ? <LoadingState label="Buscando egressos…" /> : state.error ? <ErrorState description={state.error} onRetry={() => setRevision(value => value + 1)} /> : (
+        <>
+          <p className={styles.count} role="status">{state.data.length} {state.data.length === 1 ? "egresso encontrado" : "egressos encontrados"}</p>
+          {state.data.length === 0 ? <EmptyState action={<Button variant="secondary" onClick={reset}>Mostrar todos os egressos</Button>} /> : (
+            <div className={styles.grid}>
+              {state.data.map(egresso => (
+                <article className={styles.card} key={egresso.id_egresso}>
+                  <div className={styles.body}>
+                    <Photo src={egresso.foto} alt="" className={styles.avatar} />
+                    <span className={styles.tag}>Nossa comunidade</span>
+                    <h2>{egresso.nome}</h2>
+                    <p>{egresso.descricao || "Conheça a formação e as experiências deste egresso."}</p>
+                    <Link to={"/egresso_view/" + egresso.id_egresso} className={styles.link}>Conhecer trajetória <FaArrowRight aria-hidden="true" /></Link>
+                  </div>
+                </article>
+              ))}
             </div>
-
-
-        </div>
-    );
-};
-
-export default EgressosPage;
+          )}
+        </>
+      )}
+    </PageShell>
+  );
+}

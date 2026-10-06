@@ -1,0 +1,23 @@
+.header { position: relative; z-index: 20; border-bottom: 1px solid var(--color-border); background: var(--color-surface); }
+.inner { min-height: 6rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+.brand { display: flex; align-items: center; gap: .75rem; font-weight: 750; color: var(--color-brand); white-space: nowrap; }
+.brand img { width: 2.75rem; height: 3.25rem; object-fit: contain; }
+.brand small { display: block; font-size: .6875rem; font-weight: 400; color: var(--color-text-muted); margin-top: .125rem; }
+.nav { display: flex; align-items: center; gap: 1rem; font-size: .8125rem; font-weight: 600; }
+.navLink, .access { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--color-text-muted); }
+.navLink:hover, .active, .access:hover { color: var(--color-accent-hover); }
+.active { box-shadow: inset 0 -2px var(--color-accent); }
+.access { border-left: 1px solid var(--color-border); padding-left: 1rem; }
+.join { display: inline-flex; align-items: center; justify-content: center; gap: .75rem; min-height: 2.75rem; border-radius: .75rem; padding: .625rem 1rem; color: white; background: var(--color-accent); }
+.join:hover { background: var(--color-accent-hover); }
+.toggle { display: none; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border: 1px solid var(--color-border); border-radius: .75rem; background: white; color: var(--color-brand); cursor: pointer; }
+@media (max-width: 68rem) {
+  .inner { flex-wrap: wrap; min-height: 5rem; padding-block: .75rem; gap: .75rem; }
+  .toggle { display: inline-flex; }
+  .nav { display: none; width: 100%; padding-top: 1rem; border-top: 1px solid var(--color-border); gap: .5rem; }
+  .open { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .navLink, .access { padding: .5rem; }
+  .access { border: 0; }
+  .active { background: var(--color-surface-muted); border-radius: .5rem; box-shadow: none; }
+}
+@media (max-width: 24rem) { .brand { font-size: .875rem; } .brand small { font-size: .625rem; } }

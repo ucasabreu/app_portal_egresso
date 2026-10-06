@@ -1,72 +1,39 @@
-import React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import LogoImg from "../../assets/ufmalogo.png";
-import SearchImg from "../../assets/search.svg";
-import "../Header/styles.css";
-import Button from "../Button/Button";
+import { useState } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { FaBars, FaTimes, FaArrowRight } from "react-icons/fa";
+import Logo from "../../assets/ufmalogo.png";
+import Container from "../ui/Container";
+import styles from "./Header.module.css";
 
-const Header = () => {
-  const navigate = useNavigate();
-  const location = useLocation(); // Obtém a rota atual
+const links = [
+  ["/proposta", "O portal"], ["/egressos/listar", "Egressos"],
+  ["/egressos/depoimentos", "Depoimentos"], ["/destaques", "Destaques"],
+];
 
-  const getMenuItemClass = (path) => {
-    return location.pathname === path ? "active-menu-item" : "";
-  };
-
+export default function Header() {
+  const [open, setOpen] = useState(false);
+  const closeMenu = () => setOpen(false);
   return (
-    <div className="container-header">
-      <div className="logo-header" onClick={() => navigate("/")}>
-        <img src={LogoImg} alt="Logo UFMA" />
-        <h2>PORTAL EGRESSOS</h2>
-      </div>
-
-      <div className="menu-header">
-        <ul>
-          <li><span 
-              onClick={() => navigate("/proposta")}
-              className={getMenuItemClass("/proposta")}>NOSSA PROPOSTA</span></li>
-          <li>
-            <span 
-              onClick={() => navigate("/egressos/listar")}
-              className={getMenuItemClass("/egressos/listar")}
-            >
-              NOSSOS EGRESSOS
-            </span>
-          </li>
-          <li>
-            <span 
-              onClick={() => navigate("/egressos/depoimentos")}
-              className={getMenuItemClass("/egressos/depoimentos")}
-            >
-              DEPOIMENTOS
-            </span>
-          </li>
-          <li>
-            <span 
-              onClick={() => navigate("/edit-egresso")}
-              className={getMenuItemClass("/edit-egresso")}
-            >
-              CADASTRE-SE
-            </span>
-          </li>
-          <li>
-            <span 
-              onClick={() => navigate("/destaques")}
-              className={getMenuItemClass("/destaques")}
-            >
-              DESTAQUES
-            </span>
-          </li>
-        </ul>
-      </div>
-
-      <div className="login-header">
-        <Button onClick={() => navigate("/login")} className="login-button">
-          Login coordenador
-        </Button>
-      </div>
-    </div>
+    <header className={styles.header}>
+      <Container className={styles.inner}>
+        <Link to="/" className={styles.brand} onClick={closeMenu}>
+          <img src={Logo} alt="UFMA" />
+          <span>Portal de Egressos<small>Conexões além da graduação</small></span>
+        </Link>
+        <button className={styles.toggle} type="button" aria-expanded={open} aria-controls="portal-navigation"
+          aria-label={open ? "Fechar menu" : "Abrir menu"} onClick={() => setOpen(value => !value)}>
+          {open ? <FaTimes aria-hidden="true" /> : <FaBars aria-hidden="true" />}
+        </button>
+        <nav id="portal-navigation" aria-label="Navegação principal" className={[styles.nav, open ? styles.open : ""].join(" ")}
+          onKeyDown={event => { if (event.key === "Escape") { closeMenu(); event.currentTarget.previousElementSibling?.focus(); } }}>
+          {links.map(([to, label]) => (
+            <NavLink key={to} to={to} onClick={closeMenu}
+              className={({ isActive }) => [styles.navLink, isActive ? styles.active : ""].join(" ")}>{label}</NavLink>
+          ))}
+          <Link to="/login" className={styles.access} onClick={closeMenu}>Coordenação</Link>
+          <Link to="/edit-egresso" className={styles.join} onClick={closeMenu}>Participar <FaArrowRight aria-hidden="true" /></Link>
+        </nav>
+      </Container>
+    </header>
   );
-};
-
-export default Header;
+}

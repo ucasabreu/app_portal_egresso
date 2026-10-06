@@ -1,97 +1,30 @@
-import React, { useState, useEffect } from "react";
-import DataTable from "react-data-table-component";
-import axios from "axios";
-import "../Table/Table.css";
-import { API_URL } from "../../config/config.js";
-import Button from "../Button/Button.jsx";
+import { useState } from "react";
+import useCollection from "../../hooks/useCollection";
+import Field from "../ui/Field";
+import Select from "../ui/Select";
+import Button from "../Button/Button";
+import LoadingState from "../feedback/LoadingState";
+import ErrorState from "../feedback/ErrorState";
+import PortalTable from "./PortalTable";
+import styles from "./Table.module.css";
 
-
-const TableCursos = () => {
-  const [cursosData, setCursosData] = useState([]);
-  const [searchNome, setSearchNome] = useState("");
-  const [searchNivel, setSearchNivel] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchCursos = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(API_URL + "/api/consultas/listar/cursos");
-        
-        if (Array.isArray(response.data)) {
-          const formattedData = response.data.map((item) => ({
-            nome: item.nome,
-            nivel: item.nivel,
-          }));
-          setCursosData(formattedData);
-          setErrorMessage("");
-        } else {
-          setErrorMessage("Erro: Resposta inesperada da API.");
-          setCursosData([]);
-        }
-      } catch (error) {
-        console.error("Erro ao buscar cursos:", error);
-        const message = error.response?.data ||
-          `Erro ${error.response?.status}: ${error.response?.statusText}` ||
-          "Erro ao buscar dados dos cursos. Verifique sua conexão ou tente novamente mais tarde.";
-        setErrorMessage(message);
-        setCursosData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCursos();
-  }, []);
-
-  const handleReset = () => {
-    setSearchNome("");
-    setSearchNivel("");
-  };
-
-  const filteredCursos = cursosData.filter(
-    (curso) =>
-      (searchNome === "" || curso.nome === searchNome) &&
-      (searchNivel === "" || curso.nivel === searchNivel)
-  );
-
-  const nomes = cursosData.map((curso) => String(curso.nome));
-  const niveis = [...new Set(cursosData.map((curso) => String(curso.nivel)))];
-
-  const columns = [
-    { name: "Nome", selector: (row) => row.nome, sortable: true },
-    { name: "Nível", selector: (row) => row.nivel, sortable: true },
-  ];
-
+export default function TableCursos() {
+  const { data, loading, error, retry } = useCollection("/api/consultas/listar/cursos");
+  const [name, setName] = useState("");
+  const [level, setLevel] = useState("");
+  const filtered = data.filter(item => (!name || item.nome === name) && (!level || item.nivel === level));
+  const names = [...new Set(data.map(item => item.nome).filter(Boolean))].sort();
+  const levels = [...new Set(data.map(item => item.nivel).filter(Boolean))].sort();
+  if (loading) return <LoadingState label="Buscando cursos…" />;
+  if (error) return <ErrorState description={error} onRetry={retry} />;
   return (
-    <div className="container_table">
-      {loading && <div className="loading-message">Carregando dados...</div>}
-      {!loading && errorMessage && <div className="error-message">{errorMessage}</div>}
-      {!loading && !errorMessage && (
-        <>
-          <div className="header_table">
-            <Button className="reset-button" onClick={handleReset}>Resetar Filtros</Button>
-          </div>
-          <div className="filters-container-horizontal">
-            <select className="search-input" value={searchNome} onChange={(e) => setSearchNome(e.target.value)}>
-              <option value="">Buscar por nome</option>
-              {nomes.map((nome, index) => (
-                <option key={`${nome}-${index}`} value={nome}>{nome}</option>
-              ))}
-            </select>
-            <select className="search-input" value={searchNivel} onChange={(e) => setSearchNivel(e.target.value)}>
-              <option value="">Buscar por nível</option>
-              {niveis.map((nivel, index) => (
-                <option key={`${nivel}-${index}`} value={nivel}>{nivel}</option>
-              ))}
-            </select>
-          </div>
-          <DataTable columns={columns} data={filteredCursos} pagination highlightOnHover striped />
-        </>
-      )}
+    <div className={styles.table}>
+      <div className={styles.filters}>
+        <Field as={Select} label="Curso" value={name} onChange={event => setName(event.target.value)}><option value="">Todos os cursos</option>{names.map(value => <option key={value}>{value}</option>)}</Field>
+        <Field as={Select} label="Nível de formação" value={level} onChange={event => setLevel(event.target.value)}><option value="">Todos os níveis</option>{levels.map(value => <option key={value}>{value}</option>)}</Field>
+        <Button variant="secondary" onClick={() => { setName(""); setLevel(""); }}>Limpar filtros</Button>
+      </div>
+      <PortalTable columns={[{ name: "Curso", selector: row => row.nome, sortable: true, wrap: true }, { name: "Nível de formação", selector: row => row.nivel, sortable: true }]} data={filtered} keyField="id_curso" />
     </div>
   );
-};
-
-export default TableCursos;
+}

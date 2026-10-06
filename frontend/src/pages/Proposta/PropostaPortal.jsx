@@ -1,51 +1,28 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import './PropostaPortal.css';
-import GraduacaoImg from '../../assets/graduation.jpg';
-import RedeImg from '../../assets/network.jpg';
-import OportunidadeImg from '../../assets/opportunity.jpg';
-import Button from '../../components/Button/Button';
+import { Link } from "react-router-dom";
+import { FaArrowRight } from "react-icons/fa";
+import PageShell from "../../components/ui/PageShell";
+import Graduation from "../../assets/graduation.jpg";
+import Network from "../../assets/network.jpg";
+import Opportunity from "../../assets/opportunity.jpg";
+import styles from "../../styles/Content.module.css";
 
-const PropostaPortal = () => {
-  const navigate = useNavigate();
-
+const features = [
+  { image: Graduation, title: "Valorizar a formação", text: "Reúna os cursos que fazem parte da sua história acadêmica e acompanhe os caminhos dos colegas de formação." },
+  { image: Network, title: "Manter o vínculo", text: "Encontre egressos, leia depoimentos e compartilhe experiências que aproximam a universidade e sua comunidade." },
+  { image: Opportunity, title: "Reconhecer trajetórias", text: "Apresente experiências profissionais e conheça as conquistas que a coordenação destaca no portal." },
+];
+export default function PropostaPortal() {
   return (
-    <div className='portal-egresso-container proposta-container'>
-      <header className='portal-header proposta-header'>
-        <h1>Bem-vindo ao Portal Egresso</h1>
-        <p>Conectando formandos e egressos ao futuro profissional e acadêmico.</p>
-      </header>
-      
-      <section className='portal-content proposta-content'>
-        <div className='info-box'>
-          <img src={GraduacaoImg} alt='Formandos' />
-          <h2>Para Formandos</h2>
-          <p>Saiba como o portal pode ajudar na sua transição para o mercado de trabalho, com dicas, vagas e networking.</p>
-        </div>
-
-        <div className='info-box'>
-          <img src={RedeImg} alt='Egressos' />
-          <h2>Para Egressos</h2>
-          <p>Conecte-se com sua universidade, compartilhe experiências e descubra novas oportunidades de crescimento.</p>
-        </div>
-
-        <div className='info-box'>
-          <img src={OportunidadeImg} alt='Oportunidades' />
-          <h2>Oportunidades</h2>
-          <p>Acompanhe eventos, mentorias e programas exclusivos para nossos egressos e formandos.</p>
-        </div>
-      </section>
-
-      <section className='call-to-action'>
-        <h2>Junte-se à nossa comunidade!</h2>
-        <p>Cadastre-se agora e tenha acesso a conteúdos exclusivos para sua trajetória profissional e acadêmica.</p>
-        <div  className='portal-button' >
-          <Button onClick={() => navigate('/edit-egresso')}>Cadastre-se</Button>
-        </div>
-        
-      </section>
-    </div>
+    <PageShell eyebrow="Conheça o portal" title="O vínculo com a universidade vai além do diploma." description="O Portal de Egressos reúne pessoas, experiências e conquistas em um espaço de memória e conexão com a comunidade acadêmica.">
+      <div className={styles.grid}>
+        {features.map((feature, index) => (
+          <article key={feature.title} className={styles.card}>
+            <img src={feature.image} alt="" className={styles.image} loading="lazy" />
+            <div className={styles.body}><span className={styles.tag}>0{index + 1}</span><h2>{feature.title}</h2><p>{feature.text}</p></div>
+          </article>
+        ))}
+      </div>
+      <section className={styles.callout}><div><h2>Sua história faz parte desta comunidade.</h2><p>Crie seu perfil, registre sua formação e compartilhe as experiências que marcaram sua trajetória.</p></div><Link className={styles.link} style={{ color: "white" }} to="/edit-egresso">Cadastrar meu perfil <FaArrowRight aria-hidden="true" /></Link></section>
+    </PageShell>
   );
-};
-
-export default PropostaPortal;
+}
