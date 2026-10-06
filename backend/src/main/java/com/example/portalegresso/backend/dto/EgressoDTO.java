@@ -2,6 +2,7 @@ package com.example.portalegresso.backend.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
+import com.example.portalegresso.backend.validation.ImagemValida;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class EgressoDTO {
     private String email;
 
     private String descricao;
+    @ImagemValida
     private String foto;
 
     @Pattern(regexp = "^$|^(https?:\\/\\/)?([\\w]+\\.)?linkedin\\.com\\/.*$", message = "Informe um link válido do LinkedIn")

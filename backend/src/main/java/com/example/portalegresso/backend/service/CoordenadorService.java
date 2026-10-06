@@ -175,22 +175,31 @@ public class CoordenadorService {
      * Funcões para remover
      */
 
+    @Transactional
     public void remover(Curso curso) {
-        buscarCursoPorId(curso.getId_curso());
+        verificarCursoSemFormacoes(buscarCursoPorId(curso.getId_curso()));
         cursoRepositorio.deleteById(curso.getId_curso());
     }
 
+    @Transactional
     public void remover(Coordenador coordenador) {
         Coordenador coordenadorExistente = buscarCoordenadorPorId(coordenador.getId_coordenador());
 
         // Remover todos os cursos relacionados ao coordenador
         List<Curso> cursos = cursoRepositorio.findByCoordenador(coordenadorExistente);
+        cursos.forEach(this::verificarCursoSemFormacoes);
         for (Curso curso : cursos) {
             cursoRepositorio.delete(curso);
         }
 
         // Deletar dados do coordenador
         coordenadorRepositorio.deleteById(coordenador.getId_coordenador());
+    }
+
+    private void verificarCursoSemFormacoes(Curso curso) {
+        if (!cursoEgressoRepositorio.findCursoEgressoByCursoId(curso.getId_curso()).isEmpty()) {
+            throw new RegraNegocioRunTime("Desvincule as formações do curso antes de excluí-lo: " + curso.getNome());
+        }
     }
 
     // ✅ Excluir um destaque
@@ -252,9 +261,6 @@ public class CoordenadorService {
     }
 
     public List<DestaqueEgresso> listarDestaques() {
-        if (destaqueEgressoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há destaques cadastrados.");
-        }
         return destaqueEgressoRepositorio.findAll();
     }
 
