@@ -1,42 +1,47 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { FaArrowRight, FaQuoteLeft } from "react-icons/fa";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import useCollection from "../../hooks/useCollection";
-import { formatDate } from "../../utils/presentation";
+import { orderedDepoimentos, depoimentoYear, depoimentosPath } from "../../utils/depoimentos.js";
 import PageShell from "../../components/ui/PageShell";
-import Photo from "../../components/ui/Photo";
+import DepoimentoCard from "../../components/ui/DepoimentoCard";
+import CopyLink from "../../components/ui/CopyLink";
 import Field from "../../components/ui/Field";
 import Button from "../../components/Button/Button";
 import LoadingState from "../../components/feedback/LoadingState";
 import ErrorState from "../../components/feedback/ErrorState";
 import EmptyState from "../../components/feedback/EmptyState";
-import styles from "../../styles/Content.module.css";
+import styles from "./Depoimento.module.css";
 
 export default function Depoimento() {
-  const [year, setYear] = useState("");
-  const [applied, setApplied] = useState("");
-  const { data, loading, error, retry } = useCollection("/api/consultas/listar/depoimentos" + (applied ? "/ano?ano=" + encodeURIComponent(applied) : ""));
+  const [params, setParams] = useSearchParams();
+  const search = params.toString();
+  const applied = depoimentoYear(params.get("ano"));
+  const canonical = applied ? new URLSearchParams({ ano: applied }).toString() : "";
+  const [year, setYear] = useState(applied);
+  const { data, loading, error, retry } = useCollection(depoimentosPath(applied));
+  const items = useMemo(() => orderedDepoimentos(data), [data]);
+  const path = "/egressos/depoimentos" + (canonical ? "?" + canonical : "");
+
+  useEffect(() => { setYear(applied); }, [applied]);
+  useEffect(() => {
+    if (search !== canonical) setParams(canonical, { replace: true });
+  }, [search, canonical, setParams]);
+  const reset = () => { setYear(""); setParams({}); };
+
   return (
-    <PageShell eyebrow="Vozes da comunidade" title="Experiências que atravessam gerações." description="Memórias, aprendizados e novos caminhos, contados pelos próprios egressos.">
-      <form className={styles.toolbar} onSubmit={event => { event.preventDefault(); setApplied(year); }}>
-        <Field label="Ano de publicação" type="text" inputMode="numeric" pattern="[0-9]{4}" maxLength={4} placeholder="Ex.: 2024" value={year} onChange={event => setYear(event.target.value)} />
-        <Button type="submit">Buscar depoimentos</Button>
-        <Button variant="secondary" onClick={() => { setYear(""); setApplied(""); }}>Mostrar todos</Button>
+    <PageShell eyebrow="Vozes da comunidade" title="Experiências que atravessam gerações." description="Memórias, aprendizados e novos caminhos, contados pelos próprios egressos. Leia os relatos e conheça as pessoas por trás de cada história."
+      actions={<CopyLink key={path} path={path} />}>
+      <form className={styles.toolbar} onSubmit={event => { event.preventDefault(); const value = depoimentoYear(year); setParams(value ? { ano: value } : {}); }}>
+        <Field label="Ano de publicação" name="ano" type="number" min={1900} max={2100} step={1} placeholder="Ex.: 2024" value={year} onChange={event => setYear(event.target.value)} hint="Deixe em branco para ler todos os anos." />
+        <div className={styles.actions}><Button type="submit">Buscar depoimentos</Button><Button variant="secondary" onClick={reset}>Mostrar todos</Button></div>
       </form>
-      {loading ? <LoadingState /> : error ? <ErrorState description={error} onRetry={retry} /> : data.length === 0 ? <EmptyState title="Nenhum depoimento publicado neste período" description="Experimente outro ano ou consulte todos os depoimentos." /> : (
-        <div className={styles.grid}>
-          {data.map(item => (
-            <article className={styles.card} key={item.id_depoimento}>
-              <div className={styles.body}>
-                <FaQuoteLeft className={styles.quoteIcon} aria-hidden="true" />
-                <blockquote className={styles.quote}>{item.texto}</blockquote>
-                <div className={styles.person}><Photo src={item.egresso?.foto} alt="" className={styles.avatar} /><div><h2>{item.egresso?.nome || "Egresso da comunidade"}</h2><p className={styles.meta}>{formatDate(item.data)}</p></div></div>
-                {item.egresso?.id_egresso && <Link className={styles.link} to={"/egresso_view/" + item.egresso.id_egresso}>Conhecer o perfil <FaArrowRight aria-hidden="true" /></Link>}
-              </div>
-            </article>
-          ))}
-        </div>
-      )}
+      <div className={styles.heading}>
+        <div><h2>{applied ? `Relatos publicados em ${applied}` : "Memórias compartilhadas"}</h2><p>Do mais recente ao mais antigo. Expanda os textos longos para continuar a leitura.</p></div>
+        <p className={styles.count} role="status">{loading ? "Buscando depoimentos…" : error ? "Consulta indisponível" : `${items.length} ${items.length === 1 ? "depoimento encontrado" : "depoimentos encontrados"}`}</p>
+      </div>
+      {loading ? <LoadingState label="Carregando os relatos da comunidade…" /> : error ? <ErrorState description={error} onRetry={retry} /> : !items.length ? (
+        <EmptyState title={applied ? `Nenhum depoimento publicado em ${applied}` : "As primeiras memórias ainda serão compartilhadas"} description={applied ? "Experimente outro ano ou consulte todos os depoimentos." : "Os relatos aparecerão aqui quando forem registrados pelos egressos em seus perfis."} action={applied ? <Button variant="secondary" onClick={reset}>Consultar todos os anos</Button> : undefined} />
+      ) : <div className={styles.grid}>{items.map(item => <DepoimentoCard key={item.id_depoimento} depoimento={item} headingLevel={3} />)}</div>}
     </PageShell>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Scrollbar, Keyboard, A11y } from "swiper/modules";
@@ -9,109 +9,87 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import Banner from "../../components/Banner";
 import Container from "../../components/ui/Container";
-import Photo from "../../components/ui/Photo";
+import DestaqueCard from "../../components/ui/DestaqueCard";
+import EgressoCard from "../../components/ui/EgressoCard";
+import DepoimentoCard from "../../components/ui/DepoimentoCard";
+import Button from "../../components/Button/Button";
 import Notice from "../../components/feedback/Notice";
-import TableCursos from "../../components/Table/TableCursos";
-import TableEgressos from "../../components/Table/TableEgressos";
+import LoadingState from "../../components/feedback/LoadingState";
+import ErrorState from "../../components/feedback/ErrorState";
+import EmptyState from "../../components/feedback/EmptyState";
 import useCollection from "../../hooks/useCollection";
-import { orderedDestaques } from "../../utils/destaques.js";
-import Graduation from "../../assets/graduation.jpg";
-import Network from "../../assets/network.jpg";
-import Opportunity from "../../assets/opportunity.jpg";
+import { useDirectoryDetails } from "../../hooks/useEgressoDirectory.js";
+import { homeContent } from "../../utils/homeContent.js";
+import { depoimentosPath } from "../../utils/depoimentos.js";
 import styles from "./Home.module.css";
 
-const introductions = [
-  { id: "community", title: "Trajetórias que merecem ser conhecidas.", description: "Conheça os egressos e descubra os caminhos construídos depois da graduação.", image: Graduation, link: "/egressos/listar", label: "Conhecer a comunidade" },
-  { id: "stories", title: "Cada experiência tem algo a ensinar.", description: "Leia depoimentos e reencontre a universidade pelas histórias de quem fez parte dela.", image: Network, link: "/egressos/depoimentos", label: "Ler os depoimentos" },
-  { id: "join", title: "Sua próxima conquista também faz parte.", description: "Cadastre seu perfil e compartilhe sua formação e suas experiências profissionais.", image: Opportunity, link: "/edit-egresso", label: "Participar do portal" },
-];
 const shortcuts = [
-  { to: "/egressos/listar", icon: FaUserGraduate, title: "Nossa comunidade", text: "Pessoas, formações e caminhos profissionais." },
-  { to: "/egressos/depoimentos", icon: FaQuoteLeft, title: "Vozes dos egressos", text: "Experiências contadas por quem as viveu." },
-  { to: "/destaques", icon: FaAward, title: "Conquistas em destaque", text: "Reconhecimento de trajetórias inspiradoras." },
+  { to: "/egressos/listar", icon: FaUserGraduate, title: "Conhecer pessoas", text: "Explore formações, experiências e perfis da comunidade." },
+  { to: "/egressos/depoimentos", icon: FaQuoteLeft, title: "Ouvir experiências", text: "Leia memórias e aprendizados compartilhados pelos egressos." },
+  { to: "/destaques", icon: FaAward, title: "Descobrir conquistas", text: "Conheça as histórias publicadas pela coordenação." },
 ];
 
 export default function HomePage() {
-  const [tab, setTab] = useState("cursos");
-  const { data, error, loading, retry } = useCollection("/api/coordenadores/destaque/listar");
-  const slides = [
-    ...orderedDestaques(data).slice(0, 6).map(item => ({
-      id: item.id, title: item.titulo, description: item.feitoDestaque || item.noticia,
-      image: item.imagem || item.egresso?.foto || Graduation,
-      link: "/destaques/" + item.id,
-      label: "Conhecer esta história", name: item.egresso?.nome, highlight: true,
-    })),
-    ...introductions,
-  ];
+  const stories = useCollection("/api/coordenadores/destaque/listar");
+  const community = useCollection("/api/consultas/listar/egressos");
+  const testimonials = useCollection(depoimentosPath("", 3));
+  const content = useMemo(() => homeContent({ destaques: stories.data, egressos: community.data, depoimentos: testimonials.data }), [stories.data, community.data, testimonials.data]);
+  const details = useDirectoryDetails(content.people.map(person => person.id_egresso));
 
   return (
     <>
       <Banner />
       <Container className={styles.home}>
-        <nav className={styles.shortcuts} aria-label="Explore o portal">
-          {shortcuts.map(({ to, icon, title, text }) => {
-            const Icon = icon;
-            return (
-            <Link to={to} className={styles.shortcut} key={to}>
-              <span className={styles.shortcutIcon}><Icon aria-hidden="true" /></span>
-              <div><h2>{title}</h2><p>{text}</p></div><FaArrowRight aria-hidden="true" />
-            </Link>
-            );
-          })}
-        </nav>
-        <section className={styles.section} aria-labelledby="community-title">
+        <section id="home-stories" className={styles.section} aria-labelledby="stories-title">
           <div className={styles.sectionHeader}>
-            <div><p className={styles.eyebrow}>Histórias que aproximam</p><h2 id="community-title">Descubra a comunidade.</h2></div>
+            <div><p className={styles.eyebrow}>Histórias que inspiram</p><h2 id="stories-title">Conquistas da comunidade.</h2><p className={styles.sectionDescription}>Publicações da coordenação, começando pelas mais recentes.</p></div>
             <Link to="/destaques" className={styles.textLink}>Todos os destaques <FaArrowRight aria-hidden="true" /></Link>
           </div>
-          <Swiper key={slides.map(slide => slide.id).join("-")} className={styles.carousel}
-            modules={[Navigation, Pagination, Scrollbar, Keyboard, A11y]} slidesPerView={1} spaceBetween={24}
-            navigation pagination={{ clickable: true }} scrollbar={{ draggable: true }} keyboard={{ enabled: true }}
-            a11y={{ prevSlideMessage: "História anterior", nextSlideMessage: "Próxima história", paginationBulletMessage: "Ir para a história {{index}}", slideLabelMessage: "{{index}} de {{slidesLength}}" }}>
-            {slides.map(slide => (
-              <SwiperSlide key={slide.id}>
-                <article className={styles.slide}>
-                  <Photo src={slide.image} fallback={Graduation} alt={slide.name || ""} className={styles.slideImage} />
-                  <div className={styles.slideBody}>
-                    <p className={styles.eyebrow}>{slide.highlight ? "Egresso em destaque" : "Explore o portal"}</p>
-                    <h3>{slide.title}</h3>
-                    {slide.name && <p className={styles.name}>{slide.name}</p>}
-                    <p className={styles.slideDescription}>{slide.description}</p>
-                    <Link to={slide.link} className={styles.textLink}>{slide.label} <FaArrowRight aria-hidden="true" /></Link>
-                  </div>
-                </article>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-          {loading && <p className={styles.status} role="status">Buscando os destaques da comunidade…</p>}
-          {error && <Notice variant="warning" title="Os destaques não puderam ser carregados">
-            <p>{error}</p><button type="button" className={styles.retry} onClick={retry}>Tentar novamente</button>
-          </Notice>}
-          {!loading && !error && data.length === 0 && <p className={styles.status}>Ainda não há destaques publicados. Explore a comunidade pelos cartões acima.</p>}
+          {stories.loading ? <LoadingState label="Buscando os destaques da comunidade…" /> : stories.error ? <ErrorState title="Os destaques não puderam ser carregados" description={stories.error} onRetry={stories.retry} /> : !content.stories.length ? (
+            <EmptyState title="As próximas conquistas terão espaço aqui" description="Ainda não há destaques publicados. Conheça as pessoas que já fazem parte do portal." action={<Link to="/egressos/listar" className={styles.textLink}>Explorar a comunidade <FaArrowRight aria-hidden="true" /></Link>} />
+          ) : (
+            <Swiper key={content.stories.map(story => story.id).join("-")} className={styles.carousel}
+              modules={[Navigation, Pagination, Scrollbar, Keyboard, A11y]} slidesPerView={1} spaceBetween={24}
+              navigation pagination={{ clickable: true }} scrollbar={{ draggable: true }} keyboard={{ enabled: true, onlyInViewport: true }} autoHeight watchOverflow
+              role="region" aria-label="Histórias em destaque" aria-roledescription="carrossel"
+              a11y={{ prevSlideMessage: "História anterior", nextSlideMessage: "Próxima história", paginationBulletMessage: "Ir para a história {{index}}", slideLabelMessage: "{{index}} de {{slidesLength}}" }}>
+              {content.stories.map(story => <SwiperSlide key={story.id}><DestaqueCard destaque={story} featured headingLevel={3} /></SwiperSlide>)}
+            </Swiper>
+          )}
         </section>
-        <section className={styles.section} aria-labelledby="directory-title">
+        <section id="home-community" className={styles.section} aria-labelledby="community-title">
           <div className={styles.sectionHeader}>
-            <div><p className={styles.eyebrow}>Encontre novas conexões</p><h2 id="directory-title">Formação e trajetórias.</h2></div>
-            <div role="tablist" aria-label="Consultar diretório" className={styles.tabs}>
-              {["cursos", "egressos"].map(value => (
-                <button key={value} role="tab" id={"tab-" + value} type="button" aria-selected={tab === value}
-                  aria-controls={"panel-" + value} tabIndex={tab === value ? 0 : -1}
-                  onClick={() => setTab(value)} onKeyDown={event => {
-                    if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
-                      event.preventDefault();
-                      const next = event.key === "Home" ? "cursos" : event.key === "End" ? "egressos" : tab === "cursos" ? "egressos" : "cursos";
-                      setTab(next); document.getElementById("tab-" + next)?.focus();
-                    }
-                  }}>{value === "cursos" ? "Cursos" : "Egressos"}</button>
-              ))}
-            </div>
+            <div><p className={styles.eyebrow}>Pessoas e trajetórias</p><h2 id="community-title">Conheça quem faz parte.</h2><p className={styles.sectionDescription}>Uma amostra da comunidade, organizada por nome.</p></div>
+            <Link to="/egressos/listar" className={styles.textLink}>Explorar todos os egressos <FaArrowRight aria-hidden="true" /></Link>
           </div>
-          <div id={"panel-" + tab} role="tabpanel" aria-labelledby={"tab-" + tab} tabIndex={0}>
-            {tab === "cursos" ? <TableCursos /> : <TableEgressos />}
-          </div>
+          {community.loading ? <LoadingState label="Buscando pessoas da comunidade…" /> : community.error ? <ErrorState title="Não foi possível consultar a comunidade" description={community.error} onRetry={community.retry} /> : !content.people.length ? (
+            <EmptyState title="A comunidade começa com uma história" description="Os perfis aparecerão aqui quando forem cadastrados no portal." action={<Link to="/edit-egresso" className={styles.textLink}>Cadastrar meu perfil <FaArrowRight aria-hidden="true" /></Link>} />
+          ) : <>
+            {details.loading && <p className={styles.status} role="status">Buscando formação e experiência dos perfis…</p>}
+            {details.hasErrors && <Notice variant="warning" className={styles.notice} title="Alguns detalhes estão indisponíveis"><p>Você pode abrir os perfis ou tentar carregar as formações e experiências novamente.</p><Button variant="secondary" onClick={details.retry}>Tentar carregar detalhes</Button></Notice>}
+            <div className={styles.peopleGrid}>{content.people.map(person => <EgressoCard key={person.id_egresso} egresso={person} details={details.entries[person.id_egresso]} loading={details.loading} directory="/egressos/listar" headingLevel={3} />)}</div>
+          </>}
         </section>
-        <section className={styles.join}>
-          <div><p className={styles.eyebrow}>Faça parte desta história</p><h2>O próximo capítulo<br />pode ser o seu.</h2><p>Compartilhe seu percurso e mantenha viva a conexão com a comunidade.</p></div>
+        <section id="home-testimonials" className={styles.section} aria-labelledby="testimonials-title">
+          <div className={styles.sectionHeader}>
+            <div><p className={styles.eyebrow}>Em suas próprias palavras</p><h2 id="testimonials-title">Vozes da comunidade.</h2><p className={styles.sectionDescription}>Memórias e aprendizados nos depoimentos mais recentes.</p></div>
+            <Link to="/egressos/depoimentos" className={styles.textLink}>Ler todos os depoimentos <FaArrowRight aria-hidden="true" /></Link>
+          </div>
+          {testimonials.loading ? <LoadingState label="Buscando depoimentos…" /> : testimonials.error ? <ErrorState title="Os depoimentos não puderam ser carregados" description={testimonials.error} onRetry={testimonials.retry} /> : !content.testimonials.length ? (
+            <EmptyState title="Há espaço para novas memórias" description="Os depoimentos publicados pelos egressos serão apresentados nesta seção." action={<Link to="/egressos/depoimentos" className={styles.textLink}>Conhecer a página de depoimentos <FaArrowRight aria-hidden="true" /></Link>} />
+          ) : <div className={styles.testimonialsGrid}>{content.testimonials.map(item => <DepoimentoCard key={item.id_depoimento} depoimento={item} headingLevel={3} />)}</div>}
+        </section>
+        <section className={styles.section} aria-labelledby="explore-title">
+          <div className={styles.sectionHeader}><div><p className={styles.eyebrow}>Continue a descoberta</p><h2 id="explore-title">Encontre seu caminho no portal.</h2></div><Link to="/proposta" className={styles.textLink}>Conhecer a proposta <FaArrowRight aria-hidden="true" /></Link></div>
+          <nav className={styles.shortcuts} aria-label="Explore o portal">
+            {shortcuts.map(({ to, icon, title, text }) => {
+              const Icon = icon;
+              return <Link to={to} className={styles.shortcut} key={to}><span className={styles.shortcutIcon}><Icon aria-hidden="true" /></span><div><h3>{title}</h3><p>{text}</p></div><FaArrowRight aria-hidden="true" /></Link>;
+            })}
+          </nav>
+        </section>
+        <section className={styles.join} aria-labelledby="join-title">
+          <div><p className={styles.eyebrow}>Faça parte desta história</p><h2 id="join-title">O próximo capítulo<br />pode ser o seu.</h2><p>Cadastre seu perfil, registre sua formação e compartilhe experiências com a comunidade.</p></div>
           <Link to="/edit-egresso">Cadastrar meu perfil <FaArrowRight aria-hidden="true" /></Link>
         </section>
       </Container>

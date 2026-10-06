@@ -1,0 +1,38 @@
+.eyebrow { color: var(--color-accent-hover); font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .75rem; }
+.link { display: inline-flex; align-items: center; gap: .75rem; min-height: var(--control-height); color: var(--color-accent-hover); font-size: .875rem; font-weight: 700; }
+.link:hover { text-decoration: underline; }
+.mission { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: center; padding: clamp(1.5rem, 4vw, 3rem); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); }
+.mission h2, .heading h2 { color: var(--color-brand); font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -.035em; }
+.mission > div > p:last-child { color: var(--color-text-muted); margin-top: 1rem; max-width: 60ch; }
+.summary { border-left: 3px solid var(--color-accent); padding: 1.5rem; background: var(--color-surface-muted); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+.summary span { color: var(--color-accent-hover); font-weight: 700; font-size: .875rem; }
+.summary p { color: var(--color-brand); margin-top: .75rem; line-height: 1.85; }
+.section { margin-top: 3rem; }
+.heading { margin-bottom: 1.5rem; }
+.heading > p:last-child:not(.eyebrow) { color: var(--color-text-muted); margin-top: .75rem; }
+.journeys { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
+.journey { display: flex; flex-direction: column; align-items: start; gap: .75rem; padding: 1.5rem; min-width: 0; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow-wrap: anywhere; }
+.icon { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: var(--radius-md); color: var(--color-accent-hover); background: var(--color-surface-muted); margin-bottom: .5rem; }
+.audience { color: var(--color-accent-hover); font-size: .8125rem; font-weight: 700; }
+.journey h3 { color: var(--color-brand); font-size: 1.25rem; }
+.journey > p:not(.audience) { color: var(--color-text-muted); }
+.journey ol { display: grid; gap: .75rem; padding-left: 1.25rem; color: var(--color-text-muted); font-size: .875rem; margin-block: .5rem; }
+.journey li::marker { color: var(--color-accent-hover); font-weight: 700; }
+.journey .link { margin-top: auto; padding-top: .5rem; }
+.records { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }
+.records article { padding-left: 1.25rem; border-left: 2px solid var(--color-border); }
+.records svg { color: var(--color-accent); font-size: 1.25rem; margin-bottom: .75rem; }
+.records h3 { color: var(--color-brand); font-size: 1.125rem; margin-bottom: .5rem; }
+.records p { color: var(--color-text-muted); }
+.questions { max-width: 54rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); overflow: hidden; }
+.questions details + details { border-top: 1px solid var(--color-border); }
+.questions summary { padding: 1.25rem 1.5rem; min-height: var(--control-height); font-weight: 650; color: var(--color-brand); cursor: pointer; }
+.questions details[open] summary { color: var(--color-accent-hover); }
+.questions details p { padding: 0 1.5rem 1.5rem; color: var(--color-text-muted); }
+.callout { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem; padding: clamp(1.5rem, 4vw, 3rem); margin-top: 3rem; border-radius: var(--radius-xl); background: var(--color-brand); color: white; }
+.callout h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: .75rem; }
+.callout p { color: #d1e1ec; max-width: 55ch; }
+.callout a { display: inline-flex; align-items: center; gap: .75rem; min-height: var(--control-height); padding: .75rem 1.25rem; background: white; color: var(--color-brand); border-radius: var(--radius-md); font-weight: 700; font-size: .875rem; }
+.callout a:focus-visible { outline-color: white; }
+@media (max-width: 64rem) { .journeys { grid-template-columns: minmax(0, 1fr); } .journey ol { gap: .5rem; } }
+@media (max-width: 48rem) { .mission, .records { grid-template-columns: minmax(0, 1fr); } .section, .callout { margin-top: 2.5rem; } }

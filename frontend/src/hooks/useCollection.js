@@ -5,24 +5,24 @@ import { errorMessage } from "../utils/presentation.js";
 import { getCollection } from "../services/collections.js";
 
 export default function useCollection(path) {
-  const [state, setState] = useState({ data: [], loading: true, error: "" });
+  const [state, setState] = useState({ key: "", data: [], loading: true, error: "" });
   const [revision, setRevision] = useState(0);
+  const key = path + ":" + revision;
 
   useEffect(() => {
     const controller = new AbortController();
-    setState({ data: [], loading: true, error: "" });
     const get = async url => (await axios.get(API_URL + url, { signal: controller.signal })).data;
     getCollection(get, path)
       .then(data => {
-        if (!controller.signal.aborted) setState({ data, loading: false, error: "" });
+        if (!controller.signal.aborted) setState({ key, data, loading: false, error: "" });
       })
       .catch(error => {
         if (!controller.signal.aborted) {
-          setState({ data: [], loading: false, error: errorMessage(error) });
+          setState({ key, data: [], loading: false, error: errorMessage(error) });
         }
       });
     return () => controller.abort();
-  }, [path, revision]);
+  }, [path, key]);
 
-  return { ...state, retry: () => setRevision(value => value + 1) };
+  return { ...(state.key === key ? state : { data: [], loading: true, error: "" }), retry: () => setRevision(value => value + 1) };
 }

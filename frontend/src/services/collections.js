@@ -8,6 +8,9 @@ const emptyMessages = {
   "/api/consultas/listar/egressos/cargo": ["Não há egressos cadastrados.", "Não há cargos cadastrados.", "Não há egressos com o cargo informado."],
   "/api/consultas/listar/egressos/ano_inicio": ["Não há egressos cadastrados.", "Não há egressos para o ano informado."],
   "/api/consultas/listar/egressos/ano_fim": ["Não há egressos cadastrados.", "Não há egressos para o ano informado."],
+  "/api/consultas/listar/depoimentos": "Não há depoimentos cadastrados.",
+  "/api/consultas/listar/depoimentos/limite": "Não há depoimentos cadastrados.",
+  "/api/consultas/listar/depoimentos/ano": ["Não há depoimentos cadastrados.", "Não há depoimentos para o ano informado."],
 };
 
 export async function getCollection(get, path) {

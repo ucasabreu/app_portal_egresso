@@ -4,7 +4,8 @@ import Photo from "./Photo";
 import { cardFormation, cardExperience, trajectoryPeriod } from "../../utils/egressoDirectory.js";
 import styles from "./EgressoCard.module.css";
 
-export default function EgressoCard({ egresso, details, loading, directory }) {
+export default function EgressoCard({ egresso, details, loading, directory, headingLevel = 2 }) {
+  const Heading = "h" + headingLevel;
   const formation = cardFormation(details?.cursos);
   const experience = cardExperience(details?.cargos);
   const missing = section => loading ? "Carregando…" : details?.errors[section] ? "Informação indisponível" : "Não informada";
@@ -12,7 +13,7 @@ export default function EgressoCard({ egresso, details, loading, directory }) {
     <article className={styles.card}>
       <header className={styles.identity}>
         <Photo src={egresso.foto} alt="" width={80} height={80} className={styles.avatar} />
-        <div><p className={styles.eyebrow}>Comunidade de egressos</p><h2>{egresso.nome || "Egresso"}</h2></div>
+        <div><p className={styles.eyebrow}>Comunidade de egressos</p><Heading className={styles.name}>{egresso.nome || "Egresso"}</Heading></div>
       </header>
       <p className={styles.description}>{egresso.descricao || "Conheça a formação e as experiências deste egresso."}</p>
       <dl className={styles.details}>

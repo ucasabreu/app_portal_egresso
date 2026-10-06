@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "test": "node --test tests/egresso-filters.test.js tests/dashboard.test.js tests/public-stories.test.js tests/egressos-directory.test.js",
+    "test": "node --test tests/egresso-filters.test.js tests/dashboard.test.js tests/public-stories.test.js tests/egressos-directory.test.js tests/public-entry.test.js",
     "preview": "vite preview"
   },
   "dependencies": {
