@@ -72,3 +72,16 @@ test("sessão expirada informa a interface sem disparar o evento para login inv�
     assert.equal(expired, 1);
   } finally { events.removeEventListener("portal:session-expired", listener); }
 });
+
+test("sair da conta usa o endpoint de sessão com cookies e token CSRF", async () => {
+  axios.defaults.adapter = async config => {
+    calls.push(config);
+    return response(config, config.url === "/api/auth/csrf" ? { token: "token-de-saida" } : {});
+  };
+  await axios.post("/api/auth/logout");
+  const logout = calls.filter(config => config.url === "/api/auth/logout");
+  assert.equal(logout.length, 1);
+  assert.equal(logout[0].method, "post");
+  assert.equal(logout[0].withCredentials, true);
+  assert.equal(logout[0].headers.get("X-CSRF-TOKEN"), "token-de-saida");
+});

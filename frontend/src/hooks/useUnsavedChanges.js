@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useBlocker } from "react-router-dom";
 
 export default function useUnsavedChanges(dirty, pending = false) {
@@ -12,5 +12,7 @@ export default function useUnsavedChanges(dirty, pending = false) {
   }, [dirty, pending]);
   const { state, reset } = blocker;
   useEffect(() => { if (!dirty && !pending && state === "blocked") reset?.(); }, [dirty, pending, state, reset]);
-  return { ...blocker, release: () => { released.current = true; } };
+  const release = useCallback(() => { released.current = true; }, []);
+  const retain = useCallback(() => { released.current = false; }, []);
+  return { ...blocker, release, retain };
 }

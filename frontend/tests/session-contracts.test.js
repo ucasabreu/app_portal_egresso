@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { accountPath, canEditProfile } from "../src/auth/AuthContext.js";
+import { accountPath, canEditProfile, loginDestination } from "../src/auth/AuthContext.js";
 import { readPage } from "../src/services/pagination.js";
 import { loadDashboardSummary } from "../src/services/dashboard.js";
 
@@ -66,4 +66,12 @@ test("falha do resumo agregado recupera seções independentes sem ocultar erros
   assert.equal(result.coordenador, dashboard.coordenador);
   assert.deepEqual(result.cursos, []);
   assert.equal(result.sections.destaques, "Publicações indisponíveis");
+});
+
+test("login retorna apenas ao perfil próprio e preserva o destino por papel", () => {
+  const egresso = { id: 7, role: "egresso" };
+  assert.equal(loginDestination(egresso, "/edit-egresso/7"), "/edit-egresso/7");
+  for (const target of ["/edit-egresso/8", "https://example.test", "//example.test", "/coordenador_geral/1"]) assert.equal(loginDestination(egresso, target), "/egresso/7");
+  assert.equal(loginDestination({ id: 2, role: "coordenador" }, "/egresso/7"), "/coordenador/2");
+  assert.equal(loginDestination({ id: 1, role: "geral" }, "/edit-egresso/7"), "/coordenador_geral/1");
 });

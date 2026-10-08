@@ -1,12 +1,13 @@
 import { lazy, Suspense, useEffect } from "react";
-import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Outlet, Link, useLocation } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Outlet, useLocation } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Global from "./styles/Global";
-import PageShell from "./components/ui/PageShell";
 import LoadingState from "./components/feedback/LoadingState";
 import AuthProvider from "./auth/AuthProvider";
+import SessionExitProvider from "./auth/SessionExitProvider";
 import ProtectedRoute from "./auth/ProtectedRoute";
+const NotFound = lazy(() => import("./pages/NotFound/NotFound"));
 const Egresso = lazy(() => import("./pages/Egresso/Egresso"));
 const EditEgresso = lazy(() => import("./pages/Egresso/EditEgresso"));
 const EgressoView = lazy(() => import("./pages/Egresso/EgressoView"));
@@ -28,7 +29,7 @@ function RouteScroll() {
 }
 
 function PublicLayout() {
-  return <div className="app-shell"><Header /><main id="main-content" tabIndex={-1}><Suspense fallback={<LoadingState label="Carregando página…" />}><Outlet /></Suspense></main><Footer /></div>;
+  return <SessionExitProvider><div className="app-shell"><Header /><main id="main-content" tabIndex={-1}><Suspense fallback={<LoadingState label="Carregando página…" />}><Outlet /></Suspense></main><Footer /></div></SessionExitProvider>;
 }
 
 function RootLayout() {
@@ -49,8 +50,7 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path="/destaques" element={<Destaques />} />
       <Route path="/destaques/:id" element={<DestaquePublicacao />} />
       <Route path="/egresso/:id/destaques" element={<EgressoDestaque />} />
-      <Route path="*" element={<PageShell eyebrow="Página não encontrada" title="Vamos encontrar o caminho."
-        description="O endereço acessado não está disponível. Volte ao portal para continuar."><Link to="/">Voltar ao início →</Link></PageShell>} />
+      <Route path="*" element={<NotFound />} />
     </Route>
     <Route path="/login" element={<LoginCoordenador />} />
     <Route path="/coordenador/:id" element={<ProtectedRoute role="coordenador" />}><Route index element={<Coordenador />} /></Route>

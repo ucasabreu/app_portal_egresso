@@ -34,7 +34,7 @@ export default function AuthProvider({ children }) {
     resetCsrf(); setUser(data); setError(""); return data;
   }, []);
   const logout = useCallback(async () => {
-    sessionRequest.current?.abort();
+    sessionRequest.current?.abort(); setLoading(false);
     await axios.post(API_URL + "/api/auth/logout"); resetCsrf(); setUser(null); setLoading(false); setError("");
   }, []);
   const value = useMemo(() => ({ user, loading, error, refresh, login, register, logout }), [user, loading, error, refresh, login, register, logout]);
