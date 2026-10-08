@@ -1,5 +1,7 @@
 # Portal de Egressos
 
+![Portal de Egressos — portfólio full stack para conectar formação e trajetória profissional](docs/images/capa.svg)
+
 **Formação, trajetórias e conquistas em uma comunidade conectada.**
 
 Aplicação web para aproximar a comunidade acadêmica de seus egressos. Reúne perfis
