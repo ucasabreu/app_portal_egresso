@@ -1,27 +1,17 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import SmallRght from "../../assets/small-right.svg";
-import "../Banner/styles.css";
-import Button from "../Button/Button";
+import { Link } from "react-router-dom";
+import { FaArrowRight } from "react-icons/fa";
+import Graduation from "../../assets/graduation.jpg";
+import Container from "../ui/Container";
+import PageBanner from "../ui/PageBanner";
+import styles from "./Banner.module.css";
 
-const Banner = () => {
-  const navigate = useNavigate();
-  return (
-    <div className="container-banner">
-      <div className="text-banner">
-        <h2>
-          Conectando Histórias e Construindo Futuro
-        </h2>
-        <p>
-          O site Portal Egressos tem como objetivo manter o vínculo entre a instituição e seus ex-alunos, promovendo a troca de experiências, o acompanhamento das trajetórias profissionais e a oferta de oportunidades de qualificação e networking. Além disso, busca fortalecer a comunidade acadêmica, valorizar conquistas e facilitar a integração dos egressos ao mercado de trabalho e aos projetos institucionais.
-        </p>
-        <Button onClick={() => navigate("/proposta")}>O que é o Portal Egressos? 
-          <img src={SmallRght} alt="seta" />
-          
-        </Button>
-      </div>
-    </div>
-  );
+export default function Banner({ statistics = [] }) {
+  return <section aria-labelledby="home-title"><Container>
+    <PageBanner variant="home" titleId="home-title" eyebrow="Universidade Federal do Maranhão" title={<>A formação conecta.<br />As histórias inspiram.</>}
+      description="Um espaço para acompanhar e valorizar as trajetórias de quem passou pela universidade. Reencontre pessoas, descubra conquistas e compartilhe sua história."
+      image={Graduation} imageAlt="Formandos reunidos na celebração da graduação" caption={<>Além do diploma,<br />um vínculo para a vida.</>}
+      actions={<><Link to="/egressos/listar" className={styles.primary}>Explorar a comunidade <FaArrowRight aria-hidden="true" /></Link><Link to="/edit-egresso" className={styles.secondary}>Cadastrar meu perfil</Link></>}>
+      {statistics.length > 0 && <dl className={styles.statistics} aria-label="A comunidade em números">{statistics.map(({ label, value }) => <div key={label}><dt>{label}</dt><dd>{value.toLocaleString("pt-BR")}</dd></div>)}</dl>}
+    </PageBanner>
+  </Container></section>;
 }
-
-export default Banner;

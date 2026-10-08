@@ -48,14 +48,20 @@ trap 'exit 143' TERM HUP
 if ((REINSTALL)); then "${COMPOSE[@]}" build --no-cache; fi
 STARTED=1
 "${COMPOSE[@]}" up --build -d --wait --wait-timeout 240
-printf '\nPortal: http://localhost:5173\nContas: admin.demo ou coord.demo / senha demo123\nCtrl+C encerra os serviços e preserva os dados.\n'
+FRONTEND_ADDRESS=$("${COMPOSE[@]}" port frontend 80)
+if [[ ! "$FRONTEND_ADDRESS" =~ ^127\.0\.0\.1:([0-9]+)$ ]]; then
+  printf 'Não foi possível identificar a porta publicada do frontend. Consulte docker compose ps.\n' >&2
+  exit 1
+fi
+PORTAL_URL="http://localhost:${BASH_REMATCH[1]}"
+printf '\nPortal: %s\nContas: admin.demo ou coord.demo / senha demo123\nCtrl+C encerra os serviços e preserva os dados.\n' "$PORTAL_URL"
 if ((NO_BROWSER == 0)); then
   if command -v powershell.exe >/dev/null; then
-    powershell.exe -NoProfile -NonInteractive -Command "Start-Process 'http://localhost:5173'" >/dev/null 2>&1 || true
+    powershell.exe -NoProfile -NonInteractive -Command "Start-Process '$PORTAL_URL'" >/dev/null 2>&1 || true
   elif command -v xdg-open >/dev/null; then
-    xdg-open 'http://localhost:5173' >/dev/null 2>&1 || true
+    xdg-open "$PORTAL_URL" >/dev/null 2>&1 || true
   elif command -v open >/dev/null; then
-    open 'http://localhost:5173' >/dev/null 2>&1 || true
+    open "$PORTAL_URL" >/dev/null 2>&1 || true
   fi
 fi
 "${COMPOSE[@]}" logs --follow

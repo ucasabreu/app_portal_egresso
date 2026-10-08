@@ -23,6 +23,8 @@ with (root / 'calls').open('a') as stream:
     stream.write(json.dumps(args) + '\n')
 if args == ['info']:
     sys.exit(1 if os.environ.get('TEST_DAEMON_FAIL') else 0)
+if 'port' in args:
+    print('127.0.0.1:' + os.environ.get('TEST_FRONTEND_PORT', '5173'))
 if 'up' in args:
     if os.environ.get('TEST_UP_FAIL'):
         sys.exit(1)
@@ -102,6 +104,23 @@ class DemoLauncherTests(unittest.TestCase):
         os.killpg(process.pid, signal.SIGINT)
         self.assertEqual(process.wait(timeout=10), 130)
         self.assertIn('stop', self.calls()[-1])
+        self.assertFalse(any('down' in call or '--volumes' in call for call in self.calls()))
+
+    def test_custom_port_is_reported_and_keeps_volume_on_exit(self):
+        process = subprocess.Popen(['bash', str(self.root / 'iniciar.sh'), '--no-browser'],
+                                   cwd='/tmp', env=self.env | {'TEST_FRONTEND_PORT': '5180'},
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                                   start_new_session=True)
+        self.processes.append(process)
+        deadline = time.monotonic() + 5
+        while not (self.root / 'following').exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        self.assertTrue((self.root / 'following').exists())
+        os.killpg(process.pid, signal.SIGINT)
+        output, errors = process.communicate(timeout=10)
+        self.assertEqual(process.returncode, 130, errors)
+        self.assertIn('Portal: http://localhost:5180', output)
+        self.assertTrue(any(call[-3:] == ['port', 'frontend', '80'] for call in self.calls()))
         self.assertFalse(any('down' in call or '--volumes' in call for call in self.calls()))
 
     def test_reinstall_builds_without_cache(self):

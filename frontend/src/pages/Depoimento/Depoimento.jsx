@@ -1,128 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import './Depoimento.css'; // Importa o arquivo CSS
-import SmallRght from "../../assets/small-right.svg";
-import Button from '../../components/Button/Button';
-import axios from 'axios'; // Importa axios para requisições HTTP
-import { API_URL } from '../../config/config.js'; // Importa a URL base da API
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import useCollection from "../../hooks/useCollection";
+import { orderedDepoimentos, depoimentoYear, depoimentosPath } from "../../utils/depoimentos.js";
+import Container from "../../components/ui/Container";
+import EditorialHeader from "../../components/ui/EditorialHeader";
+import DepoimentoCard from "../../components/ui/DepoimentoCard";
+import CopyLink from "../../components/ui/CopyLink";
+import Field from "../../components/ui/Field";
+import Button from "../../components/Button/Button";
+import LoadingState from "../../components/feedback/LoadingState";
+import ErrorState from "../../components/feedback/ErrorState";
+import EmptyState from "../../components/feedback/EmptyState";
+import styles from "./Depoimento.module.css";
 
+export default function Depoimento() {
+  const [params, setParams] = useSearchParams();
+  const search = params.toString();
+  const applied = depoimentoYear(params.get("ano"));
+  const canonical = applied ? new URLSearchParams({ ano: applied }).toString() : "";
+  const [year, setYear] = useState(applied);
+  const [yearError, setYearError] = useState("");
+  const { data, loading, error, retry } = useCollection(depoimentosPath(applied));
+  const items = useMemo(() => orderedDepoimentos(data), [data]);
+  const path = "/egressos/depoimentos" + (canonical ? "?" + canonical : "");
 
-const Depoimento = () => {
-    const [testimonials, setTestimonials] = useState([]); // Inicializa o estado para armazenar depoimentos
-    const [searchYear, setSearchYear] = useState(''); // Estado para armazenar o ano de pesquisa
-    const [loading, setLoading] = useState(false); // Estado para indicar carregamento
-    const [error, setError] = useState(null); // Estado para armazenar erros
+  useEffect(() => { setYear(applied); setYearError(""); }, [applied]);
+  useEffect(() => {
+    if (search !== canonical) setParams(canonical, { replace: true });
+  }, [search, canonical, setParams]);
+  const reset = () => { setYear(""); setYearError(""); setParams({}); };
+  const filterYear = event => {
+    event.preventDefault();
+    const value = depoimentoYear(year);
+    if (year.trim() && !value) {
+      setYearError("Informe um ano inteiro entre 1900 e 2100.");
+      event.currentTarget.elements.namedItem("ano")?.focus();
+      return;
+    }
+    setYearError("");
+    setParams(value ? { ano: value } : {});
+  };
 
-    const history = useNavigate(); // Initialize useNavigate
-
-    useEffect(() => {
-        // Busca dados do banco de dados
-        const fetchTestimonials = async () => {
-            setLoading(true);
-            try {
-                const response = await axios.get(API_URL + '/api/consultas/listar/depoimentos'); // Busca depoimentos da API
-                setTestimonials(response.data); // Atualiza o estado com os dados buscados
-                setError(null); // Limpa o erro se a requisição for bem-sucedida
-            } catch (error) {
-                handleApiError(error); // Define o erro no estado
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchTestimonials(); // Chama a função para buscar depoimentos
-    }, []); // Array de dependências vazio significa que este efeito roda uma vez após a renderização inicial
-
-
-    const handleProfileClick = (graduateId) => {
-        history(`/egresso_view/${graduateId}`); // Navega para a página de perfil do graduado
-    };
-
-    const handleSearchKeyPress = async (event) => {
-        if (event.key === 'Enter') {
-            const year = event.target.value;
-            setSearchYear(year);
-
-            if (year) {
-                setLoading(true);
-                try {
-                    const response = await axios.get(`${API_URL}/api/consultas/listar/depoimentos/ano?ano=${year}`);
-                    setTestimonials(response.data);
-                    setError(null); // Limpa o erro se a requisição for bem-sucedida
-                } catch (error) {
-                    handleApiError(error); // Define o erro no estado
-                } finally {
-                    setLoading(false);
-                }
-            } else {
-                // Fetch all testimonials if search input is cleared
-                setLoading(true);
-                try {
-                    const response = await axios.get(API_URL + '/api/consultas/listar/depoimentos');
-                    setTestimonials(response.data);
-                    setError(null); // Limpa o erro se a requisição for bem-sucedida
-                } catch (error) {
-                    handleApiError(error); // Define o erro no estado
-                } finally {
-                    setLoading(false);
-                }
-            }
-        }
-    };
-
-    const handleApiError = (error) => {
-        console.error('Erro ao buscar depoimentos!', error);
-        if (error.response) {
-            setError(`Erro: ${error.response.data.message || error.response.data || 'Erro ao carregar depoimentos.'}`);
-        } else if (error.request) {
-            setError('Erro: Sem resposta do servidor.');
-        } else {
-            setError('Erro: Falha na requisição.');
-        }
-        setTestimonials([]);
-    };
-
-    return (
-        <div className="depoimento-page">
-            <header className='header_depoimento'>
-                <h1>Depoimentos dos Egressos</h1>
-                <input
-                    type="text"
-                    placeholder="Pesquisar por ano..."
-                    value={searchYear}
-                    onChange={(e) => setSearchYear(e.target.value)}
-                    onKeyPress={handleSearchKeyPress}
-                    className="search-input"
-                />
-            </header>
-            <div className='container_central'>
-                {loading ? (
-                    <p className="loading">Carregando...</p>
-                ) : error ? (
-                    <p className="error-message">{error}</p>
-                ) : testimonials.length > 0 ? (
-                    testimonials.map(testimonial => (
-                        <div key={testimonial.id_depoimento} className="testimonial">
-                            <img src={testimonial.egresso.foto || 'default-image-path.jpg'} alt={testimonial.egresso.nome} className="graduate-photo" />
-                            <h2>{testimonial.egresso.nome}</h2> {/* Nome do egresso */}
-                            <p className="posting-date">{testimonial.data ? new Date(testimonial.data).toLocaleDateString('pt-BR') : "Data não informada"}</p>
-                            <p>{testimonial.texto}</p>
-
-                            <div className='profile-button'>
-                                <Button className="profile-button" onClick={() => handleProfileClick(testimonial.egresso.id_egresso)}>
-                                    Ver Perfil
-                                    <img src={SmallRght} alt="seta" />
-                                </Button>
-                            </div>
-
-                        </div>
-                    ))
-                ) : (
-                    <p className="no-results">Nenhum depoimento encontrado.</p>
-                )}
-            </div>
+  return (
+    <Container className={styles.page}>
+      <EditorialHeader breadcrumb={[{ label: "Início", to: "/" }, { label: "Depoimentos" }]} eyebrow="Vozes da comunidade" title="Experiências que atravessam gerações." description="Memórias, aprendizados e novos caminhos, contados pelos próprios egressos. Leia os relatos e conheça as pessoas por trás de cada história." actions={<CopyLink key={path} path={path} />} />
+      <form className={styles.toolbar} onSubmit={filterYear} noValidate aria-label="Filtrar depoimentos por ano">
+        <Field label="Ano de publicação" name="ano" type="text" inputMode="numeric" placeholder="Ex.: 2024" value={year} error={yearError} onChange={event => { setYear(event.target.value); setYearError(""); }} hint="Ano inteiro entre 1900 e 2100. Deixe em branco para ler todos os anos." />
+        <div className={styles.actions}><Button type="submit">Buscar depoimentos</Button><Button variant="secondary" onClick={reset}>Mostrar todos</Button></div>
+      </form>
+      <section aria-labelledby="testimonials-title" aria-busy={loading}>
+        <div className={styles.heading}>
+          <div><h2 id="testimonials-title">{applied ? `Relatos publicados em ${applied}` : "Memórias compartilhadas"}</h2><p>Do mais recente ao mais antigo. Expanda os textos longos para continuar a leitura.</p></div>
+          <p className={styles.count} role="status">{loading ? "Buscando depoimentos…" : error ? "Consulta indisponível" : `${items.length} ${items.length === 1 ? "depoimento encontrado" : "depoimentos encontrados"}`}</p>
         </div>
-    );
-};
-
-export default Depoimento;
+        {loading ? <LoadingState label="Carregando os relatos da comunidade…" /> : error ? <ErrorState description={error} onRetry={retry} /> : !items.length ? (
+          <EmptyState title={applied ? `Nenhum depoimento publicado em ${applied}` : "As primeiras memórias ainda serão compartilhadas"} description={applied ? "Experimente outro ano ou consulte todos os depoimentos." : "Os relatos aparecerão aqui quando forem registrados pelos egressos em seus perfis."} action={applied ? <Button variant="secondary" onClick={reset}>Consultar todos os anos</Button> : undefined} />
+        ) : <div className={styles.grid}>{items.map(item => <DepoimentoCard key={item.id_depoimento} depoimento={item} headingLevel={3} />)}</div>}
+      </section>
+    </Container>
+  );
+}

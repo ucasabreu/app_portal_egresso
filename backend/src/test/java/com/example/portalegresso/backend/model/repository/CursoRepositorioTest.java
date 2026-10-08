@@ -33,7 +33,7 @@ public class CursoRepositorioTest {
         Coordenador coordenador = Coordenador.builder()
                                .login("Mathias.Jose")
                                .senha("1234")
-                               .tipo("coordenadortipoteste")
+                               .tipo("coordenador")
                                .build();
 
         Coordenador coordenadorSalvo = coordenadorService.salvar(coordenador);

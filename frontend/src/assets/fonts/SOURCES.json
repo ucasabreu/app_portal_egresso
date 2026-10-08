@@ -1,0 +1,36 @@
+{
+  "fonts": [
+    {
+      "family": "Inter",
+      "file": "inter-latin-wght-normal.woff2",
+      "source_repository": "fontsource/font-files",
+      "source_path": "fonts/variable/inter/files/inter-latin-wght-normal.woff2",
+      "upstream_project": "https://github.com/rsms/inter",
+      "source_blob_sha": "d15208de03cd1ad7c5199f0a0ce915fe841e4722",
+      "sha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62",
+      "bytes": 48256,
+      "license": "SIL Open Font License 1.1",
+      "license_file": "LICENSE-inter.txt",
+      "subset": "latin",
+      "style": "normal",
+      "weight_range": "100 900",
+      "license_public_url": "/licenses/fonts/LICENSE-inter.txt"
+    },
+    {
+      "family": "Playfair Display",
+      "file": "playfair-display-latin-wght-normal.woff2",
+      "source_repository": "fontsource/font-files",
+      "source_path": "fonts/variable/playfair-display/files/playfair-display-latin-wght-normal.woff2",
+      "upstream_project": "https://github.com/clauseggers/Playfair-Display",
+      "source_blob_sha": "5a3fbbdae8f66414a2754017de622f3c74c536b0",
+      "sha256": "e0c764a8e9e1cce92163c55bac4b2ad6cd4cf8c696ce2289ab5c41565e65b7e2",
+      "bytes": 38404,
+      "license": "SIL Open Font License 1.1",
+      "license_file": "LICENSE-playfair-display.txt",
+      "subset": "latin",
+      "style": "normal",
+      "weight_range": "400 900",
+      "license_public_url": "/licenses/fonts/LICENSE-playfair-display.txt"
+    }
+  ]
+}

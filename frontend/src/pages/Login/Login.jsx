@@ -1,115 +1,77 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Hook para redirecionamento
-import "./Login.css";
-import { API_URL } from "../../config/config.js";
+import { useEffect, useRef, useState } from "react";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { FaArrowLeft, FaArrowRight, FaEye, FaEyeSlash } from "react-icons/fa";
+import { useAuth, loginDestination } from "../../auth/AuthContext.js";
+import { errorMessage } from "../../utils/presentation.js";
+import { focusFirstError } from "../../utils/management.js";
+import LoadingState from "../../components/feedback/LoadingState";
+import ErrorState from "../../components/feedback/ErrorState";
+import LogoImg from "../../assets/ufmalogo.png";
 import Button from "../../components/Button/Button.jsx";
+import Container from "../../components/ui/Container";
+import Field from "../../components/ui/Field";
+import Notice from "../../components/feedback/Notice";
+import styles from "./Login.module.css";
 
-
-const LoginCoordenador = () => {
+export default function Login() {
+  const auth = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [login, setLogin] = useState("");
   const [senha, setSenha] = useState("");
-  const [tipo, setTipo] = useState("coordenador");
   const [error, setError] = useState("");
-  const [isCadastro, setIsCadastro] = useState(false);
-
-  const navigate = useNavigate(); // Hook para navegação
-
-  const handleAuth = async (e) => {
-    e.preventDefault();
-    setError("");
-
+  const [fieldErrors, setFieldErrors] = useState({});
+  const form = useRef(null);
+  const focusError = useRef(false);
+  const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const errorRef = useRef(null);
+  const pending = useRef(false);
+  useEffect(() => { if (error) errorRef.current?.focus(); }, [error]);
+  useEffect(() => { const active = Object.fromEntries(Object.entries(fieldErrors).filter(([, message]) => message)); if (focusError.current && Object.keys(active).length) { focusError.current = false; focusFirstError(form.current, active); } }, [fieldErrors]);
+  const submit = async event => {
+    event.preventDefault();
+    if (pending.current || auth.loading) return;
+    const errors = {};
+    if (!login.trim()) errors.login = "Informe seu login ou e-mail.";
+    if (!senha.trim()) errors.senha = "Informe sua senha.";
+    setFieldErrors(errors);
+    if (Object.keys(errors).length) { focusError.current = true; return; }
+    pending.current = true; setBusy(true); setError("");
     try {
-      if (isCadastro) {
-        // Cadastro de coordenador
-        await axios.post(`${API_URL}/api/coordenadores/salvar/coordenador`, {
-          login,
-          senha,
-          tipo,
-        });
-        alert("Cadastro realizado com sucesso! Faça login.");
-        setIsCadastro(false);
-      } else {
-        // Buscar coordenador pelo login e senha
-        const response = await axios.get(`${API_URL}/api/coordenadores/buscar/coordenador`, {
-          params: { login, senha },
-        });
-        const { id_coordenador: idCoordenador, tipo } = response.data;
-
-        alert("Login bem-sucedido!");
-
-        // Verificar o tipo do coordenador e redirecionar
-        if (tipo === "geral") {
-          navigate(`/coordenador_geral/${idCoordenador}`);
-        } else {
-          navigate(`/coordenador/${idCoordenador}`);
-        }
-      }
-    } catch (err) {
-      // ✅ Atualizado para tratar as mensagens de validação do backend
-      if (err.response?.data) {
-        const data = err.response.data;
-        if (typeof data === 'object' && !Array.isArray(data)) {
-          const messages = Object.values(data).join(' | ');
-          setError(messages);
-        } else if (typeof data === 'string') {
-          setError(data);
-        } else {
-          setError("Erro ao processar a solicitação.");
-        }
-      } else {
-        setError("Erro ao processar a solicitação.");
-      }
-    }
+      const user = await auth.login({ login: login.trim(), senha });
+      setSenha("");
+      navigate(loginDestination(user, location.state?.returnTo), { replace: true });
+    } catch (error) { setError(errorMessage(error)); }
+    finally { pending.current = false; setBusy(false); }
   };
-
+  if (!auth.loading && auth.user) return <Navigate to={loginDestination(auth.user, location.state?.returnTo)} replace />;
   return (
-    <div className="container_login">
-      <div className="login">
-        <form className="login-form" onSubmit={handleAuth}>
-          <h2>{isCadastro ? "Cadastro de Coordenador" : "Login de Coordenador"}</h2>
-          {isCadastro && (
-            <p className="login-rules">
-              O login deve conter entre 4 e 20 caracteres e pode incluir apenas letras, números, pontos ou underline (_).
-            </p>
-          )}
-
-          {error && (
-            <div className="error-box">
-              <p className="error-text">⚠️ {error}</p>
+    <main id="main-content" tabIndex={-1} className={styles.page}>
+      <Container className={styles.container}>
+        <Link to="/" className={styles.back}><FaArrowLeft aria-hidden="true" /> Voltar ao portal</Link>
+        <div className={styles.layout}>
+          <section className={styles.story} aria-labelledby="portal-story-title">
+            <Link to="/" className={styles.brand}><span className={styles.logo}><img src={LogoImg} alt="UFMA" width={1080} height={1080} decoding="async" /></span><span>Portal de Egressos<small>Comunidade acadêmica</small></span></Link>
+            <div className={styles.storyContent}>
+              <p className={styles.eyebrow}>Vínculos que continuam</p><h2 id="portal-story-title" className={styles.storyTitle}>Sua trajetória continua conectada.</h2><p className={styles.storyDescription}>Atualize seu perfil, compartilhe experiências e acompanhe as conquistas da comunidade.</p>
+              <ul className={styles.features}><li><span aria-hidden="true">01</span>Perfis e trajetórias dos egressos</li><li><span aria-hidden="true">02</span>Conquistas e experiências compartilhadas</li><li><span aria-hidden="true">03</span>Gestão de cursos e publicações</li></ul>
             </div>
-          )}
-          <input
-            type="text"
-            placeholder="Login"
-            value={login}
-            onChange={(e) => setLogin(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Senha"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required
-          />
-          {isCadastro && (
-            <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
-              <option value="coordenador">Coordenador</option>
-              <option value="geral">Coordenador Geral</option>
-            </select>
-          )}
-          <div className="login-button">
-            <Button type="submit">{isCadastro ? "Cadastrar" : "Login"}</Button>
-          </div>
-
-          <p className="toggle-text" onClick={() => setIsCadastro(!isCadastro)}>
-            {isCadastro ? "Já tem uma conta? Faça login!" : "Não tem uma conta? Cadastre-se!"}
-          </p>
-        </form>
-      </div>
-    </div>
+          </section>
+          <section className={styles.access} aria-labelledby="login-title">
+            <header className={styles.intro}><p className={styles.accessEyebrow}>Acesso ao portal</p><h1 id="login-title" className={styles.title}>Bem-vindo de volta</h1><p className={styles.description}>Use seu e-mail de egresso ou login de coordenação para acessar sua área.</p></header>
+            {auth.loading ? <LoadingState label="Verificando sua sessão…" /> : auth.error ? <ErrorState description={auth.error} onRetry={auth.refresh} /> : <form ref={form} className={styles.form} onSubmit={submit} noValidate aria-busy={busy}>
+              {error && <Notice variant="error" ref={errorRef} tabIndex={-1}><p>{error}</p></Notice>}
+              <Field label="Login ou e-mail" name="login" autoComplete="username" autoCapitalize="none" spellCheck={false} value={login} error={fieldErrors.login} onChange={event => { setLogin(event.target.value); setFieldErrors(value => ({ ...value, login: "" })); }} placeholder="Seu login ou e-mail" maxLength={254} disabled={busy} required />
+              <Field id="portal-password" label="Senha" name="senha" type={showPassword ? "text" : "password"} autoComplete="current-password" value={senha} error={fieldErrors.senha} onChange={event => { setSenha(event.target.value); setFieldErrors(value => ({ ...value, senha: "" })); }} maxLength={128} disabled={busy} required
+                labelAction={<Button variant="ghost" className={styles.passwordToggle} onClick={() => setShowPassword(value => !value)} aria-controls="portal-password" aria-pressed={showPassword} disabled={busy}>{showPassword ? <FaEyeSlash aria-hidden="true" /> : <FaEye aria-hidden="true" />}{showPassword ? "Ocultar senha" : "Mostrar senha"}</Button>} />
+              <Button type="submit" className={styles.submit} loading={busy} loadingLabel="Entrando…">Entrar no portal <FaArrowRight aria-hidden="true" /></Button>
+            </form>}
+            <div className={styles.switchMode}><p>Ainda não possui um perfil?</p><Link to="/edit-egresso">Cadastrar meu perfil de egresso</Link><p>Contas de coordenação são cadastradas pela coordenação geral.</p></div>
+          </section>
+        </div>
+        <p className={styles.footer}>Portal de Egressos · Formação, comunidade e trajetória</p>
+      </Container>
+    </main>
   );
-};
-
-export default LoginCoordenador;
+}

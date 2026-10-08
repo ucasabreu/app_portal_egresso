@@ -22,13 +22,21 @@ public class Egresso {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id_egresso;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @Column(name = "senha", length = 255)
+    private String senha;
+
+    public Egresso(Integer id, String nome, String email, String descricao, String foto, String linkedin, String instagram, String curriculo) {
+        this(id, null, nome, email, descricao, foto, linkedin, instagram, curriculo);
+    }
+
     @NotBlank(message = "O nome é obrigatório")
     @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s]+$", message = "O nome deve conter apenas letras e espaços")
     @Column(name = "nome")
     private String nome;
 
     @Email(message = "Email inválido")
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "descricao", columnDefinition = "TEXT")

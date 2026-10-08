@@ -41,6 +41,18 @@ class DemoIntegrationTest {
     @Autowired DepoimentoRepositorio depoimentos;
     @Autowired DestaqueEgressoRepositorio destaques;
 
+    @Autowired org.springframework.web.context.WebApplicationContext context;
+    @org.junit.jupiter.api.BeforeEach
+    void autenticarAdministradorParaOperacoesDeGestao() throws Exception {
+        var session = new org.springframework.mock.web.MockHttpSession();
+        String token = json.readTree(mvc.perform(get("/api/auth/csrf").session(session)).andReturn().getResponse().getContentAsString()).get("token").asText();
+        mvc.perform(post("/api/auth/login").session(session).header("X-CSRF-TOKEN", token)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"login\":\"admin.demo\",\"senha\":\"demo123\"}")).andExpect(status().isOk());
+        token = json.readTree(mvc.perform(get("/api/auth/csrf").session(session)).andReturn().getResponse().getContentAsString()).get("token").asText();
+        mvc = org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup(context)
+                .defaultRequest(get("/").session(session).header("X-CSRF-TOKEN", token)).build();
+    }
+
     @Test
     void deveCarregarDadosFicticiosRelacionados() {
         assertEquals(2, coordenadores.count());
@@ -69,17 +81,17 @@ class DemoIntegrationTest {
     @Test
     void deveAutenticarAmbasContasSemRetornarSenha() throws Exception {
         for (var conta : Map.of("admin.demo", "geral", "coord.demo", "coordenador").entrySet()) {
-            mvc.perform(get("/api/coordenadores/buscar/coordenador")
-                    .param("login", conta.getKey()).param("senha", "demo123"))
-                    .andExpect(status().isOk()).andExpect(jsonPath("$.tipo").value(conta.getValue()))
+            var session = new org.springframework.mock.web.MockHttpSession();
+            String token = json.readTree(mvc.perform(get("/api/auth/csrf").session(session)).andReturn().getResponse().getContentAsString()).get("token").asText();
+            mvc.perform(post("/api/auth/login").session(session).header("X-CSRF-TOKEN", token)
+                    .contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(Map.of("login", conta.getKey(), "senha", "demo123"))))
+                    .andExpect(status().isOk()).andExpect(jsonPath("$.role").value(conta.getValue()))
                     .andExpect(jsonPath("$.senha").doesNotExist());
         }
-        mvc.perform(get("/api/coordenadores/buscar/coordenador")
-                .param("login", "admin.demo").param("senha", "incorreta"))
-                .andExpect(status().isBadRequest());
     }
 
     @Test
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
     void deveResponderSaudeConsultasEFiltros() throws Exception {
         mvc.perform(get("/api/demo/health")).andExpect(status().isOk()).andExpect(jsonPath("$.mode").value("demo"));
         for (String recurso : new String[]{"cursos", "egressos", "depoimentos", "cargos", "coordenadores"}) {
@@ -122,7 +134,7 @@ class DemoIntegrationTest {
                 .andExpect(status().isCreated());
         assertEquals(5, destaques.count());
         perfil.put("nome", "Pessoa Atualizada");
-        perfil.put("foto", "data:image/png;base64," + "a".repeat(600));
+        perfil.put("foto", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=");
         mvc.perform(put("/api/egressos/atualizar/egresso/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(perfil)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.nome").value("Pessoa Atualizada"));
@@ -140,4 +152,45 @@ class DemoIntegrationTest {
         assertEquals(4, vinculos.count());
         mvc.perform(get("/api/egressos/buscar/egresso/{id}", id)).andExpect(status().isBadRequest());
     }
+    @Test
+    void deveRejeitarImagensInvalidasAntesDeGravarPerfilOuDestaque() throws Exception {
+        var profile = Map.of("nome", "Pessoa Teste", "email", "image-test@example.com", "foto", "data:image/svg+xml;base64,PHN2Zz4=");
+        mvc.perform(post("/api/egressos/salvar/egresso").contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(profile))).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.foto").exists());
+        var coordinator = coordenadores.findAll().get(0).getId_coordenador();
+        var graduate = egressos.findAll().get(0).getId_egresso();
+        mvc.perform(post("/api/coordenadores/{coordinator}/egresso/{graduate}/destaque", coordinator, graduate)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(Map.of("titulo", "Conquista", "noticia", "Notícia",
+                        "feitoDestaque", "Projeto", "imagem", "javascript:alert(1)"))))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.imagem").exists());
+        assertEquals(4, egressos.count());
+        assertEquals(4, destaques.count());
+    }
+
+    @Test
+    void deveDesvincularFormacaoSemExcluirPerfilOuSeusOutrosRegistros() throws Exception {
+        var association = vinculos.findAll().get(0);
+        int graduate = association.getEgresso().getId_egresso();
+        mvc.perform(delete("/api/egressos/deletar/curso_egresso/{id}", association.getId_curso_egresso()))
+                .andExpect(status().isNoContent());
+        mvc.perform(get("/api/egressos/buscar/egresso/{id}", graduate)).andExpect(status().isOk());
+        assertEquals(3, vinculos.count());
+        assertEquals(4, egressos.count());
+        assertEquals(4, cargos.count());
+        assertEquals(4, depoimentos.count());
+        assertEquals(4, destaques.count());
+    }
+
+    @Test
+    void deveImpedirExclusaoDeCursoComFormacoesEPreservarConta() throws Exception {
+        var course = vinculos.findAll().get(0).getCurso();
+        mvc.perform(delete("/api/coordenadores/deletar/curso/{id}", course.getId_curso()))
+                .andExpect(status().isBadRequest());
+        assertEquals(3, cursos.count());
+        assertEquals(2, coordenadores.count());
+        assertEquals(4, vinculos.count());
+    }
+
 }

@@ -35,6 +35,7 @@ jobs:
         run: |
           npm ci --include=optional
           npm run lint
+          npm test
           npm run build
       - name: Iniciar demonstração com PostgreSQL
         run: docker compose up --build -d --wait --wait-timeout 240

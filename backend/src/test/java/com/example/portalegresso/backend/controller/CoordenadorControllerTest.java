@@ -73,7 +73,7 @@ public class CoordenadorControllerTest {
     public void testSalvarCoordenador() throws Exception {
         when(coordenadorService.salvar(any(Coordenador.class))).thenReturn(coordenador);
 
-        CoordenadorDTO dto = new CoordenadorDTO("admin", "1234", "coordenador");
+        CoordenadorDTO dto = new CoordenadorDTO("admin", "senhaSegura123", "coordenador");
 
         mockMvc.perform(post("/api/coordenadores/salvar/coordenador")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -87,7 +87,7 @@ public class CoordenadorControllerTest {
     public void testSalvarCoordenadorFalha() throws Exception {
         when(coordenadorService.salvar(any(Coordenador.class))).thenThrow(new RegraNegocioRunTime("Login já existe"));
 
-        CoordenadorDTO dto = new CoordenadorDTO("admin", "1234", "coordenador");
+        CoordenadorDTO dto = new CoordenadorDTO("admin", "senhaSegura123", "coordenador");
 
         mockMvc.perform(post("/api/coordenadores/salvar/coordenador")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -96,32 +96,12 @@ public class CoordenadorControllerTest {
                 .andExpect(content().string("Login já existe"));
     }
 
-    // Sucesso - Autenticação
     @Test
-    public void testAutenticarCoordenador() throws Exception {
-        when(coordenadorService.efetuarLogin("admin", "1234")).thenReturn(true);
-    
-        CoordenadorDTO dto = new CoordenadorDTO("admin", "1234", "coordenador");
-    
+    public void deveDesativarAutenticacaoLegadaSemCriarSessao() throws Exception {
         mockMvc.perform(post("/api/coordenadores/autenticar/coordenador")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
-    }
-
-    // Falha - Autenticação inválida
-    @Test
-    public void testAutenticarCoordenadorFalha() throws Exception {
-        doThrow(new RegraNegocioRunTime("Login ou senha inválidos"))
-                .when(coordenadorService).efetuarLogin("admin", "wrong");
-
-        CoordenadorDTO dto = new CoordenadorDTO("admin", "wrong", "coordenador");
-
-        mockMvc.perform(post("/api/coordenadores/autenticar/coordenador")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Login ou senha inválidos"));
+                .contentType(MediaType.APPLICATION_JSON).content("{\"login\":\"admin\",\"senha\":\"1234\"}"))
+                .andExpect(status().isGone());
+        verifyNoInteractions(coordenadorService);
     }
 
     // Sucesso - Salvar curso

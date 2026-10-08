@@ -1,282 +1,105 @@
-import React, { useState, useEffect } from "react";
-import DataTable from "react-data-table-component";
-import axios from "axios";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import "./CoordenadorGeral.css";
+import axios from "axios";
 import { API_URL } from "../../config/config.js";
+import useDashboard from "../../hooks/useDashboard";
+import useMutation from "../../hooks/useMutation";
+import useUnsavedChanges from "../../hooks/useUnsavedChanges.js";
+import { sameId } from "../../services/dashboard.js";
+import { courseErrors, matchesSearch, focusFirstError } from "../../utils/management.js";
+import CoordinatorForm from "../../components/ui/CoordinatorForm";
+import AdminShell from "../../components/ui/AdminShell";
+import Field from "../../components/ui/Field";
+import Select from "../../components/ui/Select";
+import ConfirmDialog from "../../components/ui/ConfirmDialog";
+import UnsavedChangesDialog from "../../components/ui/UnsavedChangesDialog";
+import Button from "../../components/Button/Button";
+import PortalTable from "../../components/Table/PortalTable";
+import LoadingState from "../../components/feedback/LoadingState";
+import ErrorState from "../../components/feedback/ErrorState";
+import Notice from "../../components/feedback/Notice";
+import styles from "./Dashboard.module.css";
 
-const CoordenadorGeral = () => {
+const empty = { nome: "", nivel: "", id_coordenador: "" };
+export default function CoordenadorGeral() {
   const { id } = useParams();
-  const [coordenadorGeral, setCoordenadorGeral] = useState(null);
-  const [coordenadores, setCoordenadores] = useState([]);
-  const [cursos, setCursos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [newCurso, setNewCurso] = useState({ nome: "", nivel: "", id_coordenador: "" });
-  const [error, setError] = useState(null);
-  const [restErrors, setRestErrors] = useState([]);          // Erros do RestControllerAdvice
-  const [formErrorMessage, setFormErrorMessage] = useState(""); // Regras de negócio ou validação
-  const [errorMessage, setErrorMessage] = useState("");      // Erros inesperados ou genéricos
-
-
-  useEffect(() => { fetchCoordenadorGeral(); }, [id]);
-
-  const fetchCoordenadorGeral = async () => {
-    if (!id) {
-      alert("Erro: ID do coordenador geral não encontrado.");
-      setLoading(false);
-      return;
-    }
-    try {
-      const response = await axios.get(`${API_URL}/api/coordenadores/buscar/coordenador/${id}`);
-      setCoordenadorGeral(response.data);
-      fetchCoordenadoresECursos(response.data.id_coordenador);
-    } catch (error) {
-      console.error("Erro ao buscar coordenador geral:", error);
-      setError(error.response ? error.response.data : "Erro ao buscar dados do coordenador geral.");
-      setLoading(false);
-    }
+  const dashboard = useDashboard(id, true);
+  const { busy, notice, run } = useMutation();
+  const [accountState, setAccountState] = useState({ dirty: false, busy: false });
+  const [editingId, setEditingId] = useState(null);
+  const [course, setCourse] = useState(empty);
+  const [confirmation, setConfirmation] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [clear, setClear] = useState(false);
+  const [review, setReview] = useState(false);
+  const [courseQuery, setCourseQuery] = useState("");
+  const [coordinatorQuery, setCoordinatorQuery] = useState("");
+  const [responsibleId, setResponsibleId] = useState("");
+  const form = useRef(null);
+  const focusError = useRef(false);
+  useEffect(() => { if (focusError.current && !review && Object.keys(errors).length) { focusError.current = false; focusFirstError(form.current, errors); } }, [review, errors]);
+  const blocker = useUnsavedChanges(Object.values(course).some(Boolean) || accountState.dirty, busy || accountState.busy);
+  const coordinator = course => course.coordenador?.login || responsibleAccounts.find(person => sameId(person.id_coordenador, course.coordenador?.id_coordenador))?.login || "Responsável não informado";
+  const responsibleAccounts = [dashboard.coordenador, ...dashboard.coordenadores].filter(Boolean);
+  const courses = dashboard.cursos.filter(course => (!responsibleId || sameId(course.coordenador?.id_coordenador, responsibleId)) && matchesSearch(courseQuery, course.nome, course.nivel, coordinator(course)));
+  const coordinators = dashboard.coordenadores.filter(person => matchesSearch(coordinatorQuery, person.login, person.tipo));
+  const update = event => { setCourse(value => ({ ...value, [event.target.name]: event.target.value })); setErrors(value => ({ ...value, [event.target.name]: "" })); setReview(false); };
+  const save = async event => {
+    event.preventDefault();
+    if (busy || accountState.busy || dashboard.loading || dashboard.sections.coordenadores) return;
+    const next = courseErrors(course, responsibleAccounts);
+    setErrors(next);
+    if (Object.keys(next).length) { focusError.current = true; setReview(false); return; }
+    if (!review) { setReview(true); return; }
+    if (await run(() => editingId ? axios.put(API_URL + "/api/coordenadores/atualizar/curso/" + editingId, course) : axios.post(API_URL + "/api/coordenadores/salvar/curso", course), editingId ? "Curso atualizado com sucesso." : "Curso cadastrado com sucesso.", dashboard.reload)) { setCourse(empty); setEditingId(null); setReview(false); }
   };
-
-  const fetchCoordenadoresECursos = async (idCoordenadorGeral) => {
-    try {
-      const responseCoordenadores = await axios.get(`${API_URL}/api/consultas/listar/coordenadores`);
-      const responseCursos = await axios.get(`${API_URL}/api/consultas/listar/cursos`);
-
-      const listaCoordenadores = responseCoordenadores.data.filter(coord => coord.id_coordenador !== idCoordenadorGeral);
-      setCoordenadores(listaCoordenadores);
-      setCursos(responseCursos.data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Erro ao buscar dados:", error);
-      setError(error.response ? error.response.data : "Erro ao buscar coordenadores e cursos.");
-      setLoading(false);
-    }
+  const remove = async () => {
+    if (!confirmation || busy || accountState.busy) return;
+    if (await run(() => axios.delete(API_URL + confirmation.path), confirmation.success, dashboard.reload)) setConfirmation(null);
   };
-
-  const getCursosPorCoordenador = (idCoordenador) => {
-    return cursos.filter(curso => curso.coordenador.id_coordenador === idCoordenador);
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewCurso({ ...newCurso, [name]: value });
-  };
-
-  const validateCurso = () => {
-    if (!newCurso.nome || !newCurso.nivel || !newCurso.id_coordenador) {
-      setFormErrorMessage("Por favor, preencha todos os campos obrigatórios.");
-      return false;
-    }
-    return true;
-  };
-
-  const handleSaveCurso = async () => {
-    setRestErrors([]);
-    setFormErrorMessage("");
-    setErrorMessage("");
-
-    if (!validateCurso()) {
-      setFormErrorMessage("Por favor, preencha todos os campos obrigatórios.");
-      return;
-    }
-
-    try {
-      await axios.post(`${API_URL}/api/coordenadores/salvar/curso`, newCurso);
-      alert("Curso salvo com sucesso!");
-      fetchCoordenadoresECursos(coordenadorGeral.id_coordenador);
-      setNewCurso({ nome: "", nivel: "", id_coordenador: "" });
-    } catch (error) {
-      console.error("Erro ao salvar curso:", error);
-      if (error.response?.data) {
-        const data = error.response.data;
-        if (typeof data === 'object' && !Array.isArray(data)) {
-          // RestControllerAdvice JSON
-          setRestErrors(Object.values(data));
-        } else if (typeof data === 'string') {
-          // Regra de negócio ou string simples
-          setFormErrorMessage(data);
-        } else {
-          setErrorMessage("Erro inesperado. Tente novamente.");
-        }
-      } else {
-        setErrorMessage("Erro inesperado. Tente novamente.");
-      }
-    }
-  };
-
-  const deleteCoordenador = async (idCoordenador) => {
-    try {
-      await axios.delete(`${API_URL}/api/coordenadores/deletar/coordenador/${idCoordenador}`);
-      alert("Coordenador deletado com sucesso.");
-      fetchCoordenadoresECursos(coordenadorGeral.id_coordenador);
-    } catch (error) {
-      console.error("Erro ao deletar coordenador:", error);
-      setError(error.response ? error.response.data : "Erro ao deletar coordenador.");
-    }
-  };
-
-  const deleteCurso = async (idCurso) => {
-    try {
-      await axios.delete(`${API_URL}/api/coordenadores/deletar/curso/${idCurso}`);
-      alert("Curso deletado com sucesso.");
-      fetchCoordenadoresECursos(coordenadorGeral.id_coordenador);
-    } catch (error) {
-      console.error("Erro ao deletar curso:", error);
-      setError(error.response ? error.response.data : "Erro ao deletar curso.");
-    }
-  };
-
-  const columnsCoordenadores = [
+  const courseColumns = [
+    { name: "Curso", selector: row => row.nome, sortable: true, wrap: true },
+    { name: "Nível", selector: row => row.nivel, sortable: true },
+    { name: "Responsável", selector: row => coordinator(row), sortable: true, wrap: true },
+    { name: "Ações", cell: row => <div className={styles.actions}><Button variant="secondary" disabled={busy || accountState.busy || Object.values(course).some(Boolean)} onClick={() => { setEditingId(row.id_curso); setCourse({ nome: row.nome, nivel: row.nivel, id_coordenador: String(row.coordenador?.id_coordenador || "") }); setErrors({}); setReview(false); document.getElementById("new-course")?.scrollIntoView({ block: "start" }); }}>Editar curso</Button><Button variant="ghost" disabled={busy || accountState.busy} onClick={() => setConfirmation({ path: "/api/coordenadores/deletar/curso/" + row.id_curso, description: `O curso “${row.nome}”, sob responsabilidade de ${coordinator(row)}, será excluído. Cursos com formações vinculadas precisam ser desvinculados antes da exclusão.`, success: "Curso excluído com sucesso." })}>Excluir curso</Button></div> },
+  ];
+  const coordinatorColumns = [
     { name: "Login", selector: row => row.login, sortable: true },
     { name: "Tipo", selector: row => row.tipo, sortable: true },
-    {
-      name: "Ações",
-      cell: (row) => (
-
-        <button onClick={() => deleteCoordenador(row.id_coordenador)} className="btn-delete">
-          Deletar
-        </button>
-
-
-      ),
-    },
+    { name: "Cursos", selector: row => dashboard.sections.cursos ? "Indisponível" : dashboard.cursos.filter(course => sameId(course.coordenador?.id_coordenador, row.id_coordenador)).length },
+    { name: "Ações", cell: row => <Button variant="ghost" disabled={busy || accountState.busy} onClick={() => setConfirmation({ path: "/api/coordenadores/deletar/coordenador/" + row.id_coordenador, description: `A conta de ${row.login} será excluída. O serviço também tenta remover os cursos desta conta; revise os cursos e suas formações antes de continuar.`, success: "Coordenador excluído com sucesso." })}>Excluir conta</Button> },
   ];
-
-  const columnsCursos = [
-    { name: "Nome", selector: row => row.nome, sortable: true },
-    { name: "Nível", selector: row => row.nivel, sortable: true },
-    {
-      name: "Ações",
-      cell: (row) => (
-        <button onClick={() => deleteCurso(row.id_curso)} className="btn-delete">
-          Deletar
-        </button>
-      ),
-    },
-  ];
-
   return (
-    <div className="container_coordenador_geral">
-      {loading ? (
-        <p className="loading">Carregando...</p>
-      ) : (
-        <>
-          {error && <p className="error">{error}</p>}
-          {coordenadorGeral && (
-            <h2 className="titulo">Coordenador Geral: {coordenadorGeral.login}</h2>
-          )}
-
-          <div className="container_manager_coordenadores">
-            <h3 className="subtitulo">Coordenadores Gerenciados</h3>
-            {coordenadores.length > 0 ? (
-              <DataTable
-                columns={columnsCoordenadores}
-                data={coordenadores.map(coord => ({
-                  ...coord,
-                  cursos: getCursosPorCoordenador(coord.id_coordenador),
-                }))}
-                expandableRows
-                expandableRowsComponent={({ data }) => (
-                  <div className="subtabela_cursos">
-                    <h4>Cursos Gerenciados:</h4>
-                    {data.cursos.length > 0 ? (
-                      <DataTable
-                        columns={columnsCursos}
-                        data={data.cursos}
-                        noHeader
-                        pagination={false}
-                        highlightOnHover
-                        striped
-                        className="tabela_cursos"
-                      />
-                    ) : (
-                      <p className="mensagem">Nenhum curso associado.</p>
-                    )}
-                  </div>
-                )}
-                pagination
-                highlightOnHover
-                striped
-                className="tabela_coordenadores"
-              />
-            ) : (
-              <p className="mensagem">Nenhum coordenador encontrado.</p>
-            )}
-          </div>
-
-          <div className="container_manager_cursos">
-            <h3 className="subtitulo">Adicionar Novo Curso</h3>
-            <form>
-
-              
-              {restErrors.length > 0 && (
-                <div className="error-message">
-                  {restErrors.map((err, index) => (
-                    <p key={index}>⚠️ <strong>Atenção:</strong> {err}</p>
-                  ))}
-                </div>
-              )}
-
-              {/* Exibir erro de regra ou textual */}
-              {formErrorMessage && (
-                <div className="error-message">
-                  ⚠️ <strong>Atenção:</strong> {formErrorMessage}
-                </div>
-              )}
-
-              {/* Exibir erro inesperado ou genérico */}
-              {errorMessage && (
-                <div className="error-message">
-                  ⚠️ <strong>Atenção:</strong> {errorMessage}
-                </div>
-              )}
-              
-
-              <div className="form-group">
-                <label>Nome:</label>
-                <input
-                  type="text"
-                  name="nome"
-                  value={newCurso.nome}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="form-group">
-                <label>Nível:</label>
-                <input
-                  type="text"
-                  name="nivel"
-                  value={newCurso.nivel}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="form-group">
-                <label>Coordenador:</label>
-                <select
-                  name="id_coordenador"
-                  value={newCurso.id_coordenador}
-                  onChange={handleInputChange}
-                >
-                  <option value="">Selecione um coordenador</option>
-                  {coordenadores.map(coord => (
-                    <option key={coord.id_coordenador} value={coord.id_coordenador}>
-                      {coord.login}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="container_buttons">
-                <button type="button" onClick={handleSaveCurso} className="btn-save">
-                  Salvar Curso
-                </button>
-              </div>
-
-            </form>
-          </div>
-        </>
-      )}
-    </div>
+    <AdminShell title="Gestão da comunidade" description="Gerencie as contas de coordenação e organize os cursos que conectam a formação dos egressos."
+      dirty={Object.values(course).some(Boolean) || accountState.dirty} pending={busy || accountState.busy} onExitConfirmed={blocker.release} onExitFailed={blocker.retain}
+      login={dashboard.coordenador?.login} sections={[["dashboard-summary", "Painel"], ["coordinators", "Coordenadores"], ["courses", "Todos os cursos"], ["new-course", "Cadastrar ou editar curso"], ["new-coordinator", "Cadastrar conta"]]}
+      stats={!dashboard.loading && !dashboard.error ? [["Outras contas de coordenação", dashboard.sections.coordenadores ? "Indisponível" : dashboard.coordenadores.length], ["Cursos cadastrados", dashboard.sections.cursos ? "Indisponível" : dashboard.cursos.length]] : undefined}>
+      {notice && <Notice variant={notice.variant} className={styles.notice}><p>{notice.text}</p></Notice>}
+      {dashboard.loading ? <LoadingState label="Carregando gestão do portal…" /> : dashboard.error ? <ErrorState description={dashboard.error} onRetry={dashboard.reload} /> : <div className={styles.sections}>
+        <section id="coordinators" className={styles.panel}><p className={styles.eyebrow}>Gestão de acesso</p><h2>Coordenadores</h2><p className={styles.sectionDescription}>Outras contas do portal. Expanda uma linha para consultar seus cursos.</p>{dashboard.sections.coordenadores ? <ErrorState description={dashboard.sections.coordenadores} onRetry={dashboard.reload} /> : <>
+          <Field label="Buscar contas de coordenação" name="buscaContas" type="search" value={coordinatorQuery} onChange={event => setCoordinatorQuery(event.target.value)} placeholder="Login ou tipo" /><p className={styles.count} role="status">{coordinators.length} de {dashboard.coordenadores.length} contas</p>
+          <div className={styles.table}><PortalTable key={coordinatorQuery} ariaLabel="Contas de coordenação" keyField="id_coordenador" columns={coordinatorColumns} data={coordinators} expandableRows paginationResetDefaultPage={!!coordinatorQuery}
+            expandableRowsComponent={({ data }) => <div className={styles.subsection}><h3>Cursos de {data.login}</h3>{dashboard.sections.cursos ? <ErrorState description={dashboard.sections.cursos} onRetry={dashboard.reload} /> : <PortalTable columns={courseColumns} data={dashboard.cursos.filter(course => sameId(course.coordenador?.id_coordenador, data.id_coordenador))} keyField="id_curso" pagination={false} />}</div>} /></div>
+        </>}</section>
+        <section id="courses" className={styles.panel}><p className={styles.eyebrow}>Organização acadêmica</p><h2>Cursos cadastrados</h2><p className={styles.sectionDescription}>Consulte os cursos e defina a conta responsável por cada formação.</p>{dashboard.sections.cursos ? <ErrorState description={dashboard.sections.cursos} onRetry={dashboard.reload} /> : <>
+          <div className={styles.filters}><Field label="Buscar cursos" name="buscaCursos" type="search" value={courseQuery} onChange={event => setCourseQuery(event.target.value)} placeholder="Nome, nível ou responsável" /><Field as={Select} label="Responsável pelo curso" name="responsavel" value={responsibleId} onChange={event => setResponsibleId(event.target.value)}><option value="">Todos os responsáveis</option>{[dashboard.coordenador, ...dashboard.coordenadores].filter(Boolean).map(person => <option key={person.id_coordenador} value={person.id_coordenador}>{person.login}</option>)}</Field><Button variant="secondary" onClick={() => { setCourseQuery(""); setResponsibleId(""); }}>Limpar pesquisa</Button></div>
+          <p className={styles.count} role="status">{courses.length} de {dashboard.cursos.length} cursos</p><div className={styles.table}><PortalTable key={courseQuery + ":" + responsibleId} ariaLabel="Cursos cadastrados" columns={courseColumns} data={courses} keyField="id_curso" paginationResetDefaultPage={!!courseQuery || !!responsibleId} /></div>
+        </>}</section>
+      </div>}
+      {!dashboard.loading && !dashboard.error && <section id="new-course" className={`${styles.panel} ${styles.composer}`}><p className={styles.eyebrow}>Gestão de formação</p><h2>{editingId ? "Editar curso" : "Cadastrar novo curso"}</h2><p className={styles.sectionDescription}>Confira o curso e seu responsável antes de confirmar.</p>
+        <form ref={form} className={styles.form} onSubmit={save} noValidate aria-busy={busy || accountState.busy}>
+          {review ? <><Notice title={editingId ? "Confira as alterações do curso" : "Confira o vínculo antes de cadastrar"}><p>O curso ficará associado à conta indicada abaixo.</p></Notice><dl className={styles.review}><div><dt>Curso</dt><dd>{course.nome}</dd></div><div><dt>Nível</dt><dd>{course.nivel}</dd></div><div><dt>Responsável</dt><dd>{responsibleAccounts.find(person => sameId(person.id_coordenador, course.id_coordenador))?.login}</dd></div></dl></> : <>
+            <div className={styles.columns}><Field label="Nome do curso" name="nome" value={course.nome} onChange={update} error={errors.nome} hint="Use letras e espaços." required disabled={busy || accountState.busy} /><Field label="Nível de formação" name="nivel" value={course.nivel} onChange={update} error={errors.nivel} placeholder="Ex.: Graduação" required disabled={busy || accountState.busy} /></div>
+            {dashboard.sections.coordenadores && <ErrorState description="Carregue as contas de coordenação para escolher o responsável pelo curso." onRetry={dashboard.reload} />}
+            <Field as={Select} label="Coordenador responsável" name="id_coordenador" value={course.id_coordenador} onChange={update} error={errors.id_coordenador} required disabled={busy || accountState.busy || !!dashboard.sections.coordenadores}><option value="">Selecione uma conta de coordenação</option>{responsibleAccounts.map(item => <option value={item.id_coordenador} key={item.id_coordenador}>{item.login}</option>)}</Field>
+          </>}
+          <div className={styles.actions}><Button type="submit" loading={busy} loadingLabel={editingId ? "Salvando…" : "Cadastrando…"} disabled={accountState.busy || !!dashboard.sections.coordenadores || !responsibleAccounts.length}>{review ? editingId ? "Salvar alterações" : "Cadastrar curso" : "Revisar curso"}</Button>{review && <Button variant="secondary" disabled={busy || accountState.busy} onClick={() => setReview(false)}>Continuar editando</Button>}<Button variant="secondary" disabled={busy || accountState.busy} onClick={() => setClear(true)}>Limpar campos</Button></div>
+        </form>
+      </section>}
+      <CoordinatorForm onSaved={dashboard.reload} onStateChange={setAccountState} disabled={busy || dashboard.loading || !!dashboard.error} />
+      <ConfirmDialog open={!!confirmation} error={notice?.variant === "error" ? notice.text : undefined} pending={busy || accountState.busy} description={confirmation?.description} onCancel={() => setConfirmation(null)} onConfirm={remove} />
+      <ConfirmDialog open={clear} pending={busy || accountState.busy} title="Limpar os dados do curso?" description="Os dados preenchidos ainda não foram cadastrados." confirmLabel="Limpar campos" onCancel={() => setClear(false)} onConfirm={() => { setCourse(empty); setEditingId(null); setErrors({}); setReview(false); setClear(false); }} />
+      <UnsavedChangesDialog blocker={blocker} pending={busy || accountState.busy} />
+    </AdminShell>
   );
-};
-
-export default CoordenadorGeral;
+}

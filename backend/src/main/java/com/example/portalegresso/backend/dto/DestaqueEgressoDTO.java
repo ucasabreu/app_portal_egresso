@@ -3,6 +3,7 @@ package com.example.portalegresso.backend.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import com.example.portalegresso.backend.validation.ImagemValida;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,8 +26,10 @@ public class DestaqueEgressoDTO {
     @NotBlank(message = "A noticia é obrigatório")
     private String noticia;
 
+    @ImagemValida
     private String imagem;
 
     @NotBlank(message = "O feito é obrigatório")
+    @Size(max = 255, message = "O feito deve ter no máximo 255 caracteres")
     private String feitoDestaque;
 }

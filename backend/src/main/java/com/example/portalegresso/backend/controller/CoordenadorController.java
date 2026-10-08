@@ -27,13 +27,15 @@ import com.example.portalegresso.backend.service.CoordenadorService;
 import com.example.portalegresso.backend.service.RegraNegocioRunTime;
 
 import jakarta.validation.Valid;
+import com.example.portalegresso.backend.auth.PortalAccess;
+import static com.example.portalegresso.backend.auth.PortalAccess.Policy.*;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/coordenadores")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+
 
 public class CoordenadorController {
 
@@ -48,7 +50,8 @@ public class CoordenadorController {
     }
 
     // POST
-    @PostMapping("/salvar/coordenador") // OK
+    @PostMapping("/salvar/coordenador")
+    @PortalAccess(ADMIN) // OK
     public ResponseEntity<?> salvar(@RequestBody @Valid CoordenadorDTO dto) {
         Coordenador coordenador = Coordenador.builder()
                 // .id_coordenador(dto.getId_coordenador())
@@ -65,17 +68,14 @@ public class CoordenadorController {
         }
     }
 
-    @PostMapping("/autenticar/coordenador") // ok
-    public ResponseEntity<?> autenticar(@RequestBody @Valid CoordenadorDTO dto) {
-        try {
-            coordenadorService.efetuarLogin(dto.getLogin(), dto.getSenha());
-            return ResponseEntity.ok(true);
-        } catch (RegraNegocioRunTime e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @PostMapping("/autenticar/coordenador")
+    @PortalAccess(PUBLIC) // ok
+    public ResponseEntity<?> autenticar(@RequestBody CoordenadorDTO dto) {
+        return ResponseEntity.status(HttpStatus.GONE).body("Use POST /api/auth/login para iniciar uma sessão.");
     }
 
     @PostMapping("/{id_coord}/egresso/{id_egresso}/destaque")
+    @PortalAccess(CREATE_HIGHLIGHT)
     public ResponseEntity<?> salvarDestaque(@PathVariable("id_egresso") Integer idEgresso,
             @PathVariable("id_coord") Integer idCoord, @RequestBody @Valid DestaqueEgressoDTO dto) {
         DestaqueEgresso destaque = DestaqueEgresso.builder()
@@ -96,7 +96,8 @@ public class CoordenadorController {
 
     }
 
-    @PostMapping("/salvar/curso") // ok
+    @PostMapping("/salvar/curso")
+    @PortalAccess(ADMIN) // ok
     public ResponseEntity<?> salvarCurso(@RequestBody @Valid CursoDTO dto) {
         Curso curso = Curso.builder()
                 .nome(dto.getNome())
@@ -114,18 +115,13 @@ public class CoordenadorController {
     }
 
     @GetMapping("/buscar/coordenador")
-    public ResponseEntity<?> buscarCoordenadorPorSenha(@RequestParam("login") String login,
-            @RequestParam("senha") String senha) {
-        try {
-            Coordenador coordenador = coordenadorService.buscarCoordenadorPorLoginESenha(login, senha);
-            return new ResponseEntity<>(coordenador, HttpStatus.OK);
-        } catch (RegraNegocioRunTime e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> buscarCoordenadorPorSenha() {
+        return ResponseEntity.status(HttpStatus.GONE).body("Use POST /api/auth/login. Credenciais não são aceitas na URL.");
     }
 
     // GET
     @GetMapping("/buscar/coordenador/{id}")
+    @PortalAccess(SELF_COORDINATOR)
     public ResponseEntity<?> buscarCoordenador(@PathVariable("id") Integer idCoordenador) {
         try {
             Coordenador coordenador = coordenadorService.buscarCoordenadorPorId(idCoordenador);
@@ -179,7 +175,8 @@ public class CoordenadorController {
     }
 
     // DELETE
-    @DeleteMapping("/deletar/coordenador/{id}") // ok
+    @DeleteMapping("/deletar/coordenador/{id}")
+    @PortalAccess(ADMIN_OTHER_COORDINATOR) // ok
     public ResponseEntity<?> remover(@PathVariable("id") Integer idCoordenador) {
         try {
             Coordenador coor = Coordenador.builder().id_coordenador(idCoordenador).build();
@@ -191,7 +188,8 @@ public class CoordenadorController {
 
     }
 
-    @DeleteMapping("/deletar/curso/{id}") // ok
+    @DeleteMapping("/deletar/curso/{id}")
+    @PortalAccess(ADMIN) // ok
     public ResponseEntity<?> removerCurso(@PathVariable("id") Integer idCurso) {
         try {
             Curso curso = Curso.builder().id_curso(idCurso).build();
@@ -203,6 +201,7 @@ public class CoordenadorController {
     }
 
     @DeleteMapping("/deletar/destaque/{id}")
+    @PortalAccess(HIGHLIGHT)
     public ResponseEntity<?> removerDestaque(@PathVariable("id") Long idDestaque) {
         try {
             DestaqueEgresso destaque = DestaqueEgresso.builder().id(idDestaque).build();

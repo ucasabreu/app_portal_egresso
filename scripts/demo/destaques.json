@@ -1,0 +1,50 @@
+[
+  {
+    "key": "api-comunidade",
+    "email": "ana@example.com",
+    "titulo": "Da universidade a uma API que conecta pessoas",
+    "feitoDestaque": "Exemplo fictício: uma API documentada e testada transforma um desafio acadêmico em uma solução para a comunidade.",
+    "noticia": "Conteúdo fictício de demonstração. Esta história foi criada para apresentar as telas do Portal de Egressos e não descreve uma conquista real.\n\n{nome} reuniu conhecimentos de programação, modelagem de dados e testes para imaginar uma API que conecta perfis, formações e experiências. O projeto de exemplo organiza regras de negócio em serviços e oferece respostas claras para quem utiliza a aplicação.\n\nAlém da implementação, o trabalho valorizou documentação, validações e colaboração. O percurso mostra como conhecimentos adquiridos na universidade podem se transformar em soluções compreensíveis, bem organizadas e próximas das necessidades das pessoas.",
+    "imagem": "/demo/destaques/api-comunidade.svg"
+  },
+  {
+    "key": "interfaces-acessiveis",
+    "email": "bruno@example.com",
+    "titulo": "Interfaces que aproximam a comunidade",
+    "feitoDestaque": "Exemplo fictício: uma interface responsiva facilita a descoberta de trajetórias e o acesso às informações do portal.",
+    "noticia": "Conteúdo fictício de demonstração. A pessoa e o projeto pertencem ao banco de exemplo do portal.\n\n{nome} explorou uma interface pensada para diferentes telas: cartões de pessoas, filtros compreensíveis e caminhos curtos entre uma publicação e o perfil de seu autor. A proposta considera também rótulos de formulário, navegação por teclado e mensagens de erro que ajudam a continuar a tarefa.\n\nO percurso destaca a contribuição do frontend para uma experiência consistente. Navegação clara, conteúdo legível e atenção aos diferentes dispositivos aproximam a comunidade e tornam as informações mais fáceis de encontrar.",
+    "imagem": "/demo/destaques/interfaces-acessiveis.svg"
+  },
+  {
+    "key": "dados-trajetorias",
+    "email": "carla@example.com",
+    "titulo": "Dados que ajudam a enxergar novos caminhos",
+    "feitoDestaque": "Exemplo fictício: visualizações organizam informações acadêmicas e tornam diferentes percursos mais fáceis de compreender.",
+    "noticia": "Conteúdo fictício de demonstração. Nenhum indicador ou resultado desta história representa dados reais de uma instituição.\n\n{nome} imaginou uma análise de percursos acadêmicos e experiências profissionais utilizando somente um conjunto de dados de exemplo. O trabalho começa pela organização das informações e pela distinção entre dados ausentes e consultas indisponíveis.\n\nAs visualizações propostas ajudam a interpretar diferentes caminhos sem reduzir as pessoas a números. O cuidado com a qualidade das informações e com a comunicação dos resultados é parte central dessa trajetória.",
+    "imagem": "/demo/destaques/dados-trajetorias.svg"
+  },
+  {
+    "key": "arquitetura-software",
+    "email": "diego@example.com",
+    "titulo": "Uma arquitetura preparada para crescer",
+    "feitoDestaque": "Exemplo fictício: organização do código, testes e integração contínua ajudam uma aplicação a evoluir com clareza.",
+    "noticia": "Conteúdo fictício de demonstração, criado exclusivamente para a apresentação do Portal de Egressos.\n\n{nome} estruturou um projeto de exemplo em camadas, separando entrada HTTP, regras de negócio e persistência. No frontend, componentes compartilhados e serviços de consulta permitem reutilizar comportamentos entre as telas.\n\nO percurso destaca decisões pequenas que tornam o desenvolvimento mais previsível: testes de validação, configuração por ambiente e instruções de execução reproduzíveis. A conquista fictícia valoriza o cuidado com a construção do software e a comunicação dessas escolhas.",
+    "imagem": "/demo/destaques/arquitetura-software.svg"
+  },
+  {
+    "key": "conhecimento-compartilhado",
+    "email": "ana@example.com",
+    "titulo": "Conhecimento compartilhado além da sala de aula",
+    "feitoDestaque": "Exemplo fictício: encontros de estudo conectam experiências de desenvolvimento e incentivam a troca de conhecimento.",
+    "noticia": "Conteúdo fictício de demonstração. O encontro descrito não corresponde a um evento real.\n\n{nome} participou de uma troca de experiências imaginária sobre desenvolvimento de aplicações web. A conversa reuniu exemplos de integração entre interfaces e APIs, dúvidas sobre testes e caminhos para apresentar um projeto no GitHub.\n\nCompartilhar dúvidas e aprendizados fortalece a comunidade e cria novas oportunidades de colaboração. A trajetória valoriza a continuidade do vínculo com a universidade e o conhecimento construído coletivamente depois da graduação.",
+    "imagem": "/demo/destaques/conhecimento-compartilhado.svg"
+  },
+  {
+    "key": "pesquisa-comunidade",
+    "email": "carla@example.com",
+    "titulo": "Pesquisa e tecnologia a serviço da comunidade",
+    "feitoDestaque": "Exemplo fictício: uma investigação aplicada aproxima perguntas da comunidade e soluções construídas com tecnologia.",
+    "noticia": "Conteúdo fictício de demonstração. O estudo e seus resultados pertencem ao conjunto de exemplos do portal.\n\n{nome} desenhou uma investigação imaginária sobre a forma como pessoas encontram informações e compartilham suas trajetórias. O trabalho combinou perguntas claras, organização dos dados de exemplo e uma apresentação acessível dos aprendizados.\n\nA proposta aproxima investigação e desenvolvimento de software. Escutar as pessoas, formular boas perguntas e comunicar descobertas com clareza são passos que ajudam a transformar conhecimento em possibilidades para a comunidade.",
+    "imagem": "/demo/destaques/pesquisa-comunidade.svg"
+  }
+]

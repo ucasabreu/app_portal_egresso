@@ -48,7 +48,7 @@ public class CoordenadorServiceTest {
         Coordenador coord = Coordenador.builder()
                             .login("coordenadorlogin")
                             .senha("minhaSenha")
-                            .tipo("esseeotipo")
+                            .tipo("coordenador")
                             .build();
         coordenadorService.salvar(coord);
         Assertions.assertThrows(RegraNegocioRunTime.class, () -> coordenadorService.efetuarLogin("loginInexistente", "minhaSenha"),"Erro de autenticação. Login não encontrado.");
@@ -60,7 +60,7 @@ public class CoordenadorServiceTest {
         Coordenador coord = Coordenador.builder()
                             .login("coordenadorlogin")
                             .senha("minhaSenha")
-                            .tipo("esseeotipo")
+                            .tipo("coordenador")
                             .build();
         coordenadorService.salvar(coord);
         Assertions.assertThrows(RegraNegocioRunTime.class, () -> coordenadorService.efetuarLogin("coordenadorlogin", "senhaIncorreta"),"Erro de autenticação. Senha incorreta.");
@@ -72,7 +72,7 @@ public class CoordenadorServiceTest {
         Coordenador coord = Coordenador.builder()
                             .login("coordenadorlogin")
                             .senha("minhaSenha")
-                            .tipo("esseeotipo")
+                            .tipo("coordenador")
                             .build();
         coordenadorService.salvar(coord);
         Assertions.assertThrows(RegraNegocioRunTime.class, () -> coordenadorService.efetuarLogin(null, "minhaSenha"),"Login deve ser informado.");
@@ -84,7 +84,7 @@ public class CoordenadorServiceTest {
         Coordenador coord = Coordenador.builder()
                             .login("coordenadorlogin")
                             .senha("minhaSenha")
-                            .tipo("esseeotipo")
+                            .tipo("coordenador")
                             .build();
         coordenadorService.salvar(coord);
         Assertions.assertThrows(RegraNegocioRunTime.class, () -> coordenadorService.efetuarLogin("coordenadorlogin", null),"Senha deve ser informada.");
@@ -96,13 +96,13 @@ public class CoordenadorServiceTest {
         Coordenador coord = Coordenador.builder()
                             .login("coordenadorlogin")
                             .senha("minhaSenha")
-                            .tipo("esseeotipo")
+                            .tipo("coordenador")
                             .build();
         coordenadorService.salvar(coord);
         Coordenador coord2 = Coordenador.builder()
                             .login("coordenadorlogin")
                             .senha("minhaSenha")
-                            .tipo("esseeotipo")
+                            .tipo("coordenador")
                             .build();
         Assertions.assertThrows(RegraNegocioRunTime.class, () -> coordenadorService.salvar(coord2),"Esse login ja existe");
         repositorio.delete(coord);
@@ -119,7 +119,7 @@ public class CoordenadorServiceTest {
     public void deveGerarErroAoTentarSalvarCoordSemLogin(){
         Coordenador coord = Coordenador.builder()
                             .senha("null")
-                            .tipo("esseeotipo")
+                            .tipo("coordenador")
                             .build();
         Assertions.assertThrows(RegraNegocioRunTime.class, () -> coordenadorService.salvar(coord),"Deve informar um login valido");
     }
@@ -128,7 +128,7 @@ public class CoordenadorServiceTest {
     public void deveGerarErroAoTentarSalvarCoordSemSenha(){
         Coordenador coord = Coordenador.builder()
                             .login("loginCoordenador")
-                            .tipo("esseeotipo")
+                            .tipo("coordenador")
                             .build();
         Assertions.assertThrows(RegraNegocioRunTime.class, () -> coordenadorService.salvar(coord),"Deve informar uma senha");
     }
@@ -214,7 +214,7 @@ public class CoordenadorServiceTest {
         Coordenador coord = Coordenador.builder()
                             .login("coordenadorlogin")
                             .senha("null")
-                            .tipo("esseeotipo")
+                            .tipo("coordenador")
                             .build();
         Coordenador coordenadorSalvo = coordenadorService.salvar(coord);
         Assertions.assertNotNull(coordenadorSalvo);
@@ -226,7 +226,7 @@ public class CoordenadorServiceTest {
         Coordenador coord = Coordenador.builder()
                             .login("coordenadorlogin")
                             .senha("null")
-                            .tipo("esseeotipo")
+                            .tipo("coordenador")
                             .build();
         Coordenador coordenadorSalvo = coordenadorService.salvar(coord);
         Curso curso = Curso.builder()
@@ -245,7 +245,7 @@ public class CoordenadorServiceTest {
         Coordenador coord = Coordenador.builder()
                             .login("coordenadorlogin")
                             .senha("senhaTeste")
-                            .tipo("esseeotipo")
+                            .tipo("coordenador")
                             .build();
         Coordenador coordenadorSalvo = coordenadorService.salvar(coord);
         boolean loginAceito = coordenadorService.efetuarLogin("coordenadorlogin", "senhaTeste");
@@ -258,7 +258,7 @@ public class CoordenadorServiceTest {
         Coordenador coord = Coordenador.builder()
                             .login("coordenadorlogin")
                             .senha("senhaTeste")
-                            .tipo("esseeotipo")
+                            .tipo("coordenador")
                             .build();
         Coordenador coordenadorSalvo = coordenadorService.salvar(coord);
         coordenadorService.remover(coordenadorSalvo);
@@ -270,7 +270,7 @@ public class CoordenadorServiceTest {
         Coordenador coord = Coordenador.builder()
                             .login("coordenadorlogin")
                             .senha("senhaTeste")
-                            .tipo("esseeotipo")
+                            .tipo("coordenador")
                             .build();
         Coordenador coordenadorSalvo = coordenadorService.salvar(coord);
         Curso curso = Curso.builder()

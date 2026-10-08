@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Dados que ajudam a enxergar novos caminhos</title>
+  <desc id="desc">Ilustração editorial de dados. Conteúdo fictício para demonstração do Portal de Egressos.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102e43"/><stop offset="1" stop-color="#22475a"/></linearGradient></defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <circle cx="1160" cy="40" r="245" fill="#eccb86" opacity=".07"/>
+  <circle cx="120" cy="670" r="170" fill="#eccb86" opacity=".06"/>
+  <path d="M80 83h42" stroke="#eccb86" stroke-width="6" stroke-linecap="round"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="80" y="126" font-size="19" fill="#c9d9e1" letter-spacing="3">PORTAL DE EGRESSOS</text>
+    <text x="80" y="247" font-size="15" fill="#eccb86" letter-spacing="3">DADOS</text>
+    <text x="80" y="319" font-size="43" font-weight="650" fill="#f3f6f5">Cada trajetória</text>
+    <text x="80" y="376" font-size="43" font-weight="650" fill="#f3f6f5">conta uma história</text>
+    <text x="80" y="441" font-size="20" fill="#bed0d8">Formação · Comunidade · Trajetória</text>
+    <rect x="80" y="543" width="237" height="37" rx="18" fill="#eccb86" opacity=".15"/>
+    <text x="102" y="568" font-size="13" font-weight="650" fill="#eccb86" letter-spacing="1">EXEMPLO FICTÍCIO</text>
+  </g>
+  <rect x="696" y="178" width="363" height="357" rx="27" fill="#102b3d" stroke="#526e7d" stroke-opacity=".5"/>
+  <path d="M743 241v257h279" fill="none" stroke="#7490a2" stroke-width="5"/><rect x="775" y="372" width="45" height="111" rx="7" fill="#7299a8"/><rect x="846" y="309" width="45" height="174" rx="7" fill="#eccb86"/><rect x="917" y="263" width="45" height="220" rx="7" fill="#83b8a6"/><path d="M781 317l86-59 97-49" fill="none" stroke="#e8eff4" stroke-width="5" stroke-dasharray="9 10"/>
+</svg>

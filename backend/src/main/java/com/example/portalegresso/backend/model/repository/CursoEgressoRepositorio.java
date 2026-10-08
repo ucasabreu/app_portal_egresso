@@ -33,5 +33,12 @@ public interface CursoEgressoRepositorio extends JpaRepository<CursoEgresso,Inte
     @Query("SELECT ce FROM CursoEgresso ce WHERE ce.curso.id_curso = :id_curso")
     List<CursoEgresso> findCursoEgressoByCursoId(@Param("id_curso") Integer id_curso);
     
-}
+    @org.springframework.data.jpa.repository.Query("select (count(ce) > 0) from CursoEgresso ce where ce.egresso.id_egresso = :graduate and ce.curso.coordenador.id_coordenador = :coordinator")
+    boolean existsForCoordinator(@org.springframework.data.repository.query.Param("graduate") Integer graduate, @org.springframework.data.repository.query.Param("coordinator") Integer coordinator);
 
+    @Query("select ce from CursoEgresso ce join fetch ce.curso c join fetch c.coordenador join fetch ce.egresso where ce.egresso.id_egresso in :ids")
+    List<CursoEgresso> forGraduates(List<Integer> ids);
+    @Query("select ce from CursoEgresso ce join fetch ce.curso c join fetch c.coordenador join fetch ce.egresso where c.id_curso in :ids")
+    List<CursoEgresso> forCourses(List<Integer> ids);
+
+}

@@ -2,6 +2,7 @@ package com.example.portalegresso.backend.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
+import com.example.portalegresso.backend.validation.ImagemValida;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,12 +15,16 @@ import lombok.NoArgsConstructor;
 public class EgressoDTO {
 
     @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s]+$", message = "O nome deve conter apenas letras e espaços")
+    @jakarta.validation.constraints.NotBlank(message = "O nome é obrigatório")
     private String nome;
 
     @Email(message = "Email inválido")
+    @jakarta.validation.constraints.NotBlank(message = "O e-mail é obrigatório")
+    @jakarta.validation.constraints.Size(max = 254)
     private String email;
 
     private String descricao;
+    @ImagemValida
     private String foto;
 
     @Pattern(regexp = "^$|^(https?:\\/\\/)?([\\w]+\\.)?linkedin\\.com\\/.*$", message = "Informe um link válido do LinkedIn")

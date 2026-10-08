@@ -45,34 +45,24 @@ public class ConsultasService {
 
     /* ------- Consulta cursos ------- */
     public List<Curso> listarTodosCursos() {
-        if (cursoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há cursos cadastrados.");
-        }
         return cursoRepositorio.findAll();
     }
 
     public List<Curso> listarPorFiltros(String nivel) {
-        if (nivel == null || nivel.isEmpty()) {
+        if (nivel == null || nivel.isBlank()) {
             throw new RegraNegocioRunTime("Nível do curso não pode ser vazio.");
         }
 
         List<Curso> cursos = cursoRepositorio.filtrarCursosPorNivel(nivel);
 
-        if(cursos.isEmpty()){
-            throw new RegraNegocioRunTime("Não há cursos com o nível informado.");
-        }
 
         return cursos;
     }
 
     /* ------- Consulta depoimentos ------- */
-    // opcao para adicionar o limite de depoimentos maximo (opcional), caso para sem
-    // limite == null.
+    // A consulta limitada aceita de 1 a 100 depoimentos.
     public List<Depoimento> consultarRecentes(Integer limite) {
-        if (depoimentoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há depoimentos cadastrados.");
-        }
-        if (limite > 0) {
+        if (limite != null && limite > 0 && limite <= 100) {
             // Define a paginação para limitar os resultados
             Pageable pageable = PageRequest.of(0, limite);
             return depoimentoRepositorio.findRecentes(pageable);
@@ -82,9 +72,6 @@ public class ConsultasService {
     }
 
     public List<Depoimento> consultarRecentes() {
-        if (depoimentoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há depoimentos cadastrados.");
-        }
         return depoimentoRepositorio.findAllByOrderByDataDesc();
     }
 
@@ -93,32 +80,20 @@ public class ConsultasService {
             throw new RegraNegocioRunTime("O ano não pode ser nulo.");
         }
 
-        if (depoimentoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há depoimentos cadastrados.");
-        }
         if (ano <= 0) {
             throw new RegraNegocioRunTime("O ano deve ser maior que zero.");
         }
 
         List<Depoimento> depoimentos = depoimentoRepositorio.findByAno(ano);
-        if (depoimentos.isEmpty()) {
-            throw new RegraNegocioRunTime("Não há depoimentos para o ano informado.");
-        }
 
         return depoimentos;
     }
 
     public List<Cargo> listarCargos() {
-        if (cargoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há cargos cadastrados.");
-        }
         return cargoRepositorio.findAll();
     }
 
     public List<Egresso> listarEgressos() {
-        if (egressoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há egressos cadastrados.");
-        }
         return egressoRepositorio.findAll();
     }
 
@@ -131,19 +106,13 @@ public class ConsultasService {
             throw new RegraNegocioRunTime("Nome não pode ser nulo.");
         }
 
-        if (egressoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há egressos cadastrados.");
-        }
 
-        if (nome == null || nome.isEmpty()) {
+        if (nome == null || nome.isBlank()) {
             throw new RegraNegocioRunTime("Nome não pode ser vazio.");
         }
 
         List<Egresso> egressos = egressoRepositorio.findByNomeContainingIgnoreCase(nome);
 
-        if (egressos.isEmpty()) {
-            throw new RegraNegocioRunTime("Não há egressos com o nome informado.");
-        }
 
         return egressos;
     }
@@ -156,21 +125,12 @@ public class ConsultasService {
             throw new RegraNegocioRunTime("Cargo não pode ser nulo.");
         }
 
-        if (cargoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há cargos cadastrados.");
-        }
-        if (egressoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há egressos cadastrados.");
-        }
-        if (cargo == null || cargo.isEmpty()) {
+        if (cargo == null || cargo.isBlank()) {
             throw new RegraNegocioRunTime("Cargo não pode ser vazio.");
         }
 
         List<Egresso> egressos = cargoRepositorio.findEgressosByCargoDescricao(cargo);
 
-        if (egressos.isEmpty()) {
-            throw new RegraNegocioRunTime("Não há egressos com o cargo informado.");
-        }
 
         return egressos;
     }
@@ -182,17 +142,11 @@ public class ConsultasService {
             throw new RegraNegocioRunTime("Curso não pode ser nulo.");
         }
 
-        if (egressoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há egressos cadastrados.");
-        }
-        if (curso == null || curso.isEmpty()) {
+        if (curso == null || curso.isBlank()) {
             throw new RegraNegocioRunTime("Curso não pode ser vazio.");
         }
 
         List<Egresso> egressos = cursoEgressoRepositorio.findEgressosByCursoNome(curso);
-        if (egressos.isEmpty()) {
-            throw new RegraNegocioRunTime("Não há egressos com o curso informado.");
-        }
 
         return egressos;
     }
@@ -203,17 +157,11 @@ public class ConsultasService {
             throw new RegraNegocioRunTime("O ano não pode ser nulo.");
         }
 
-        if (egressoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há egressos cadastrados.");
-        }
         if (ano <= 0) {
             throw new RegraNegocioRunTime("O ano deve ser maior que zero.");
         }
         List<Egresso> egressos = cursoEgressoRepositorio.findEgressosByAnoInicio(ano);
 
-        if (egressos.isEmpty()) {
-            throw new RegraNegocioRunTime("Não há egressos para o ano informado.");
-        }
 
         return egressos;
     }
@@ -223,40 +171,25 @@ public class ConsultasService {
         if (ano == null) {
             throw new RegraNegocioRunTime("O ano não pode ser nulo.");
         }
-        if (egressoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há egressos cadastrados.");
-        }
         if (ano <= 0) {
             throw new RegraNegocioRunTime("O ano deve ser maior que zero.");
         }
 
         List<Egresso> egressos = cursoEgressoRepositorio.findEgressosByAnoFim(ano);
-        if (egressos.isEmpty()) {
-            throw new RegraNegocioRunTime("Não há egressos para o ano informado.");
-        }
         return egressos;
     }
 
     public List<String> listarTodosNomesEgressos() {
-        if (egressoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há egressos cadastrados.");
-        }
         return egressoRepositorio.findAll().stream()
                 .map(Egresso::getNome)
                 .collect(Collectors.toList());
     }
 
     public List<CursoEgresso> listarCursoEgresso() {
-        if (cursoEgressoRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há dados de curso egresso cadastrados.");
-        }
         return cursoEgressoRepositorio.findAll();
     }
 
     public List<Coordenador> listarCoordenadores() {
-        if (coordenadorRepositorio.count() == 0) {
-            throw new RegraNegocioRunTime("Não há coordenadores cadastrados.");
-        }
         return coordenadorRepositorio.findAll();
     }
 

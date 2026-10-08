@@ -14,6 +14,7 @@ import com.example.portalegresso.backend.model.repository.*;
 import lombok.RequiredArgsConstructor;
 
 @Component
+@org.springframework.core.annotation.Order(0)
 @Profile("demo")
 @RequiredArgsConstructor
 public class DemoDataInitializer implements ApplicationRunner {

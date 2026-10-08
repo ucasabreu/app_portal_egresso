@@ -1,0 +1,10 @@
+.primary, .secondary { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-3); min-height: var(--control-height); max-width: 100%; padding: var(--space-2) var(--space-4); border: 1px solid var(--color-brand); border-radius: var(--radius-sm); font-weight: 600; font-size: var(--text-sm); overflow-wrap: anywhere; }
+.primary { background: var(--color-brand); color: var(--color-on-brand); }
+.primary:hover { background: var(--color-brand-strong); }
+.primary svg { flex-shrink: 0; }
+.secondary { color: var(--color-brand); background: var(--color-surface); }
+.secondary:hover { background: var(--color-surface-muted); }
+.statistics { display: flex; flex-wrap: wrap; gap: var(--space-6); margin: var(--space-8) 0 0; }
+.statistics > div { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.statistics dt { color: var(--color-text-muted); font-size: var(--text-xs); overflow-wrap: anywhere; }
+.statistics dd { order: -1; margin: 0; color: var(--color-brand); font-family: var(--font-heading); font-size: 1.75rem; font-weight: 600; line-height: 1.2; }

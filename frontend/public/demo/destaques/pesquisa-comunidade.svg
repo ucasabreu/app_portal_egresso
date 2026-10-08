@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Pesquisa e tecnologia a serviço da comunidade</title>
+  <desc id="desc">Ilustração editorial de pesquisa. Conteúdo fictício para demonstração do Portal de Egressos.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102e43"/><stop offset="1" stop-color="#22475a"/></linearGradient></defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <circle cx="1160" cy="40" r="245" fill="#a5d2ce" opacity=".07"/>
+  <circle cx="120" cy="670" r="170" fill="#a5d2ce" opacity=".06"/>
+  <path d="M80 83h42" stroke="#a5d2ce" stroke-width="6" stroke-linecap="round"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="80" y="126" font-size="19" fill="#c9d9e1" letter-spacing="3">PORTAL DE EGRESSOS</text>
+    <text x="80" y="247" font-size="15" fill="#a5d2ce" letter-spacing="3">PESQUISA</text>
+    <text x="80" y="319" font-size="43" font-weight="650" fill="#f3f6f5">Boas perguntas</text>
+    <text x="80" y="376" font-size="43" font-weight="650" fill="#f3f6f5">abrem caminhos</text>
+    <text x="80" y="441" font-size="20" fill="#bed0d8">Formação · Comunidade · Trajetória</text>
+    <rect x="80" y="543" width="237" height="37" rx="18" fill="#a5d2ce" opacity=".15"/>
+    <text x="102" y="568" font-size="13" font-weight="650" fill="#a5d2ce" letter-spacing="1">EXEMPLO FICTÍCIO</text>
+  </g>
+  <rect x="696" y="178" width="363" height="357" rx="27" fill="#102b3d" stroke="#526e7d" stroke-opacity=".5"/>
+  <circle cx="849" cy="329" r="91" fill="#e8eff4"/><path d="M916 395l88 88" stroke="#a5d2ce" stroke-width="22" stroke-linecap="round"/><path d="M803 335l35-40 33 25 24-37" fill="none" stroke="#42766c" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="803" cy="335" r="8" fill="#42766c"/><circle cx="895" cy="283" r="8" fill="#42766c"/>
+</svg>

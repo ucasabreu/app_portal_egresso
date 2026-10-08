@@ -1,478 +1,147 @@
-import React, { useState, useEffect } from 'react';
-import { FaEnvelope, FaLinkedin, FaInstagram, FaFileAlt } from 'react-icons/fa';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import "../../pages/Egresso/styles.css";
-import { API_URL } from '../../config/config.js';
-import Button from '../../components/Button/Button.jsx';
+import { useEffect, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import axios from "axios";
+import { API_URL } from "../../config/config.js";
+import { errorMessage } from "../../utils/presentation";
+import useSessionExitGuard from "../../hooks/useSessionExitGuard.js";
+import useUnsavedChanges from "../../hooks/useUnsavedChanges.js";
+import UnsavedChangesDialog from "../../components/ui/UnsavedChangesDialog";
+import { trajectoryErrors, focusFirstError } from "../../utils/management.js";
+import useProfile from "../../hooks/useProfile";
+import useCollection from "../../hooks/useCollection";
+import Container from "../../components/ui/Container";
+import EditorialHeader from "../../components/ui/EditorialHeader";
+import ProfileDetails from "../../components/ui/ProfileDetails";
+import Field from "../../components/ui/Field";
+import Select from "../../components/ui/Select";
+import ConfirmDialog from "../../components/ui/ConfirmDialog";
+import TextArea from "../../components/TextArea/TextArea";
+import Button from "../../components/Button/Button";
+import LoadingState from "../../components/feedback/LoadingState";
+import ErrorState from "../../components/feedback/ErrorState";
+import Notice from "../../components/feedback/Notice";
+import styles from "./Editor.module.css";
+import content from "../../styles/Content.module.css";
 
-
-const Egresso = () => {
+const emptyCargo = { descricao: "", local: "", ano_inicio: "", ano_fim: "" };
+const emptyCurso = { id_curso: "", ano_inicio: "", ano_fim: "" };
+export default function Egresso() {
   const { id } = useParams();
-  const navigate = useNavigate(); // Hook para navegação
-  const [egresso, setEgresso] = useState(null);
-  const [depoimentos, setDepoimentos] = useState([]);
-  const [cargos, setCargos] = useState([]); // Adiciona o estado para cargos
-  const [cursos, setCursos] = useState([]); // Adiciona o estado para cursos
-  const [novoDepoimento, setNovoDepoimento] = useState({ texto: '' }); // Remove o campo autor do estado para novo depoimento
-  const [novoCargo, setNovoCargo] = useState({ descricao: '', ano_inicio: '', ano_fim: '', local: '' }); // Adiciona o campo local ao estado novoCargo
-  const [novoCurso, setNovoCurso] = useState({ id_curso: '', ano_inicio: '', ano_fim: '' }); // Adiciona o estado para novo curso
-  const [listaCursos, setListaCursos] = useState([]); // Adiciona o estado para a lista de cursos
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false); // Adiciona o estado para controlar a exibição do formulário
-  const [showCargoForm, setShowCargoForm] = useState(false); // Adiciona o estado para controlar a exibição do formulário de cargo
-  const [showCursoForm, setShowCursoForm] = useState(false); // Adiciona o estado para controlar a exibição do formulário de curso
-  const [errorMessage, setErrorMessage] = useState(""); // Adiciona estado para mensagens de erro
-  const [formErrorMessage, setFormErrorMessage] = useState(""); // Adiciona estado para erros de formulário
-  const [restErrors, setRestErrors] = useState([]);
-
-  useEffect(() => {
-    const fetchEgresso = async () => {
-      if (!id) {
-        alert("Erro: ID do egresso não encontrado. Tente novamente.");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await axios.get(`${API_URL}/api/egressos/buscar/egresso/${id}`);
-        setEgresso(response.data);
-      } catch (error) {
-        console.error('Erro ao buscar dados do egresso:', error);
-        const errorMessage =
-          error.response?.data ||
-          `Erro ${error.response?.status}: ${error.response?.statusText}` ||
-          "Erro ao buscar dados do egresso. Verifique sua conexão ou tente novamente mais tarde.";
-        setErrorMessage(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchDepoimentos = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/egressos/egresso/${id}/depoimentos`);
-        setDepoimentos(response.data);
-      } catch (error) {
-        console.error('Erro ao buscar depoimentos do egresso:', error);
-        const errorMessage =
-          error.response?.data ||
-          `Erro ${error.response?.status}: ${error.response?.statusText}` ||
-          "Erro ao buscar depoimentos do egresso. Verifique sua conexão ou tente novamente mais tarde.";
-        setErrorMessage(errorMessage);
-      }
-    };
-
-    const fetchCargos = async () => { // Adiciona a função para buscar cargos
-      try {
-        const response = await axios.get(`${API_URL}/api/egressos/egresso/${id}/cargos`);
-        setCargos(response.data);
-      } catch (error) {
-        console.error('Erro ao buscar cargos do egresso:', error);
-        const errorMessage =
-          error.response?.data ||
-          `Erro ${error.response?.status}: ${error.response?.statusText}` ||
-          "Erro ao buscar cargos do egresso. Verifique sua conexão ou tente novamente mais tarde.";
-        setErrorMessage(errorMessage);
-      }
-    };
-
-    const fetchCursos = async () => { // Adiciona a função para buscar cursos vinculados a egressos
-      try {
-        const response = await axios.get(`${API_URL}/api/egressos/egresso/${id}/cursos_egresso`);
-        setCursos(response.data);
-      } catch (error) {
-        console.error('Erro ao buscar cursos do egresso:', error);
-        const errorMessage =
-          error.response?.data ||
-          `Erro ${error.response?.status}: ${error.response?.statusText}` ||
-          "Erro ao buscar cursos do egresso. Verifique sua conexão ou tente novamente mais tarde.";
-        setErrorMessage(errorMessage);
-      }
-    };
-
-    const fetchListaCursos = async () => { // Adiciona a função para buscar a lista de cursos
-      try {
-        const response = await axios.get(`${API_URL}/api/consultas/listar/cursos`);
-        setListaCursos(response.data);
-      } catch (error) {
-        console.error('Erro ao buscar lista de cursos:', error);
-        const errorMessage =
-          error.response?.data ||
-          `Erro ${error.response?.status}: ${error.response?.statusText}` ||
-          "Erro ao buscar lista de cursos. Verifique sua conexão ou tente novamente mais tarde.";
-        setErrorMessage(errorMessage);
-      }
-    };
-
-    fetchEgresso();
-    fetchDepoimentos();
-    fetchCargos(); // Chama a função para buscar cargos
-    fetchCursos(); // Chama a função para buscar cursos
-    fetchListaCursos(); // Chama a função para buscar a lista de cursos
-  }, [id]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNovoDepoimento({ ...novoDepoimento, [name]: value });
+  const profile = useProfile(id);
+  const courses = useCollection("/api/consultas/listar/cursos");
+  const [active, setActive] = useState("");
+  const [cargo, setCargo] = useState(emptyCargo);
+  const [curso, setCurso] = useState(emptyCurso);
+  const [texto, setTexto] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState(null);
+  const [confirmation, setConfirmation] = useState(null);
+  const pending = useRef(false);
+  const form = useRef(null);
+  const noticeRef = useRef(null);
+  const [errors, setErrors] = useState({});
+  const [review, setReview] = useState(false);
+  const [nextActive, setNextActive] = useState(null);
+  const draft = active === "cargo" ? cargo : active === "curso" ? curso : active === "depoimento" ? { texto } : {};
+  const dirty = Object.values(draft).some(Boolean);
+  const blocker = useUnsavedChanges(dirty, busy);
+  const exiting = useSessionExitGuard({ dirty, pending: busy, release: blocker.release, retain: blocker.retain });
+  const locked = busy || exiting;
+  const resetForm = next => { setCargo(emptyCargo); setCurso(emptyCurso); setTexto(""); setErrors({}); setReview(false); setActive(next); setNextActive(null); };
+  const openForm = next => { if (pending.current || exiting) return; if (dirty) setNextActive(next); else resetForm(next); };
+  const validate = () => {
+    const next = trajectoryErrors(active, draft, courses.data);
+    setErrors(next);
+    if (Object.keys(next).length) { setReview(false); return false; }
+    if (!review) { setReview(true); return false; }
+    return true;
   };
-
-  const handleCargoInputChange = (e) => {
-    const { name, value } = e.target;
-    setNovoCargo({ ...novoCargo, [name]: value });
-  };
-
-  const handleCursoInputChange = (e) => {
-    const { name, value } = e.target;
-    setNovoCurso({ ...novoCurso, [name]: value });
-  };
-
-  const handleSubmitDepoimento = async (e) => {
-    e.preventDefault();
-    setFormErrorMessage(""); // Limpa mensagens de erro antes de salvar
+  useEffect(() => { if (!review && Object.keys(errors).length) focusFirstError(form.current, errors); }, [errors, review]);
+  useEffect(() => { form.current?.querySelector("h3")?.focus(); }, [active, review]);
+  useEffect(() => { if (notice?.variant === "error") noticeRef.current?.focus(); }, [notice]);
+  const run = async (operation, success) => {
+    if (pending.current || exiting) return false;
+    pending.current = true; setBusy(true); setNotice(null);
     try {
-      await axios.post(`${API_URL}/api/egressos/salvar/egresso/${id}/salvar_depoimento`, novoDepoimento);
-      alert('Depoimento salvo com sucesso!');
-      setNovoDepoimento({ texto: '' });
-      const response = await axios.get(`${API_URL}/api/egressos/egresso/${id}/depoimentos`);
-      setDepoimentos(response.data);
-      setShowForm(false); // Esconde o formulário após salvar o depoimento
-    } catch (error) {
-      console.error('Erro ao salvar curso:', error);
-      if (error.response?.data && typeof error.response.data === 'object') {
-        const messages = Object.values(error.response.data);
-        setRestErrors(messages);
-      } else {
-        setRestErrors(["Erro ao salvar curso. Verifique os dados e tente novamente."]);
-      }
-    }
+      await operation();
+      setNotice({ variant: "success", text: success });
+      profile.reload();
+      return true;
+    } catch (error) { setNotice({ variant: "error", text: errorMessage(error) }); return false; }
+    finally { pending.current = false; setBusy(false); }
   };
-
-  const handleSubmitCargo = async (e) => {
-    e.preventDefault();
-
-    // Limpa todos os erros antes da tentativa
-    setFormErrorMessage("");
-    setErrorMessage("");
-    setRestErrors([]);
-
-    try {
-      await axios.post(`${API_URL}/api/egressos/salvar/egresso/${id}/salvar_cargo`, novoCargo);
-
-      alert('Cargo salvo com sucesso!');
-      setNovoCargo({ descricao: '', ano_inicio: '', ano_fim: '', local: '' });
-
-      const cargosResponse = await axios.get(`${API_URL}/api/egressos/egresso/${id}/cargos`);
-      setCargos(cargosResponse.data);
-      setShowCargoForm(false);
-
-    } catch (error) {
-      console.error('Erro ao salvar cargo:', error);
-
-      // ✅ Trata RestControllerAdvice (Erros de validação enviados como Map pelo backend)
-      if (error.response?.data && typeof error.response.data === 'object' && !Array.isArray(error.response.data)) {
-        const messages = Object.values(error.response.data);
-        setRestErrors(messages); // Preenche o array de restErrors
-      }
-      // ✅ Se vier um erro textual ou exceção conhecida da API
-      else if (typeof error.response?.data === 'string') {
-        setFormErrorMessage(error.response.data); // Exibe no formErrorMessage
-      }
-      // ✅ Qualquer outro erro inesperado
-      else {
-        setErrorMessage("Erro inesperado. Tente novamente.");
-      }
-    }
+  const saveCargo = async event => {
+    event.preventDefault();
+    if (pending.current || exiting || !validate()) return;
+    if (await run(() => axios.post(API_URL + "/api/egressos/salvar/egresso/" + id + "/salvar_cargo", { ...cargo, ano_fim: cargo.ano_fim || null }), "Experiência registrada com sucesso.")) { setCargo(emptyCargo); resetForm(""); }
   };
-
-  const handleSubmitCurso = async (e) => {
-    e.preventDefault();
-    setFormErrorMessage(""); // Limpa mensagens de erro antes de salvar
-    try {
-      await axios.post(`${API_URL}/api/egressos/salvar/egresso/${id}/curso/${novoCurso.id_curso}/curso_egresso`, novoCurso);
-      alert('Curso salvo com sucesso!');
-      setNovoCurso({ id_curso: '', ano_inicio: '', ano_fim: '' });
-      const cursosResponse = await axios.get(`${API_URL}/api/egressos/egresso/${id}/cursos_egresso`);
-      setCursos(cursosResponse.data);
-      setShowCursoForm(false); // Esconde o formulário após salvar o curso
-    } catch (error) {
-      console.error('Erro ao salvar curso:', error);
-      const errorMessage =
-        error.response?.data ||
-        `Erro ${error.response?.status}: ${error.response?.statusText}` ||
-        "Erro ao salvar curso. Verifique os dados e tente novamente.";
-      setFormErrorMessage(errorMessage);
-    }
+  const saveCurso = async event => {
+    event.preventDefault();
+    if (courses.loading || courses.error) return;
+    if (pending.current || exiting || !validate()) return;
+    if (await run(() => axios.post(API_URL + "/api/egressos/salvar/egresso/" + id + "/curso/" + curso.id_curso + "/curso_egresso", { ...curso, ano_fim: curso.ano_fim || null }), "Curso registrado com sucesso.")) { setCurso(emptyCurso); resetForm(""); }
   };
-
-  const handleDeleteDepoimento = async (depoimentoId) => {
-    try {
-      await axios.delete(`${API_URL}/api/egressos/deletar/depoimento/${depoimentoId}`);
-      alert('Depoimento deletado com sucesso!');
-      const response = await axios.get(`${API_URL}/api/egressos/egresso/${id}/depoimentos`);
-      setDepoimentos(response.data);
-    } catch (error) {
-      console.error('Erro ao deletar depoimento:', error);
-      alert('Erro ao deletar depoimento.');
-    }
+  const saveDepoimento = async event => {
+    event.preventDefault();
+    if (pending.current || exiting || !validate()) return;
+    if (await run(() => axios.post(API_URL + "/api/egressos/salvar/egresso/" + id + "/salvar_depoimento", { texto }), "Depoimento compartilhado com sucesso.")) { setTexto(""); resetForm(""); }
   };
-
-  const handleDeleteCargo = async (cargoId) => {
-    try {
-      await axios.delete(`${API_URL}/api/egressos/deletar/cargo/${cargoId}`);
-      alert('Cargo deletado com sucesso!');
-      const response = await axios.get(`${API_URL}/api/egressos/egresso/${id}/cargos`);
-      setCargos(response.data);
-    } catch (error) {
-      console.error('Erro ao deletar cargo:', error);
-      alert('Erro ao deletar cargo.');
-    }
+  const remove = async () => {
+    if (!confirmation || pending.current || exiting) return;
+    const endpoints = { cargo: "cargo", curso: "curso_egresso", depoimento: "depoimento" };
+    if (await run(() => axios.delete(API_URL + "/api/egressos/deletar/" + endpoints[confirmation.type] + "/" + confirmation.id), "Registro excluído com sucesso.")) setConfirmation(null);
   };
-
-  const handleDeleteCurso = async (cursoEgressoId) => {
-    try {
-      await axios.delete(`${API_URL}/api/egressos/deletar/curso_egresso/${cursoEgressoId}`);
-      alert('Curso deletado com sucesso!');
-      const response = await axios.get(`${API_URL}/api/egressos/egresso/${id}/cursos_egresso`);
-      setCursos(response.data);
-    } catch (error) {
-      console.error('Erro ao deletar curso:', error);
-      alert('Erro ao deletar curso.');
-    }
-  };
-
-  const handleConfirm = () => {
-    navigate(`/egresso_view/${id}`); // Redireciona para a página do egresso
-  };
-
-  if (loading) {
-    return <div className="loading-message">Carregando...</div>;
-  }
-
-  if (errorMessage) {
-    return <div className="error-message">{errorMessage}</div>;
-  }
-
-  if (!egresso) {
-    return <div className="error-message">Erro: Dados do egresso não encontrados.</div>;
-  }
-
+  const actions = <div className={styles.actions}><Button variant="secondary" disabled={locked} onClick={() => openForm("")}>Cancelar</Button><Button type="submit" loading={busy} loadingLabel="Salvando…">{review ? "Confirmar e salvar" : "Revisar registro"}</Button></div>;
+  const yearField = (value, onChange, name, label, required) => <Field key={name} label={label} name={name} type="text" inputMode="numeric" pattern="[0-9]{4}" maxLength={4} value={value} onChange={onChange} error={errors[name]} hint={!required ? "Deixe vazio se estiver em andamento." : undefined} placeholder="Ex.: 2024" required={required} disabled={locked} />;
+  const cargoChange = event => { setCargo(value => ({ ...value, [event.target.name]: event.target.value })); setErrors({}); };
+  const cursoChange = event => { setCurso(value => ({ ...value, [event.target.name]: event.target.value })); setErrors({}); };
+  const summary = entries => <div className={styles.full}><Notice title="Confira antes de salvar"><p>Este registro ficará visível na trajetória de {profile.egresso?.nome}.</p></Notice><dl className={styles.review}>{entries.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value || "Em andamento"}</dd></div>)}</dl><Button variant="secondary" disabled={locked} onClick={() => setReview(false)}>Continuar editando</Button></div>;
+  const cargoAction = active === "cargo" ? (
+    <form ref={form} className={styles.inlineForm} onSubmit={saveCargo} noValidate aria-busy={locked} aria-label="Registrar experiência">
+      <h3 tabIndex={-1} className={styles.inlineTitle}>Registrar experiência</h3>
+      {review ? summary([["Cargo", cargo.descricao], ["Local", cargo.local], ["Início", cargo.ano_inicio], ["Conclusão", cargo.ano_fim]]) : <>
+      <Field label="Cargo ou atividade" name="descricao" error={errors.descricao} value={cargo.descricao} onChange={cargoChange} required disabled={locked} />
+      <Field label="Local de atuação" name="local" error={errors.local} value={cargo.local} onChange={cargoChange} required disabled={locked} />
+      {yearField(cargo.ano_inicio, cargoChange, "ano_inicio", "Ano de início", true)}
+      {yearField(cargo.ano_fim, cargoChange, "ano_fim", "Ano de conclusão", false)}
+      </>}
+      {actions}
+    </form>
+  ) : <Button variant="secondary" className={styles.addAction} disabled={locked} onClick={() => openForm("cargo")}>Adicionar experiência</Button>;
+  const cursoAction = active === "curso" ? (
+    <form ref={form} className={styles.inlineForm} onSubmit={saveCurso} noValidate aria-busy={locked} aria-label="Registrar formação">
+      <h3 tabIndex={-1} className={styles.inlineTitle}>Registrar formação</h3>
+      {review ? summary([["Curso", courses.data.find(item => String(item.id_curso) === String(curso.id_curso))?.nome], ["Ingresso", curso.ano_inicio], ["Conclusão", curso.ano_fim]]) : <>
+      {courses.error ? <div className={styles.full}><ErrorState description={courses.error} onRetry={courses.retry} /></div> : (
+        <Field as={Select} className={styles.full} label="Curso" name="id_curso" error={errors.id_curso} value={curso.id_curso} onChange={cursoChange} required disabled={locked || courses.loading}>
+          <option value="">{courses.loading ? "Carregando cursos…" : "Selecione seu curso"}</option>
+          {courses.data.map(item => <option key={item.id_curso} value={item.id_curso}>{item.nome}</option>)}
+        </Field>
+      )}
+      {yearField(curso.ano_inicio, cursoChange, "ano_inicio", "Ano de ingresso", true)}
+      {yearField(curso.ano_fim, cursoChange, "ano_fim", "Ano de conclusão", false)}
+      </>}
+      <div className={styles.actions}><Button variant="secondary" disabled={locked} onClick={() => openForm("")}>Cancelar</Button><Button type="submit" loading={busy} disabled={courses.loading || !!courses.error} loadingLabel="Salvando…">{review ? "Salvar formação" : "Revisar formação"}</Button></div>
+    </form>
+  ) : <Button variant="secondary" className={styles.addAction} disabled={locked} onClick={() => openForm("curso")}>Adicionar formação</Button>;
+  const depoimentoAction = active === "depoimento" ? (
+    <form ref={form} className={styles.inlineForm} onSubmit={saveDepoimento} noValidate aria-busy={locked} aria-label="Compartilhar depoimento"><h3 tabIndex={-1} className={styles.inlineTitle}>Compartilhar experiência</h3>{review ? summary([["Depoimento", texto]]) : <Field as={TextArea} className={styles.full} label="Seu depoimento" name="texto" error={errors.texto} value={texto} onChange={event => { setTexto(event.target.value); setErrors({}); }} hint="Compartilhe uma experiência da sua trajetória. O relato será público." rows={6} required disabled={locked} />}{actions}</form>
+  ) : <Button variant="secondary" className={styles.addAction} disabled={locked} onClick={() => openForm("depoimento")}>Adicionar depoimento</Button>;
   return (
-    <div className="container_principal">
-      <header className='header_egressoview'>
-        <h1>Dados do Egresso</h1>
-        <button type="button" onClick={() => navigate(`/edit-egresso/${id}`)}>Editar perfil</button>
-      </header>
-      <div className='container_egresso'>
-        {restErrors.length > 0 && (
-          <div className="error-message">
-            {restErrors.map((msg, index) => (
-              <p key={index}>⚠ Atenção: {msg}</p>
-            ))}
-          </div>
-        )}
-
-        {formErrorMessage && (
-          <div className="error-message">
-            ⚠ Atenção: {formErrorMessage}
-          </div>
-        )}
-
-        {errorMessage && (
-          <div className="error-message">
-            ⚠ Atenção: {errorMessage}
-          </div>
-        )}
-
-        <div className="egresso-header">
-          <img src={egresso.foto || '/demo/avatar.svg'} alt={egresso.nome} className="egresso-photo" />
-          <div className="egresso-info">
-            <p><strong>Nome:</strong> {egresso.nome}</p>
-            <p><FaEnvelope className="icon" /> {egresso.email}</p>
-            <p><FaLinkedin className="icon" /> <a href={egresso.linkedin} target="_blank" rel="noopener noreferrer">{egresso.linkedin}</a></p>
-            <p><FaInstagram className="icon" /> <a href={egresso.instagram} target="_blank" rel="noopener noreferrer">{egresso.instagram}</a></p>
-            <p><FaFileAlt className="icon" /> <strong>Currículo:</strong> <a href={egresso.curriculo} target="_blank" rel="noopener noreferrer">Visualizar Currículo</a></p>
-          </div>
-        </div>
-        <div className="egresso-descricao">
-          <h2>Descrição</h2>
-          <p>{egresso.descricao}</p>
-        </div>
-        <div className="egresso-cargos">
-          <h2>Cargos</h2>
-          {cargos.length > 0 ? (
-            cargos.map((cargo, index) => (
-              <div key={cargo.id || index} className="cargo">
-                <p><strong>{cargo.nome}</strong></p>
-                <p>{cargo.descricao}</p>
-                <p>Local: {cargo.local}</p>
-                <p><em>Período: {cargo.ano_inicio} - {cargo.ano_fim}</em></p>
-                <Button onClick={() => handleDeleteCargo(cargo.id_cargo)}>Deletar</Button>
-              </div>
-            ))
-          ) : (
-            <p>Nenhum cargo encontrado.</p>
-          )}
-          <div className="novo-cargo">
-            {showCargoForm ? (
-              <form onSubmit={handleSubmitCargo}>
-                <div className="form-group">
-                  <label htmlFor="descricao">Descrição:</label>
-                  <input
-                    id="descricao"
-                    name="descricao"
-                    value={novoCargo.descricao}
-                    onChange={handleCargoInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="ano_inicio">Ano de Início:</label>
-                  <input
-                    id="ano_inicio"
-                    name="ano_inicio"
-                    value={novoCargo.ano_inicio}
-                    onChange={handleCargoInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="ano_fim">Ano de Fim:</label>
-                  <input
-                    id="ano_fim"
-                    name="ano_fim"
-                    value={novoCargo.ano_fim}
-                    onChange={handleCargoInputChange}
-                    placeholder='(Opicional)'
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="local">Local:</label>
-                  <input
-                    id="local"
-                    name="local"
-                    value={novoCargo.local}
-                    onChange={handleCargoInputChange}
-                    required
-                  />
-                </div>
-                <div className='button-confirm'>
-                  <Button type="submit">Salvar Cargo</Button>
-                </div>
-
-              </form>
-            ) : (
-
-              <Button onClick={() => setShowCargoForm(true)}>Adicionar cargo</Button>
-            )}
-          </div>
-        </div>
-        <div className="egresso-cursos">
-          <h2>Cursos</h2>
-          {cursos.length > 0 ? (
-            cursos.map((curso, index) => (
-              <div key={curso.id || index} className="curso">
-                <p><strong>{curso.curso.nome}</strong></p>
-                <p><em>Período: {curso.ano_inicio} - {curso.ano_fim}</em></p>
-                <Button onClick={() => handleDeleteCurso(curso.id_curso_egresso)}>Deletar</Button>
-              </div>
-            ))
-          ) : (
-            <p>Nenhum curso encontrado.</p>
-          )}
-          <div className="novo-curso">
-            {showCursoForm ? (
-              <form onSubmit={handleSubmitCurso}>
-                <div className="form-group">
-                  <label htmlFor="id_curso">Curso:</label>
-                  <select
-                    id="id_curso"
-                    name="id_curso"
-                    value={novoCurso.id_curso}
-                    onChange={handleCursoInputChange}
-                    required
-                  >
-                    <option value="">Selecione um curso</option>
-                    {listaCursos.map((curso) => (
-                      <option key={curso.id_curso} value={curso.id_curso}>{curso.nome}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="ano_inicio">Ano de Início:</label>
-                  <input
-                    id="ano_inicio"
-                    name="ano_inicio"
-                    value={novoCurso.ano_inicio}
-                    onChange={handleCursoInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="ano_fim">Ano de Fim:</label>
-                  <input
-                    id="ano_fim"
-                    name="ano_fim"
-                    value={novoCurso.ano_fim}
-                    onChange={handleCursoInputChange}
-                    required
-                  />
-                </div>
-                <div className='button-confirm'>
-                  <Button type="submit">Salvar Curso</Button>
-                </div>
-
-              </form>
-            ) : (
-              <Button onClick={() => setShowCursoForm(true)}>Adicionar Novo Curso</Button>
-            )}
-          </div>
-        </div>
-        <div className="egresso-depoimentos">
-          <h2>Depoimentos</h2>
-          {depoimentos.length > 0 ? (
-            depoimentos.map((depoimento, index) => (
-              <div key={depoimento.id || index} className="depoimento">
-                <p>{depoimento.texto}</p>
-                <p><strong>{depoimento.autor}</strong></p>
-                <p><em>Publicado em: {new Date(depoimento.data).toLocaleDateString()}</em></p>
-                <button onClick={() => handleDeleteDepoimento(depoimento.id_depoimento)}>Deletar</button>
-              </div>
-            ))
-          ) : (
-            <p>Nenhum depoimento encontrado.</p>
-          )}
-        </div>
-        <div className="novo-depoimento">
-          {showForm ? (
-            <form onSubmit={handleSubmitDepoimento}>
-              <div className="form-group">
-                <label htmlFor="texto">Depoimento:</label>
-                <textarea
-                  id="texto"
-                  name="texto"
-                  value={novoDepoimento.texto}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className='button-confirm'>
-                <Button type="submit">Salvar Depoimento</Button>
-              </div>
-
-            </form>
-          ) : (
-            <Button onClick={() => setShowForm(true)}>Adicionar depoimento</Button>
-          )}
-        </div>
-      </div>
-      <div className="button-confirm">
-        <Button onClick={handleConfirm} className="confirm-button">
-          Confirmar e Visualizar
-        </Button>
-      </div>
-    </div>
+    <Container className={styles.page}>
+      <EditorialHeader breadcrumb={[{ label: "Início", to: "/" }, { label: "Meu espaço" }]} eyebrow="Construindo sua trajetória" title="O próximo capítulo começa por você." description="Complete sua formação e suas experiências para apresentar seu percurso à comunidade."
+        actions={<><Link className={content.link} to={"/edit-egresso/" + id}>Editar dados pessoais →</Link><Link className={content.link} to={"/egresso_view/" + id}>Ver perfil público →</Link></>} />
+      {notice && <Notice variant={notice.variant} ref={noticeRef} tabIndex={-1} className={styles.notice}><p>{notice.text}</p></Notice>}
+      {profile.loading ? <LoadingState label="Atualizando trajetória…" /> : profile.error || !profile.egresso ? <ErrorState description={profile.error || "Perfil não encontrado."} onRetry={profile.reload} /> : (
+        <>
+          {profile.warnings.length > 0 && <Notice variant="warning" className={styles.notice}>{profile.warnings.map(message => <p key={message}>{message}</p>)}</Notice>}
+          <ProfileDetails {...profile} cargoAction={cargoAction} cursoAction={cursoAction} depoimentoAction={depoimentoAction}
+            renderDelete={(type, itemId) => <Button variant="ghost" disabled={locked} aria-label={"Excluir " + (type === "curso" ? "formação" : type === "cargo" ? "experiência" : "depoimento")} onClick={() => { setNotice(null); setConfirmation({ type, id: itemId, name: type === "curso" ? profile.cursos.find(item => item.id_curso_egresso === itemId)?.curso?.nome : type === "cargo" ? profile.cargos.find(item => item.id_cargo === itemId)?.descricao : "Depoimento de " + profile.egresso.nome }); }}>Excluir</Button>} />
+        </>
+      )}
+      <ConfirmDialog open={!!confirmation} error={notice?.variant === "error" ? notice.text : undefined} pending={busy} description={`“${confirmation?.name || "Registro"}” será removido da trajetória de ${profile.egresso?.nome || "este egresso"}. A exclusão não pode ser desfeita.`} onCancel={() => setConfirmation(null)} onConfirm={remove} />
+      <ConfirmDialog open={nextActive !== null} title="Descartar alterações do registro?" description="O registro ainda não foi salvo. Você perderá os dados deste formulário." confirmLabel="Descartar alterações" onCancel={() => setNextActive(null)} onConfirm={() => resetForm(nextActive)} />
+      <UnsavedChangesDialog blocker={blocker} pending={busy} />
+    </Container>
   );
-};
-
-export default Egresso;
+}

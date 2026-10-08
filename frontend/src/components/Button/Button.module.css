@@ -1,0 +1,86 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-height);
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 650;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+    color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.primary {
+  background: var(--color-brand);
+  color: var(--color-surface);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--color-brand-strong);
+}
+
+.secondary {
+  border-color: var(--color-brand);
+  background: var(--color-surface);
+  color: var(--color-brand);
+}
+
+.secondary:hover:not(:disabled),
+.ghost:hover:not(:disabled) {
+  background: var(--color-surface-muted);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--color-brand);
+}
+
+.danger {
+  background: var(--color-danger);
+  color: var(--color-surface);
+}
+
+.danger:hover:not(:disabled) {
+  background: #8f1b13;
+}
+
+.button:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-outline-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button img,
+.button svg {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+}
+
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

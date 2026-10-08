@@ -1,4 +1,6 @@
 package com.example.portalegresso.backend.controller;
+import com.example.portalegresso.backend.auth.PortalAccess;
+import static com.example.portalegresso.backend.auth.PortalAccess.Policy.*;
 
 
 import java.util.List;
@@ -24,7 +26,7 @@ import com.example.portalegresso.backend.service.RegraNegocioRunTime;
 
 @RequestMapping("/api/consultas")
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+
 
 public class ConsultasController {
     @Autowired
@@ -191,6 +193,7 @@ public class ConsultasController {
     }
 
     @GetMapping("/listar/coordenadores")
+    @PortalAccess(ADMIN)
     public ResponseEntity<?> listarCoordenadores() {
         try {
             List<Coordenador> cursos = consultasService.listarCoordenadores();

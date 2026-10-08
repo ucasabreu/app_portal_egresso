@@ -62,30 +62,27 @@ public class ConsultasServiceTest {
     }
 
     @Test
-    public void deveGerarErroAoListarTodosCursosQuandoNaoHouverCursos() {
+    public void deveRetornarListaVaziaQuandoNaoHouverCursos() {
         when(cursoRepositorio.findAll()).thenReturn(new ArrayList<>());
 
-        Assertions.assertThrows(RegraNegocioRunTime.class, () -> consultasService.listarTodosCursos(), "Nenhum curso encontrado.");
+        Assertions.assertTrue(consultasService.listarTodosCursos().isEmpty(), "Nenhum curso encontrado.");
     }
 
     @Test
-    public void deveGerarErroQuandoNaoHouverCursosCadastrados() {
-        when(cursoRepositorio.count()).thenReturn(0L);
+    public void deveRetornarListaVaziaQuandoNivelNaoEncontrarCursos() {
 
-        Assertions.assertThrows(RegraNegocioRunTime.class, () -> consultasService.listarPorFiltros("nivel"), "Não há cursos cadastrados.");
+        Assertions.assertTrue(consultasService.listarPorFiltros("nivel").isEmpty(), "Não há cursos cadastrados.");
     }
 
 
     @Test
     public void deveGerarErroQuandoNivelDoCursoForVazio() {
-        when(cursoRepositorio.count()).thenReturn(1L);
 
         Assertions.assertThrows(RegraNegocioRunTime.class, () -> consultasService.listarPorFiltros(""), "Nível do curso não pode ser vazio.");
     }
 
     @Test
     public void deveListarCursosQuandoFiltrosSaoValidos() {
-        when(cursoRepositorio.count()).thenReturn(1L);
         List<Curso> cursos = new ArrayList<>();
         cursos.add(new Curso());
         when(cursoRepositorio.filtrarCursosPorNivel("nivel")).thenReturn(cursos);
@@ -97,22 +94,19 @@ public class ConsultasServiceTest {
 
 
     @Test
-    public void deveGerarErroQuandoNaoHouverDepoimentosCadastrados() {
-        when(depoimentoRepositorio.count()).thenReturn(0L);
+    public void deveRetornarListaVaziaQuandoNaoHouverDepoimentos() {
 
-        Assertions.assertThrows(RegraNegocioRunTime.class, () -> consultasService.consultarRecentes(10), "Não há depoimentos cadastrados.");
+        Assertions.assertTrue(consultasService.consultarRecentes(10).isEmpty(), "Não há depoimentos cadastrados.");
     }
 
     @Test
     public void deveGerarErroQuandoLimiteForInvalido() {
-        when(depoimentoRepositorio.count()).thenReturn(1L);
 
         Assertions.assertThrows(RegraNegocioRunTime.class, () -> consultasService.consultarRecentes(-1), "Valor limite deve ser válido.");
     }
 
     @Test
     public void deveRetornarDepoimentosRecentesComLimite() {
-        when(depoimentoRepositorio.count()).thenReturn(1L);
         List<Depoimento> depoimentos = new ArrayList<>();
         depoimentos.add(new Depoimento());
         Pageable pageable = PageRequest.of(0, 10);
@@ -125,7 +119,6 @@ public class ConsultasServiceTest {
 
     @Test
     public void deveRetornarDepoimentosRecentesSemLimite() {
-        when(depoimentoRepositorio.count()).thenReturn(1L);
         List<Depoimento> depoimentos = new ArrayList<>();
         depoimentos.add(new Depoimento());
         when(depoimentoRepositorio.findAllByOrderByDataDesc()).thenReturn(depoimentos);
@@ -137,14 +130,12 @@ public class ConsultasServiceTest {
 
     @Test
     public void deveGerarErroQuandoAnoForInvalido() {
-        when(depoimentoRepositorio.count()).thenReturn(1L);
 
         Assertions.assertThrows(RegraNegocioRunTime.class, () -> consultasService.consultarPorAno(0), "o ano deve ser maior que zero.");
     }
 
     @Test
     public void deveRetornarDepoimentosPorAno() {
-        when(depoimentoRepositorio.count()).thenReturn(1L);
         List<Depoimento> depoimentos = new ArrayList<>();
         depoimentos.add(new Depoimento());
         when(depoimentoRepositorio.findByAno(2021)).thenReturn(depoimentos);
@@ -155,22 +146,19 @@ public class ConsultasServiceTest {
     }
 
     @Test
-    public void deveGerarErroQuandoNaoHouverEgressosCadastrados() {
-        when(egressoRepositorio.count()).thenReturn(0L);
+    public void deveRetornarListaVaziaQuandoNomeNaoEncontrarEgressos() {
 
-        Assertions.assertThrows(RegraNegocioRunTime.class, () -> consultasService.consultarEgressosPorNome("nome"), "Não há egressos cadastrados.");
+        Assertions.assertTrue(consultasService.consultarEgressosPorNome("nome").isEmpty(), "Não há egressos cadastrados.");
     }
 
     @Test
     public void deveGerarErroQuandoNomeDoEgressoForVazio() {
-        when(egressoRepositorio.count()).thenReturn(1L);
 
         Assertions.assertThrows(RegraNegocioRunTime.class, () -> consultasService.consultarEgressosPorNome(""), "Nome não pode ser vazio.");
     }
 
     @Test
     public void deveRetornarEgressosPorNome() {
-        when(egressoRepositorio.count()).thenReturn(1L);
         List<Egresso> egressos = new ArrayList<>();
         egressos.add(new Egresso());
         when(egressoRepositorio.findByNomeContainingIgnoreCase("nome")).thenReturn(egressos);
@@ -181,24 +169,19 @@ public class ConsultasServiceTest {
     }
 
     @Test
-    public void deveGerarErroQuandoNaoHouverCargosCadastrados() {
-        when(cargoRepositorio.count()).thenReturn(0L);
+    public void deveRetornarListaVaziaQuandoCargoNaoEncontrarEgressos() {
 
-        Assertions.assertThrows(RegraNegocioRunTime.class, () -> consultasService.consultarEgressosPorCargo("cargo"), "Não há cargos cadastrados.");
+        Assertions.assertTrue(consultasService.consultarEgressosPorCargo("cargo").isEmpty(), "Não há cargos cadastrados.");
     }
 
     @Test
     public void deveGerarErroQuandoCargoForVazio() {
-        when(cargoRepositorio.count()).thenReturn(1L);
-        when(egressoRepositorio.count()).thenReturn(1L);
 
         Assertions.assertThrows(RegraNegocioRunTime.class, () -> consultasService.consultarEgressosPorCargo(""), "Cargo não pode ser vazio.");
     }
 
     @Test
     public void deveRetornarEgressosPorCargo() {
-        when(cargoRepositorio.count()).thenReturn(1L);
-        when(egressoRepositorio.count()).thenReturn(1L);
         List<Egresso> egressos = new ArrayList<>();
         egressos.add(new Egresso());
         when(cargoRepositorio.findEgressosByCargoDescricao("cargo")).thenReturn(egressos);
@@ -210,14 +193,12 @@ public class ConsultasServiceTest {
 
     @Test
     public void deveGerarErroQuandoCursoForVazio() {
-        when(egressoRepositorio.count()).thenReturn(1L);
 
         Assertions.assertThrows(RegraNegocioRunTime.class, () -> consultasService.consultarEgressosPorCurso(""), "Curso não pode ser vazio.");
     }
 
     @Test
     public void deveRetornarEgressosPorCurso() {
-        when(egressoRepositorio.count()).thenReturn(1L);
         List<Egresso> egressos = new ArrayList<>();
         egressos.add(new Egresso());
         when(cursoEgressoRepositorio.findEgressosByCursoNome("curso")).thenReturn(egressos);
@@ -229,14 +210,12 @@ public class ConsultasServiceTest {
 
     @Test
     public void deveGerarErroQuandoAnoForInvalidoParaEgressos() {
-        when(egressoRepositorio.count()).thenReturn(1L);
 
         Assertions.assertThrows(RegraNegocioRunTime.class, () -> consultasService.consultarEgressosPorAnoInicio(0), "O ano deve ser maior que zero.");
     }
 
     @Test
     public void deveRetornarEgressosPorAno() {
-        when(egressoRepositorio.count()).thenReturn(1L);
         List<Egresso> egressos = new ArrayList<>();
         egressos.add(new Egresso());
         when(cursoEgressoRepositorio.findEgressosByAnoInicio(2021)).thenReturn(egressos);
