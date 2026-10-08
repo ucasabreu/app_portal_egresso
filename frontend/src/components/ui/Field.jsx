@@ -6,6 +6,7 @@ export default function Field({
   as: control = Input,
   label,
   labelAction,
+  hideLabel = false,
   hint,
   error,
   id,
@@ -24,10 +25,10 @@ export default function Field({
 
   return (
     <div className={[styles.field, className].join(" ")}>
-      <div className={styles.heading}>
+      <div className={[styles.heading, hideLabel && !labelAction ? styles.hiddenHeading : ""].join(" ")}>
         <label className={styles.label} htmlFor={controlId}>
           {label}
-          {required && <span className={styles.required}>Obrigatório</span>}
+          {required && <span className={styles.required} aria-hidden="true">*</span>}
         </label>
         {labelAction}
       </div>

@@ -5,9 +5,10 @@
   gap: var(--space-2);
   min-height: var(--control-height);
   max-width: 100%;
-  padding: var(--space-3) var(--space-6);
+  overflow-wrap: anywhere;
+  padding: var(--space-2) var(--space-4);
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   font-size: var(--text-sm);
   font-weight: 650;
   line-height: 1.4;
@@ -19,16 +20,16 @@
 }
 
 .primary {
-  background: var(--color-accent);
+  background: var(--color-brand);
   color: var(--color-surface);
 }
 
 .primary:hover:not(:disabled) {
-  background: var(--color-accent-hover);
+  background: var(--color-brand-strong);
 }
 
 .secondary {
-  border-color: var(--color-border-strong);
+  border-color: var(--color-brand);
   background: var(--color-surface);
   color: var(--color-brand);
 }
@@ -53,8 +54,8 @@
 }
 
 .button:focus-visible {
-  outline: 3px solid var(--color-brand);
-  outline-offset: 3px;
+  outline: var(--focus-ring-width) solid var(--focus-outline-color);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .button:disabled {

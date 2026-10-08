@@ -12,7 +12,7 @@ export default function ConfirmDialog({ open, title = "Confirmar exclusão", des
     if (!open && dialog.open) dialog.close();
   }, [open]);
   return (
-    <dialog ref={ref} className={styles.dialog} aria-labelledby={titleId} aria-describedby={descriptionId}
+    <dialog ref={ref} className={styles.dialog} aria-labelledby={titleId} aria-describedby={descriptionId} aria-busy={pending}
       onCancel={event => { event.preventDefault(); if (!pending) onCancel(); }}>
       <h2 id={titleId}>{title}</h2><p id={descriptionId}>{description}</p>
       {error && <p className={styles.error} role="alert">{error}</p>}

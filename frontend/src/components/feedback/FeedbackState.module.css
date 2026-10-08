@@ -1,4 +1,5 @@
 .state {
+  --focus-outline-color: var(--color-focus);
   display: grid;
   justify-items: center;
   gap: var(--space-3);
@@ -16,10 +17,12 @@
   height: var(--space-12);
   border-radius: var(--radius-md);
   background: var(--color-surface-muted);
-  color: var(--color-accent);
+  color: var(--color-brand);
 }
 
 .title {
+  font-family: var(--font-body);
+  font-weight: 600;
   color: var(--color-brand);
   font-size: var(--text-lg);
 }
@@ -38,7 +41,7 @@
   width: var(--space-6);
   height: var(--space-6);
   border: 3px solid var(--color-border);
-  border-top-color: var(--color-accent);
+  border-top-color: var(--color-brand);
   border-radius: 50%;
   animation: spin 800ms linear infinite;
 }

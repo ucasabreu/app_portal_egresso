@@ -24,9 +24,9 @@
 }
 
 .required {
-  color: var(--color-text-muted);
-  font-size: var(--text-xs);
-  font-weight: 400;
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  font-weight: 600;
 }
 
 .hint,
@@ -42,3 +42,7 @@
 .error {
   color: var(--color-danger);
 }
+
+.hint, .error { font-size: var(--text-xs); }
+
+.hiddenHeading { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
