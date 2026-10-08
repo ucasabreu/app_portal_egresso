@@ -1,0 +1,9 @@
+.dialog { position: relative; width: min(28rem, calc(100% - 2rem)); margin: auto; padding: var(--space-8); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text); text-align: center; max-height: calc(100dvh - 2rem); overflow-y: auto; }
+.dialog::backdrop { background: rgb(10 47 79 / 60%); }
+.close { position: absolute; right: var(--space-2); top: var(--space-2); display: grid; place-items: center; width: var(--control-height); height: var(--control-height); border: 0; background: transparent; color: var(--color-brand); cursor: pointer; }
+.icon { width: 2.5rem; height: 2.5rem; margin-bottom: var(--space-4); color: var(--color-success); }
+.dialog h2 { font-size: var(--text-xl); margin-bottom: var(--space-3); }
+.dialog p { font-size: var(--text-sm); color: var(--color-text-muted); }
+.actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--space-3); margin-top: var(--space-6); }
+.actions a { display: inline-flex; align-items: center; justify-content: center; min-height: var(--control-height); padding: var(--space-2) var(--space-4); border-radius: var(--radius-sm); color: var(--color-on-brand); background: var(--color-brand); font-size: var(--text-sm); font-weight: 600; }
+.actions a:hover { background: var(--color-brand-strong); }

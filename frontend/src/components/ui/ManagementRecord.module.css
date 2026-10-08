@@ -1,0 +1,16 @@
+.record { display: grid; grid-template-columns: 5rem minmax(0, 1fr) auto var(--control-height); align-items: center; gap: var(--space-4); min-width: 0; padding-block: var(--space-4); border-bottom: 1px solid var(--color-border); }
+.cover { width: 5rem; height: 3.75rem; object-fit: cover; border-radius: var(--radius-sm); background: var(--color-surface-muted); }
+.body { min-width: 0; }
+.body h3 { font-family: var(--font-heading); font-size: var(--text-base); color: var(--color-brand-strong); line-height: 1.4; margin-bottom: var(--space-2); }
+.body p { font-size: var(--text-xs); color: var(--color-text-muted); overflow-wrap: anywhere; }
+.published, .draft { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); padding: var(--space-1) var(--space-2); border-radius: 2rem; font-size: .75rem; font-weight: 500; white-space: nowrap; }
+.published { color: var(--color-success); background: var(--color-success-surface); }
+.draft { color: var(--color-warning); background: var(--color-warning-surface); }
+.menu { position: relative; }
+.menu > summary { display: grid; place-items: center; width: var(--control-height); height: var(--control-height); border-radius: var(--radius-sm); color: var(--color-brand); cursor: pointer; list-style: none; }
+.menu > summary::-webkit-details-marker { display: none; }
+.menu > summary:hover, .menu[open] > summary { background: var(--color-info-surface); }
+.actions { position: absolute; right: 0; top: calc(100% + .25rem); z-index: 4; display: grid; min-width: 12rem; max-width: 80vw; padding: var(--space-2); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); }
+.actions > a, .actions > button { justify-content: start; text-align: left; padding: var(--space-2) var(--space-3); min-height: var(--control-height); border: 0; background: transparent; border-radius: var(--radius-sm); font-size: var(--text-xs); }
+.actions > a:hover, .actions > button:hover:not(:disabled) { background: var(--color-info-surface); text-decoration: none; }
+@media (max-width: 39.99rem) { .record { grid-template-columns: 3.5rem minmax(0, 1fr) var(--control-height); gap: var(--space-3); } .cover { width: 3.5rem; height: 3.5rem; } .published, .draft { grid-column: 2; justify-self: start; } .menu { grid-column: 3; grid-row: 1 / span 2; } .body h3 { font-size: var(--text-sm); } }
