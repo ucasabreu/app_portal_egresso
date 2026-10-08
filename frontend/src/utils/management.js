@@ -15,6 +15,7 @@ export function highlightErrors(values) {
   else if (values.titulo.length > 100) errors.titulo = "Use no máximo 100 caracteres.";
   else if (!/^[A-Za-zÀ-ÿ0-9\s]+$/.test(values.titulo)) errors.titulo = "Use somente letras, números e espaços, conforme a regra atual do portal.";
   if (!values.noticia.trim()) errors.noticia = "Escreva o texto da notícia.";
+  else if (values.noticia.length > 100_000) errors.noticia = "Use no máximo 100.000 caracteres.";
   if (!values.feitoDestaque.trim()) errors.feitoDestaque = "Descreva a conquista reconhecida.";
   else if (values.feitoDestaque.length > 255) errors.feitoDestaque = "Resuma a conquista em até 255 caracteres.";
   if (values.imagem && (!httpUrl(values.imagem) || values.imagem.length > 2048 || new URL(values.imagem).username || new URL(values.imagem).password)) errors.imagem = "Informe uma URL completa com http:// ou https://.";
@@ -71,4 +72,39 @@ export function trajectoryErrors(type, values, courses = [], currentYear = new D
   if (!/^\d{4}$/.test(values.ano_inicio) || Number(values.ano_inicio) < minimum || Number(values.ano_inicio) > currentYear) errors.ano_inicio = `Informe um ano entre ${minimum} e ${currentYear}, conforme a regra atual do portal.`;
   if (values.ano_fim && (!/^\d{4}$/.test(values.ano_fim) || Number(values.ano_fim) < 1900 || Number(values.ano_fim) > 2100 || Number(values.ano_fim) < Number(values.ano_inicio))) errors.ano_fim = "Informe um ano entre 1900 e 2100, igual ou posterior ao início.";
   return errors;
+}
+
+export function draftErrors(values) {
+  const errors = {};
+  for (const [key, limit] of [["titulo", 100], ["feitoDestaque", 255], ["noticia", 100_000]]) {
+    if (values[key].length > limit) errors[key] = `Use no máximo ${limit.toLocaleString("pt-BR")} caracteres.`;
+  }
+  if (values.imagem) {
+    const error = highlightErrors({ titulo: "Título", noticia: "Texto", feitoDestaque: "Conquista", imagem: values.imagem }).imagem;
+    if (error) errors.imagem = error;
+  }
+  return errors;
+}
+
+export function coordinatorErrors(values) {
+  const errors = {};
+  if (!/^[a-zA-Z0-9._]{4,20}$/.test(values.login)) errors.login = "Use de 4 a 20 caracteres: letras, números, ponto ou underline.";
+  if (values.senha.length < 8 || values.senha.length > 128 || !values.senha.trim()) errors.senha = "Use uma senha de 8 a 128 caracteres.";
+  if (!["coordenador", "geral"].includes(values.tipo)) errors.tipo = "Selecione um tipo de coordenação disponível.";
+  return errors;
+}
+
+export function graduateSummary(courses, unavailable = false) {
+  const incomplete = Boolean(unavailable || courses.some(course => course.egressosError));
+  const associations = courses.flatMap(course => course.egressos || []).filter(person => person?.id != null);
+  return { people: incomplete ? "Indisponível" : new Set(associations.map(person => String(person.id))).size,
+    associations: incomplete ? "Indisponível" : associations.length };
+}
+
+export function draftResponse(data, expectedId) {
+  if (!data || data.id == null || !Number.isSafeInteger(data.versao) || data.versao < 0 ||
+      (expectedId != null && String(data.id) !== String(expectedId))) {
+    throw new Error("Não foi possível confirmar a identificação e a versão do rascunho. Seu conteúdo foi mantido no formulário.");
+  }
+  return data;
 }

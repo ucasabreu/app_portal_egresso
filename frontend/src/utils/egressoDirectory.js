@@ -13,6 +13,13 @@ export function readDirectory(search) {
   return { filters, order: params.get("ordem") === "nome-desc" ? "nome-desc" : "nome-asc", page: Number.isSafeInteger(page) && page > 0 ? page : 1, size: [6, 12, 24].includes(size) ? size : 6 };
 }
 
+export function directoryFilterErrors(filters) {
+  return Object.fromEntries(["anoInicio", "anoFim"].filter(key => {
+    const value = String(filters[key] ?? "").trim();
+    return value && (!/^\d{4}$/.test(value) || Number(value) < 1900 || Number(value) > 2100);
+  }).map(key => [key, "Informe um ano inteiro entre 1900 e 2100."]));
+}
+
 export function directorySearch(view) {
   const params = new URLSearchParams();
   Object.keys(emptyFilters).forEach(key => {
@@ -45,11 +52,39 @@ export function cardExperience(jobs = []) {
   return jobs.filter(item => item?.descricao).sort((a, b) => Number(b.ano_fim == null) - Number(a.ano_fim == null) || (b.ano_fim || b.ano_inicio || 0) - (a.ano_fim || a.ano_inicio || 0))[0];
 }
 
+function trajectoryYear(value) {
+  if (value == null || !/^\d{4}$/.test(String(value))) return null;
+  const year = Number(value);
+  return year >= 1900 && year <= 2100 ? year : null;
+}
+
 export function trajectoryPeriod(record) {
   if (!record) return "";
-  return [record.ano_inicio, record.ano_fim ?? "Em andamento"].filter(value => value != null && value !== "").join(" – ");
+  const start = trajectoryYear(record.ano_inicio);
+  const end = trajectoryYear(record.ano_fim);
+  if (start == null && end == null) return "Período não informado";
+  if (start == null) return "Conclusão em " + end;
+  return start + " – " + (end ?? "Em andamento");
+}
+
+export function orderedTrajectory(records = []) {
+  return records.filter(item => item && typeof item === "object").map((record, index) => ({ record, index }))
+    .sort((a, b) => (trajectoryYear(a.record.ano_inicio) ?? Infinity) - (trajectoryYear(b.record.ano_inicio) ?? Infinity)
+      || (trajectoryYear(a.record.ano_fim) ?? Infinity) - (trajectoryYear(b.record.ano_fim) ?? Infinity) || a.index - b.index)
+    .map(({ record }) => record);
 }
 
 export function directoryReturn(path) {
   return typeof path === "string" && /^\/egressos\/listar(?:\?[^#]*)?$/.test(path) ? path : "/egressos/listar";
+}
+
+export function paginationItems(current, total) {
+  if (!Number.isSafeInteger(total) || total < 1) return [];
+  const selected = Number(current);
+  const page = Math.max(1, Math.min(Number.isSafeInteger(selected) ? selected : 1, total));
+  const start = Math.max(1, Math.min(page - 1, total - 2));
+  const visible = new Set([1, total, start, Math.min(start + 1, total), Math.min(start + 2, total)]);
+  const pages = [...visible].sort((a, b) => a - b), result = [];
+  pages.forEach((number, index) => { if (index && number - pages[index - 1] > 1) result.push("gap"); result.push(number); });
+  return result;
 }

@@ -1,6 +1,7 @@
+import { profileValues, saveProfileChanges } from "../src/services/profileEditor.js";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { graduateRows, matchesSearch, highlightErrors, profileErrors, courseErrors, trajectoryErrors } from "../src/utils/management.js";
+import { graduateRows, matchesSearch, highlightErrors, profileErrors, courseErrors, trajectoryErrors, draftErrors, coordinatorErrors, graduateSummary, draftResponse } from "../src/utils/management.js";
 import { MAX_IMAGE_BYTES, imageFileError } from "../src/utils/imagePolicy.js";
 import readImageFile from "../src/utils/readImageFile.js";
 
@@ -80,4 +81,84 @@ test("arquivos aceitos respeitam o limite inclusivo de 2 MB", () => {
 test("leitura rejeita imagem grande ou formato inválido antes de instanciar FileReader", async () => {
   await assert.rejects(readImageFile({ type: "image/png", size: MAX_IMAGE_BYTES + 1 }), /2 MB/);
   await assert.rejects(readImageFile({ type: "image/svg+xml", size: 50 }), /JPEG/);
+});
+
+test("payload do perfil contém somente os campos públicos, sem senha ou confirmação", () => {
+  const payload = profileValues({ ...profile, senha: "segredo", confirmationPassword: "segredo", foto: null, id_egresso: 7 });
+  assert.equal(payload.foto, "");
+  assert.equal(payload.nome, "Ana Demo");
+  assert.equal(Object.hasOwn(payload, "senha"), false);
+  assert.equal(Object.hasOwn(payload, "confirmationPassword"), false);
+  assert.equal(Object.hasOwn(payload, "id_egresso"), false);
+});
+
+test("perfil salvo e falha de senha são operações com resultados separados", async () => {
+  const failure = new Error("Redefinição indisponível");
+  const operations = [];
+  const result = await saveProfileChanges({ id: 7, values: profile, password: "senha-demo", allowPasswordReset: true,
+    updateProfile: async (id, values) => { operations.push(["perfil", id, values.nome]); return { id_egresso: 7 }; },
+    resetPassword: async id => { operations.push(["senha", id]); throw failure; },
+  });
+  assert.deepEqual(operations, [["perfil", 7, "Ana Demo"], ["senha", 7]]);
+  assert.equal(result.profileSaved, true);
+  assert.equal(result.passwordSaved, false);
+  assert.equal(result.passwordError, failure);
+});
+
+test("repetir somente a senha não envia o perfil já salvo novamente", async () => {
+  let profileCalls = 0;
+  const result = await saveProfileChanges({ id: 7, values: profile, password: "senha-demo", allowPasswordReset: true, skipProfile: true,
+    updateProfile: async () => { profileCalls++; }, resetPassword: async (id, password) => { assert.equal(id, 7); assert.equal(password, "senha-demo"); },
+  });
+  assert.equal(profileCalls, 0);
+  assert.equal(result.passwordSaved, true);
+  assert.equal(result.passwordError, null);
+});
+
+test("falha ou identidade inesperada do perfil interrompem a redefinição da senha", async () => {
+  let resets = 0;
+  const base = { id: 7, values: profile, password: "senha-demo", allowPasswordReset: true, resetPassword: async () => { resets++; } };
+  await assert.rejects(saveProfileChanges({ ...base, updateProfile: async () => { throw new Error("Perfil indisponível"); } }), /Perfil indisponível/);
+  await assert.rejects(saveProfileChanges({ ...base, updateProfile: async () => ({ id_egresso: 8 }) }), /identificação/);
+  assert.equal(resets, 0);
+});
+
+test("sem autorização de redefinição, salvar o perfil não envia senha", async () => {
+  let resets = 0;
+  const result = await saveProfileChanges({ id: 7, values: profile, password: "senha-demo", updateProfile: async () => ({ id_egresso: 7 }), resetPassword: async () => { resets++; } });
+  assert.equal(resets, 0);
+  assert.equal(result.profileSaved, true);
+});
+
+test("rascunho permite texto incompleto e exige limites e URL válidos", () => {
+  assert.deepEqual(draftErrors({ titulo: "", feitoDestaque: "", noticia: "", imagem: "" }), {});
+  assert.ok(draftErrors({ ...highlight, titulo: "x".repeat(101) }).titulo);
+  assert.ok(draftErrors({ ...highlight, noticia: "x".repeat(100001) }).noticia);
+  assert.ok(draftErrors({ ...highlight, imagem: "javascript:alert(1)" }).imagem);
+  assert.ok(highlightErrors({ ...highlight, noticia: "x".repeat(100001) }).noticia);
+});
+
+test("resumo conta pessoas únicas e vínculos separadamente e indica consulta incompleta", () => {
+  const courses = [{ egressos: [{ id: 7 }, { id: 8 }] }, { egressos: [{ id: "7" }] }];
+  assert.deepEqual(graduateSummary(courses), { people: 2, associations: 3 });
+  assert.deepEqual(graduateSummary([...courses, { egressosError: "Indisponível" }]), { people: "Indisponível", associations: "Indisponível" });
+  assert.deepEqual(graduateSummary([], true), { people: "Indisponível", associations: "Indisponível" });
+});
+
+test("conta de coordenação exige login e senha do contrato e tipo disponível", () => {
+  const values = { login: "coord.demo", senha: "senha-demo", tipo: "coordenador" };
+  assert.deepEqual(coordinatorErrors(values), {});
+  assert.deepEqual(coordinatorErrors({ ...values, tipo: "geral" }), {});
+  assert.ok(coordinatorErrors({ ...values, login: "a b" }).login);
+  assert.ok(coordinatorErrors({ ...values, senha: "curta" }).senha);
+  assert.ok(coordinatorErrors({ ...values, tipo: "administrador" }).tipo);
+});
+
+test("resposta do rascunho exige versão confirmada e preserva sua identidade", () => {
+  const saved = { id: 12, versao: 3, titulo: "Conquista" };
+  assert.equal(draftResponse(saved, "12"), saved);
+  assert.equal(draftResponse({ ...saved, versao: 0 }).versao, 0);
+  for (const value of [null, { id: 12 }, { ...saved, versao: -1 }, { ...saved, versao: "3" }, { ...saved, id: 13 }]) {
+    assert.throws(() => draftResponse(value, 12), /versão do rascunho/);
+  }
 });

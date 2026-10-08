@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readDirectory, directorySearch, directoryPage, cardFormation, cardExperience, trajectoryPeriod, directoryReturn } from "../src/utils/egressoDirectory.js";
+import { readDirectory, directorySearch, directoryFilterErrors, directoryPage, cardFormation, cardExperience, trajectoryPeriod, orderedTrajectory, directoryReturn } from "../src/utils/egressoDirectory.js";
 import { loadDirectory, createDirectoryDetailsCache } from "../src/services/egressoDirectory.js";
 import { getCollection } from "../src/services/collections.js";
 
@@ -167,4 +167,46 @@ test("atualização impede que respostas antigas repovoem o cache", async () => 
   const updated = await cache.load(async () => { calls += 1; return []; }, [1]);
   assert.equal(calls, 2);
   assert.deepEqual(updated[1].cursos, []);
+});
+
+
+test("períodos incompletos não inventam datas nem andamento para registros sem nenhum ano", () => {
+  assert.equal(trajectoryPeriod({ ano_inicio: null, ano_fim: null }), "Período não informado");
+  assert.equal(trajectoryPeriod({ ano_inicio: null, ano_fim: 2022 }), "Conclusão em 2022");
+  assert.equal(trajectoryPeriod({ ano_inicio: 2018, ano_fim: null }), "2018 – Em andamento");
+  assert.equal(trajectoryPeriod({ ano_inicio: "2018", ano_fim: "2022" }), "2018 – 2022");
+  assert.equal(trajectoryPeriod({ ano_inicio: "", ano_fim: "" }), "Período não informado");
+  assert.equal(trajectoryPeriod({ ano_inicio: 0, ano_fim: 3000 }), "Período não informado");
+});
+
+test("trajetória é cronológica, estável e deixa registros sem início por último sem alterar a origem", () => {
+  const unknown = { id: 1, ano_inicio: null, ano_fim: null };
+  const current = { id: 2, ano_inicio: 2020, ano_fim: null };
+  const first = { id: 3, ano_inicio: 2010, ano_fim: 2014 };
+  const same = { id: 4, ano_inicio: 2010, ano_fim: 2014 };
+  const records = [unknown, current, first, same];
+  assert.deepEqual(orderedTrajectory(records), [first, same, current, unknown]);
+  assert.deepEqual(records, [unknown, current, first, same]);
+  assert.deepEqual(orderedTrajectory([null, first, undefined]), [first]);
+});
+
+
+test("anos dos filtros validam limites e não impõem um intervalo inexistente na consulta", () => {
+  assert.deepEqual(directoryFilterErrors({ anoInicio: "1900", anoFim: "2100" }), {});
+  assert.deepEqual(directoryFilterErrors({ anoInicio: "2022", anoFim: "2018" }), {});
+  assert.deepEqual(directoryFilterErrors({ anoInicio: "", anoFim: " " }), {});
+  for (const value of ["1899", "2101", "2018.5", "02018", "-1", "abc"]) {
+    assert.ok(directoryFilterErrors({ anoInicio: value, anoFim: value }).anoInicio);
+    assert.ok(directoryFilterErrors({ anoInicio: value, anoFim: value }).anoFim);
+  }
+});
+
+test("paginação mantém página atual e extremidades sem controles duplicados", async () => {
+  const { paginationItems } = await import("../src/utils/egressoDirectory.js");
+  assert.deepEqual(paginationItems(1, 1), [1]);
+  assert.deepEqual(paginationItems(2, 3), [1, 2, 3]);
+  assert.deepEqual(paginationItems(1, 32), [1, 2, 3, "gap", 32]);
+  assert.deepEqual(paginationItems(17, 32), [1, "gap", 16, 17, 18, "gap", 32]);
+  assert.deepEqual(paginationItems(32, 32), [1, "gap", 30, 31, 32]);
+  assert.deepEqual(paginationItems(1, 0), []);
 });
