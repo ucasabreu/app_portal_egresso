@@ -5,6 +5,7 @@ import useProfile from "../../hooks/useProfile";
 import PageShell from "../../components/ui/PageShell";
 import Container from "../../components/ui/Container";
 import ProfileHero from "../../components/ui/ProfileHero";
+import ProfileNavigation from "../../components/ui/ProfileNavigation";
 import ProfileDetails from "../../components/ui/ProfileDetails";
 import LoadingState from "../../components/feedback/LoadingState";
 import ErrorState from "../../components/feedback/ErrorState";
@@ -24,11 +25,9 @@ export default function EgressoView() {
   );
   return (
     <Container as="section" className={styles.page}>
-      <div className={styles.top}><Link to={returnPath} className={styles.link}>← Voltar aos egressos</Link>{canEditProfile(user, id) && <Link to={"/edit-egresso/" + id} className={styles.link}>Editar perfil →</Link>}</div>
-      <ProfileHero egresso={profile.egresso} cursos={profile.cursos} />
-      <nav className={styles.sections} aria-label="Nesta trajetória">
-        <a href="#profile-education">Formação</a><a href="#profile-experience">Experiências</a><a href="#profile-highlights">Conquistas</a><a href="#profile-testimonials">Depoimentos</a>
-      </nav>
+      <div className={styles.top}><nav className={styles.breadcrumb} aria-label="Caminho da página"><Link to="/">Início</Link><span aria-hidden="true">/</span><Link to={returnPath}>Comunidade</Link><span aria-hidden="true">/</span><span aria-current="page">{profile.egresso.nome || "Perfil"}</span></nav>{canEditProfile(user, id) && <Link to={"/edit-egresso/" + id} className={styles.link}>Editar perfil →</Link>}</div>
+      <ProfileHero egresso={profile.egresso} cursos={profile.cursos} cargos={profile.cargos} depoimentos={profile.depoimentos} sections={profile.sections} />
+      <ProfileNavigation variant="public" />
       <ProfileDetails {...profile} publicView />
     </Container>
   );
