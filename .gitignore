@@ -10,3 +10,8 @@
 
 # Metadados do Windows
 *Zone.Identifier
+
+# Materiais locais de redesign e planejamento
+/docs/redesign/
+/docs/planejamento/
+/novo_redesign/
