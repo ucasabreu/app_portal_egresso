@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { orderedDepoimentos, depoimentoExcerpt, depoimentoYear, depoimentosPath } from "../src/utils/depoimentos.js";
-import { homeContent } from "../src/utils/homeContent.js";
+import { homeContent, homeStatistics } from "../src/utils/homeContent.js";
 import { getCollection } from "../src/services/collections.js";
 
 const problem = (status, data) => Object.assign(new Error(data), { response: { status, data } });
@@ -101,4 +101,27 @@ test("validação de ano/limite, autenticação e falhas de servidor continuam c
 
 test("resposta malformada dos relatos não é apresentada como lista vazia", async () => {
   await assert.rejects(getCollection(async () => ({ texto: "Formato incorreto" }), depoimentosPath()), /formato inesperado/);
+});
+
+
+test("contagens da home usam totais da API, incluindo zero, sem contar apenas a prévia", () => {
+  const community = { data: { total: 125, items: [{ id: 1 }] }, loading: false, error: "" };
+  const stories = { data: { total: 0, items: [] }, loading: false, error: "" };
+  assert.deepEqual(homeStatistics({ community, stories }), [
+    { label: "Egressos na comunidade", value: 125 },
+    { label: "Histórias publicadas", value: 0 },
+  ]);
+});
+
+test("contagens ausentes, pendentes ou com falha não viram métricas fictícias", () => {
+  assert.deepEqual(homeStatistics(), []);
+  for (const collection of [
+    { data: { total: 20 }, loading: true },
+    { data: { total: 20 }, loading: false, error: "Indisponível" },
+    { data: { total: "20" }, loading: false },
+    { data: { total: -1 }, loading: false },
+    { data: { total: 1.5 }, loading: false },
+    { data: { total: Number.MAX_SAFE_INTEGER + 1 }, loading: false },
+    {},
+  ]) assert.deepEqual(homeStatistics({ community: collection, stories: collection }), []);
 });

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { getCollection } from "../src/services/collections.js";
 import { loadProfile } from "../src/services/profile.js";
-import { orderedDestaques, groupDestaques } from "../src/utils/destaques.js";
+import { orderedDestaques, groupDestaques, galleryReturn } from "../src/utils/destaques.js";
 import { loadDestaque } from "../src/services/destaques.js";
 
 const failure = (status, data) => Object.assign(new Error("Falha de consulta"), { response: { status, data } });
@@ -138,4 +138,16 @@ test("gestão do egresso conserva suas consultas sem buscar destaques adicionais
   }, 1);
   assert.deepEqual(result.destaques, []);
   assert.equal(result.cursos.length, 1);
+});
+
+test("retorno do artigo preserva a busca, a ordem e a página da galeria", () => {
+  const path = "/destaques?busca=Ana+%26+Jo%C3%A3o&ordem=antigos&pagina=3";
+  assert.equal(galleryReturn(path), path);
+  assert.equal(galleryReturn("/destaques"), "/destaques");
+});
+
+test("retorno da galeria rejeita outros destinos, artigos e fragmentos", () => {
+  for (const value of [null, {}, "https://example.test/destaques", "//example.test", "/destaques/2", "/destaques-extra", "/destaques#conteudo", "/destaques?pagina=2#conteudo"]) {
+    assert.equal(galleryReturn(value), "/destaques");
+  }
 });

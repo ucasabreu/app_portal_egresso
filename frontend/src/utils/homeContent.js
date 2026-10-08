@@ -10,3 +10,13 @@ export function homeContent({ destaques = [], egressos = [], depoimentos = [] })
     testimonials: orderedDepoimentos(depoimentos).slice(0, 3),
   };
 }
+
+
+export function homeStatistics({ community, stories } = {}) {
+  return [
+    { collection: community, label: "Egressos na comunidade" },
+    { collection: stories, label: "Histórias publicadas" },
+  ].filter(({ collection }) => collection && !collection.loading && !collection.error
+    && Number.isSafeInteger(collection.data?.total) && collection.data.total >= 0)
+    .map(({ collection, label }) => ({ label, value: collection.data.total }));
+}

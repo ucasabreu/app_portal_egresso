@@ -4,13 +4,13 @@ import Photo from "./Photo";
 import { formatDate } from "../../utils/presentation.js";
 import styles from "./DestaqueCard.module.css";
 
-export default function DestaqueCard({ destaque, featured = false, headingLevel = 2, expandable = false }) {
+export default function DestaqueCard({ destaque, featured = false, headingLevel = 2, expandable = false, compact = false }) {
   const location = useLocation();
   const state = { gallery: location.pathname === "/destaques" ? location.pathname + location.search : "/destaques" };
   const Heading = "h" + headingLevel;
   const path = "/destaques/" + destaque.id;
   return (
-    <article className={[styles.card, featured ? styles.featured : ""].join(" ")}>
+    <article className={[styles.card, featured ? styles.featured : "", compact ? styles.compact : ""].join(" ")}>
       <Photo src={destaque.imagem || destaque.egresso?.foto} alt="" className={styles.cover} width={800} height={450} loading={featured ? "eager" : "lazy"} />
       <div className={styles.body}>
         <div className={styles.meta}><span>{featured ? "História em evidência" : "Conquista da comunidade"}</span><time dateTime={destaque.dataPublicacao || undefined}>{formatDate(destaque.dataPublicacao)}</time></div>

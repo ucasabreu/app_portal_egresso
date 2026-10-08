@@ -31,3 +31,7 @@ export function groupDestaques(items) {
   });
   return [...groups].map(([year, destaques]) => ({ year, destaques }));
 }
+
+export function galleryReturn(path) {
+  return typeof path === "string" && /^\/destaques(?:\?[^#]*)?$/.test(path) ? path : "/destaques";
+}

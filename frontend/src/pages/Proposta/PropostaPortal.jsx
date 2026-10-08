@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaCompass, FaUserGraduate, FaAward, FaGraduationCap, FaBriefcase, FaQuoteLeft } from "react-icons/fa";
-import PageShell from "../../components/ui/PageShell";
+import Container from "../../components/ui/Container";
+import EditorialHeader from "../../components/ui/EditorialHeader";
+import Graduation from "../../assets/graduation.jpg";
 import styles from "./Proposta.module.css";
 
 const journeys = [
-  { icon: FaCompass, audience: "Para quem visita", title: "Descubra a comunidade", text: "Conheça as pessoas que passaram pela universidade e os caminhos que construíram.", steps: ["Pesquise egressos por nome, curso, cargo ou período.", "Abra um perfil para conhecer formação e experiências.", "Leia depoimentos e publicações sobre suas conquistas."], to: "/egressos/listar", action: "Explorar egressos" },
+  { icon: FaCompass, audience: "Para quem visita", title: "Descubra a comunidade", text: "Conheça as pessoas que passaram pela universidade e os caminhos que construíram.", steps: ["Pesquise por nome, curso, cargo e anos de ingresso ou conclusão.", "Abra um perfil para conhecer formação e experiências.", "Leia depoimentos e publicações sobre suas conquistas."], to: "/egressos/listar", action: "Explorar egressos" },
   { icon: FaUserGraduate, audience: "Para quem é egresso", title: "Conte sua trajetória", text: "Reúna sua história acadêmica e profissional em um perfil que pode ser compartilhado.", steps: ["Cadastre nome, apresentação, foto e links do seu perfil.", "Registre cursos e experiências com seus períodos.", "Compartilhe aprendizados em um depoimento."], to: "/edit-egresso", action: "Cadastrar meu perfil" },
   { icon: FaAward, audience: "Para a coordenação", title: "Dê espaço às conquistas", text: "Acompanhe a comunidade dos seus cursos e publique histórias que merecem ser conhecidas.", steps: ["Acesse o painel com sua conta de coordenação.", "Consulte cursos e egressos vinculados.", "Publique um destaque com título, conquista e notícia."], to: "/login", action: "Acessar a coordenação" },
 ];
@@ -16,8 +18,9 @@ const records = [
 
 export default function PropostaPortal() {
   return (
-    <PageShell eyebrow="Conheça o portal" title="O vínculo com a universidade vai além do diploma." description="O Portal de Egressos reúne pessoas, experiências e conquistas em um espaço de memória e conexão com a comunidade acadêmica."
-      actions={<Link className={styles.link} to="/egressos/listar">Conhecer a comunidade <FaArrowRight aria-hidden="true" /></Link>}>
+    <Container className={styles.page}>
+      <EditorialHeader breadcrumb={[{ label: "Início", to: "/" }, { label: "Proposta" }]} image={Graduation} eyebrow="Conheça o portal" title="O vínculo com a universidade vai além do diploma." description="O Portal de Egressos reúne trajetórias da comunidade da UFMA em um espaço de memória e conexão: formação, experiências e conquistas que continuam depois da universidade."
+        actions={<Link className={styles.link} to="/egressos/listar">Conhecer a comunidade <FaArrowRight aria-hidden="true" /></Link>} />
       <section className={styles.mission} aria-labelledby="mission-title">
         <div><p className={styles.eyebrow}>Uma história, muitos caminhos</p><h2 id="mission-title">Dar visibilidade a quem faz parte.</h2><p>A formação é um ponto de encontro. Depois dela, cada pessoa constrói experiências, continua aprendendo e abre novos caminhos. O portal aproxima essas trajetórias da comunidade que as ajudou a começar.</p></div>
         <aside className={styles.summary}><span>Conhecer · Registrar · Compartilhar</span><p>Um perfil apresenta a pessoa.<br />Um depoimento conta sua experiência.<br />Um destaque reconhece sua conquista.</p></aside>
@@ -47,6 +50,6 @@ export default function PropostaPortal() {
         </div>
       </section>
       <section className={styles.callout} aria-labelledby="participate-title"><div><h2 id="participate-title">Sua história também tem lugar aqui.</h2><p>Comece pelo seu perfil e acrescente os capítulos da sua formação e experiência.</p></div><Link to="/edit-egresso">Cadastrar meu perfil <FaArrowRight aria-hidden="true" /></Link></section>
-    </PageShell>
+    </Container>
   );
 }
